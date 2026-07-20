@@ -15,4 +15,5 @@ def login():
     return render_template("login.html")
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    print("Starting Flask...")
+    app.run(debug=False, use_reloader=False)
