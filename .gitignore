@@ -13,3 +13,6 @@ instance/
 
 # macOS
 .DS_Store
+
+# Generated QR Codes
+static/qr/
