@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WareFlow AI Dashboard</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+<div class="login-box">
+
+    <h1>📦 WareFlow AI</h1>
+
+    <p>Welcome, Admin</p>
+
+    <hr><br>
+
+    <button onclick="location.href='/search'">
+        🔍 Search Warehouse Location
+    </button>
+
+    <br><br>
+
+    <button onclick="location.href='/qr'">
+        📱 Generate QR Code
+    </button>
+
+    <br><br>
+
+    <button onclick="location.href='/inventory'">
+        📦 Inventory
+    </button>
+
+    <br><br>
+
+    <button onclick="location.href='/'">
+        🚪 Logout
+    </button>
+
+</div>
+
+</body>
+</html>
