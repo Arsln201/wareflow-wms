@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Product</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+<div class="login-box">
+
+    <h1>➕ Add Product</h1>
+
+    <p>Create a new warehouse product</p>
+
+    <form method="POST">
+
+        <input
+            type="text"
+            name="product_name"
+            placeholder="Product Name"
+            required
+        >
+
+        <input
+            type="text"
+            name="sku"
+            placeholder="SKU"
+            required
+        >
+
+        <input
+            type="text"
+            name="rack"
+            placeholder="Rack"
+            required
+        >
+
+        <input
+            type="text"
+            name="shelf"
+            placeholder="Shelf"
+            required
+        >
+
+        <input
+            type="text"
+            name="bin"
+            placeholder="Bin"
+            required
+        >
+
+        <button type="submit">
+            Save Product
+        </button>
+
+    </form>
+
+    <br>
+
+    <button onclick="location.href='/inventory'">
+        ⬅ Back
+    </button>
+
+</div>
+
+</body>
+</html>

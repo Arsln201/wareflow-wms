@@ -1,26 +1,51 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>QR Code</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Warehouse Label</title>
+
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
 
 <div class="login-box">
 
-    <h1>QR Code Generated ✅</h1>
+    <h1>📦 WareFlow AI</h1>
 
-    <img src="{{ qr_image }}" width="250">
+    <p>Warehouse Label Generated Successfully</p>
 
-    <br><br>
+    <hr><br>
 
-    <h3>{{ location }}</h3>
+    <h3>{{ product.product_name }}</h3>
+
+    <p><b>SKU:</b> {{ product.sku }}</p>
+
+    <p><b>Rack:</b> {{ product.rack }}</p>
+
+    <p><b>Shelf:</b> {{ product.shelf }}</p>
+
+    <p><b>Bin:</b> {{ product.bin }}</p>
 
     <br>
 
-    <a href="/dashboard">
-        <button>Back to Dashboard</button>
-    </a>
+    <img src="{{ qr_image }}" width="220">
+
+    <br><br>
+
+    <p><b>Location:</b> {{ location }}</p>
+
+    <br>
+
+    <button onclick="window.print()">
+        🖨 Print Label
+    </button>
+
+    <br>
+
+    <button onclick="location.href='/dashboard'">
+        ⬅ Back to Dashboard
+    </button>
 
 </div>
 

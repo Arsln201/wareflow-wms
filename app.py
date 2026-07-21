@@ -2,9 +2,9 @@ import qrcode
 import os
 
 from flask import Flask, render_template, request, redirect
-from models import db
+from models import db, Product
 from config import Config
-from warehouse_data import WAREHOUSE
+
 
 app = Flask(__name__)
 app.config.from_object(Config)
@@ -34,6 +34,36 @@ def process_login():
 def dashboard():
     return render_template("dashboard.html")
 
+@app.route("/add-product", methods=["GET", "POST"])
+def add_product():
+
+    if request.method == "POST":
+
+        product = Product(
+            product_name=request.form["product_name"],
+            sku=request.form["sku"],
+            rack=request.form["rack"].upper(),
+            shelf=request.form["shelf"],
+            bin=request.form["bin"].upper()
+        )
+
+        db.session.add(product)
+        db.session.commit()
+
+        return redirect("/inventory")
+
+    return render_template("add_product.html")
+
+@app.route("/inventory")
+def inventory():
+
+    products = Product.query.order_by(Product.product_name).all()
+
+    return render_template(
+        "inventory.html",
+        products=products
+    )
+
 @app.route("/search")
 def search():
     return render_template("search.html")
@@ -43,11 +73,23 @@ def result():
 
     location = request.form.get("location").upper()
 
-    if location in WAREHOUSE:
+    try:
+        rack, shelf, bin = location.split("-")
+    except ValueError:
+        return """
+        <h1>❌ Invalid Location Format</h1>
+        <br>
+        <a href="/search"><button>Try Again</button></a>
+        """
 
-        item = WAREHOUSE[location]
+    product = Product.query.filter_by(
+        rack=rack,
+        shelf=shelf,
+        bin=bin
+    ).first()
 
-        # Generate QR Code
+    if product:
+
         filename = f"{location}.png"
         filepath = os.path.join("static", "qr", filename)
 
@@ -57,7 +99,8 @@ def result():
         return render_template(
             "qr.html",
             qr_image=f"/static/qr/{filename}",
-            location=location
+            location=location,
+            product=product
         )
 
     return """

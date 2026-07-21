@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inventory</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+<div class="dashboard-container">
+
+    <h1>📦 Inventory</h1>
+
+    <p>Manage warehouse products</p>
+
+    <button onclick="location.href='/add-product'">
+        ➕ Add Product
+    </button>
+
+    <br><br>
+
+    <table>
+
+        <tr>
+            <th>Product</th>
+            <th>SKU</th>
+            <th>Location</th>
+        </tr>
+
+        {% for product in products %}
+
+        <tr>
+
+            <td>{{ product.product_name }}</td>
+
+            <td>{{ product.sku }}</td>
+
+            <td>{{ product.rack }}-{{ product.shelf }}-{{ product.bin }}</td>
+
+        </tr>
+
+        {% endfor %}
+
+    </table>
+
+    <br>
+
+    <button onclick="location.href='/dashboard'">
+        ⬅ Back
+    </button>
+
+</div>
+
+</body>
+</html>
