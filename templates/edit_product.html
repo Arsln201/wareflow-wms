@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Product</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+<div class="login-box">
+
+<h1>✏ Edit Product</h1>
+
+<form method="POST">
+
+    <input
+        type="text"
+        name="product_name"
+        value="{{ product.product_name }}"
+        required
+    >
+
+    <input
+        type="text"
+        name="sku"
+        value="{{ product.sku }}"
+        required
+    >
+
+    <input
+        type="text"
+        name="rack"
+        value="{{ product.rack }}"
+        required
+    >
+
+    <input
+        type="text"
+        name="shelf"
+        value="{{ product.shelf }}"
+        required
+    >
+
+    <input
+        type="text"
+        name="bin"
+        value="{{ product.bin }}"
+        required
+    >
+
+    <button type="submit">
+        Save Changes
+    </button>
+
+</form>
+
+<br>
+
+<button onclick="location.href='/inventory'">
+    ⬅ Back
+</button>
+
+</div>
+
+</body>
+</html>

@@ -1,10 +1,10 @@
+from werkzeug.security import check_password_hash
 import qrcode
 import os
 
-from flask import Flask, render_template, request, redirect
-from models import db, Product
+from flask import Flask, render_template, request, redirect, session
+from models import db, Product, Employee
 from config import Config
-
 
 app = Flask(__name__)
 app.config.from_object(Config)
@@ -14,9 +14,19 @@ db.init_app(app)
 with app.app_context():
     db.create_all()
 
+
+# ==========================
+# LOGIN
+# ==========================
+
 @app.route("/")
 def login():
+
+    if "employee_id" in session:
+        return redirect("/dashboard")
+
     return render_template("login.html")
+
 
 @app.route("/login", methods=["POST"])
 def process_login():
@@ -24,18 +34,77 @@ def process_login():
     employee_id = request.form.get("employee_id")
     password = request.form.get("password")
 
-    # Temporary login
-    if employee_id == "EMP1001" and password == "admin123":
+    employee = Employee.query.filter_by(employee_id=employee_id).first()
+
+    if employee and check_password_hash(employee.password, password):
+
+        session["employee_id"] = employee.employee_id
+        session["employee_name"] = employee.name
+        session["role"] = employee.role
+
         return redirect("/dashboard")
 
-    return "Invalid Employee ID or Password"
+    return render_template(
+        "login.html",
+        error="Invalid Employee ID or Password"
+    )
+
+
+# ==========================
+# LOGOUT
+# ==========================
+
+@app.route("/logout")
+def logout():
+
+    session.clear()
+
+    return redirect("/")
+
+
+# ==========================
+# DASHBOARD
+# ==========================
 
 @app.route("/dashboard")
 def dashboard():
-    return render_template("dashboard.html")
+
+    if "employee_id" not in session:
+        return redirect("/")
+
+    return render_template(
+        "dashboard.html",
+        employee=session["employee_name"]
+    )
+
+
+# ==========================
+# INVENTORY
+# ==========================
+
+@app.route("/inventory")
+def inventory():
+
+    if "employee_id" not in session:
+        return redirect("/")
+
+    products = Product.query.order_by(Product.product_name).all()
+
+    return render_template(
+        "inventory.html",
+        products=products
+    )
+
+
+# ==========================
+# ADD PRODUCT
+# ==========================
 
 @app.route("/add-product", methods=["GET", "POST"])
 def add_product():
+
+    if "employee_id" not in session:
+        return redirect("/")
 
     if request.method == "POST":
 
@@ -54,32 +123,91 @@ def add_product():
 
     return render_template("add_product.html")
 
-@app.route("/inventory")
-def inventory():
 
-    products = Product.query.order_by(Product.product_name).all()
+# ==========================
+# EDIT PRODUCT
+# ==========================
+
+@app.route("/edit-product/<int:id>", methods=["GET", "POST"])
+def edit_product(id):
+
+    if "employee_id" not in session:
+        return redirect("/")
+
+    product = Product.query.get_or_404(id)
+
+    if request.method == "POST":
+
+        product.product_name = request.form["product_name"]
+        product.sku = request.form["sku"]
+        product.rack = request.form["rack"].upper()
+        product.shelf = request.form["shelf"]
+        product.bin = request.form["bin"].upper()
+
+        db.session.commit()
+
+        return redirect("/inventory")
 
     return render_template(
-        "inventory.html",
-        products=products
+        "edit_product.html",
+        product=product
     )
+
+
+# ==========================
+# DELETE PRODUCT
+# ==========================
+
+@app.route("/delete-product/<int:id>")
+def delete_product(id):
+
+    if "employee_id" not in session:
+        return redirect("/")
+
+    product = Product.query.get_or_404(id)
+
+    db.session.delete(product)
+    db.session.commit()
+
+    return redirect("/inventory")
+
+
+# ==========================
+# SEARCH PAGE
+# ==========================
 
 @app.route("/search")
 def search():
+
+    if "employee_id" not in session:
+        return redirect("/")
+
     return render_template("search.html")
+
+
+# ==========================
+# SEARCH RESULT + QR
+# ==========================
 
 @app.route("/result", methods=["POST"])
 def result():
+
+    if "employee_id" not in session:
+        return redirect("/")
 
     location = request.form.get("location").upper()
 
     try:
         rack, shelf, bin = location.split("-")
+
     except ValueError:
+
         return """
         <h1>❌ Invalid Location Format</h1>
         <br>
-        <a href="/search"><button>Try Again</button></a>
+        <a href="/search">
+            <button>Try Again</button>
+        </a>
         """
 
     product = Product.query.filter_by(
@@ -113,7 +241,25 @@ def result():
     </a>
     """
 
+
+# ==========================
+# DEBUG SESSION
+# ==========================
+
+@app.route("/test-session")
+def test_session():
+
+    return {
+        "employee_id": session.get("employee_id"),
+        "employee_name": session.get("employee_name"),
+        "role": session.get("role")
+    }
+
+
+# ==========================
+# START APP
+# ==========================
+
 if __name__ == "__main__":
     print("Starting Flask...")
-    app.run(debug=False, use_reloader=False)
-    
+    app.run(debug=True)

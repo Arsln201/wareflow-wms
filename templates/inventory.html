@@ -11,35 +11,52 @@
 
 <div class="dashboard-container">
 
-    <h1>📦 Inventory</h1>
+    <h1>Inventory</h1>
 
     <p>Manage warehouse products</p>
 
     <button onclick="location.href='/add-product'">
-        ➕ Add Product
+    Add Product
     </button>
 
     <br><br>
 
     <table>
 
-        <tr>
-            <th>Product</th>
-            <th>SKU</th>
-            <th>Location</th>
-        </tr>
-
+       <tr>
+    <th>Product</th>
+    <th>SKU</th>
+    <th>Location</th>
+    <th>Action</th>
+</tr>
         {% for product in products %}
 
         <tr>
 
-            <td>{{ product.product_name }}</td>
+    <td>{{ product.product_name }}</td>
 
-            <td>{{ product.sku }}</td>
+    <td>{{ product.sku }}</td>
 
-            <td>{{ product.rack }}-{{ product.shelf }}-{{ product.bin }}</td>
+    <td>{{ product.rack }}-{{ product.shelf }}-{{ product.bin }}</td>
 
-        </tr>
+<td>
+
+    <div class="action-buttons">
+
+        <a href="/edit-product/{{ product.id }}">
+            <button>Edit</button>
+        </a>
+
+        <a href="/delete-product/{{ product.id }}"
+           onclick="return confirm('Delete this product?')">
+            <button>Delete</button>
+        </a>
+
+    </div>
+
+</td>
+
+</tr>
 
         {% endfor %}
 
@@ -48,7 +65,7 @@
     <br>
 
     <button onclick="location.href='/dashboard'">
-        ⬅ Back
+         Back to Dashboard
     </button>
 
 </div>

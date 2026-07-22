@@ -6,6 +6,9 @@
     <title>WareFlow AI</title>
 
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
 
@@ -14,6 +17,14 @@
     <h1>WareFlow AI</h1>
 
     <p>Smart Warehouse Operations Platform</p>
+
+   {% if error %}
+<p class="error-text">{{ error }}</p>
+{% endif %}
+
+{% if success %}
+<p class="success-text">{{ success }}</p>
+{% endif %}
 
  <form method="POST" action="/login">
 
@@ -24,18 +35,60 @@
         required
     >
 
-    <input
-        type="password"
-        name="password"
-        placeholder="Password"
-        required
-    >
+    <div class="password-box">
 
-    <button type="submit">Login</button>
+        <input
+            type="password"
+            id="password"
+            name="password"
+            placeholder="Password"
+            required
+        >
+
+        <span
+         class="toggle-btn"
+         onclick="togglePassword()"
+         id="togglePassword">
+         Show
+       </span>
+
+    </div>
+
+    <button id="loginBtn" type="submit">
+        Login
+    </button>
 
 </form>
 
 </div>
+
+<script>
+
+function togglePassword(){
+
+    const password = document.getElementById("password");
+    const toggle = document.getElementById("togglePassword");
+
+    if(password.type === "password"){
+        password.type = "text";
+        toggle.innerHTML = "Hide";
+    }else{
+        password.type = "password";
+        toggle.innerHTML = "Show";
+    }
+
+}
+
+document.querySelector("form").addEventListener("submit", function(){
+
+    const btn = document.getElementById("loginBtn");
+
+    btn.innerHTML = "Logging in...";
+    btn.disabled = true;
+
+});
+
+</script>
 
 </body>
 </html>

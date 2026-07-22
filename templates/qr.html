@@ -9,42 +9,34 @@
 </head>
 <body>
 
-<div class="login-box">
+<div class="qr-container">
 
-    <h1>📦 WareFlow AI</h1>
+    <h1>WareFlow AI</h1>
 
     <p>Warehouse Label Generated Successfully</p>
 
-    <hr><br>
+    <hr style="border:1px solid #30363d; margin:20px 0;">
 
-    <h3>{{ product.product_name }}</h3>
+    <h2>{{ product.product_name }}</h2>
 
-    <p><b>SKU:</b> {{ product.sku }}</p>
+    <p><strong>SKU:</strong> {{ product.sku }}</p>
 
-    <p><b>Rack:</b> {{ product.rack }}</p>
+    <p><strong>Rack:</strong> {{ product.rack }}</p>
 
-    <p><b>Shelf:</b> {{ product.shelf }}</p>
+    <p><strong>Shelf:</strong> {{ product.shelf }}</p>
 
-    <p><b>Bin:</b> {{ product.bin }}</p>
+    <p><strong>Bin:</strong> {{ product.bin }}</p>
 
-    <br>
+    <img src="{{ qr_image }}" alt="QR Code">
 
-    <img src="{{ qr_image }}" width="220">
-
-    <br><br>
-
-    <p><b>Location:</b> {{ location }}</p>
-
-    <br>
+    <p><strong>Location:</strong> {{ location }}</p>
 
     <button onclick="window.print()">
-        🖨 Print Label
+        Print Label
     </button>
 
-    <br>
-
     <button onclick="location.href='/dashboard'">
-        ⬅ Back to Dashboard
+        Back to Dashboard
     </button>
 
 </div>
