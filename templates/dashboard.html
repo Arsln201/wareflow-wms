@@ -1,61 +1,524 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
+
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
     <title>WareFlow AI Dashboard</title>
 
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/style.css') }}"
+    >
+
 </head>
+
 <body>
 
 <div class="dashboard-container">
 
-    <h1>📦 WareFlow AI</h1>
+    <!-- ================= HEADER ================= -->
 
-    <p>Smart Warehouse Operations Platform</p>
+    <div class="dashboard-header">
 
-    <div class="cards">
+        <div>
 
-        <div class="card">
-            <h2>📦</h2>
-            <h3>Products</h3>
-            <p>3</p>
+            <h1>📦 WareFlow AI</h1>
+
+            <p class="welcome">
+                Welcome back,
+                <strong>{{ employee }}</strong> 👋
+            </p>
+
+            <p class="role">
+                Role:
+                <strong>{{ role }}</strong>
+            </p>
+
         </div>
 
-        <div class="card">
-            <h2>📍</h2>
-            <h3>Locations</h3>
-            <p>3</p>
-        </div>
+        <div class="datetime">
 
-        <div class="card">
-            <h2>👥</h2>
-            <h3>Employees</h3>
-            <p>1</p>
-        </div>
+            <h3 id="currentDate"></h3>
 
-        <div class="card">
-            <h2>🖨️</h2>
-            <h3>QR Labels</h3>
-            <p>1</p>
+            <p id="currentTime"></p>
+
         </div>
 
     </div>
 
-    <button onclick="location.href='/search'">
-        🔍 Search Warehouse Location
-    </button>
 
-    <button onclick="location.href='/inventory'">
-    📦 Inventory
-</button>
+    <!-- ================= STATISTICS ================= -->
 
-    <button onclick="location.href='/'">
-        🚪 Logout
-    </button>
+    <div class="cards">
+
+        <div class="card">
+
+            <h2>📦</h2>
+
+            <h3>Total Products</h3>
+
+            <p>{{ total_products }}</p>
+
+        </div>
+
+
+        <div class="card">
+
+            <h2>📍</h2>
+
+            <h3>Locations</h3>
+
+            <p>{{ total_locations }}</p>
+
+        </div>
+
+
+        <div class="card">
+
+            <h2>👥</h2>
+
+            <h3>Employees</h3>
+
+            <p>{{ total_employees }}</p>
+
+        </div>
+
+
+        <div class="card">
+
+            <h2>👤</h2>
+
+            <h3>Logged In</h3>
+
+            <p class="employee-name">
+                {{ employee }}
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <!-- ================= QUICK ACTIONS ================= -->
+
+    <h2 class="section-title">
+        Quick Actions
+    </h2>
+
+
+    <div class="quick-actions">
+
+        <button onclick="location.href='/search'">
+            🔍 Search Warehouse
+        </button>
+
+
+        <button onclick="location.href='/inventory'">
+            📦 Inventory
+        </button>
+
+
+        <button onclick="location.href='/add-product'">
+            ➕ Add Product
+        </button>
+
+
+        <button onclick="location.href='/logout'">
+            🚪 Logout
+        </button>
+
+    </div>
+
+
+    <!-- ================= LOWER DASHBOARD ================= -->
+
+    <div class="dashboard-grid">
+
+
+        <!-- RECENT ACTIVITY -->
+
+        <div class="dashboard-panel">
+
+            <div class="panel-header">
+
+                <div>
+
+                    <h2>📊 Recent Activity</h2>
+
+                    <p>
+                        Recently added warehouse products
+                    </p>
+
+                </div>
+
+                <span class="panel-status">
+                    LIVE
+                </span>
+
+            </div>
+
+
+            {% if recent_products %}
+
+                <div class="activity-list">
+
+                    {% for product in recent_products %}
+
+                    <div class="activity-item">
+
+                        <div class="activity-icon">
+                            📦
+                        </div>
+
+
+                        <div class="activity-content">
+
+                            <strong>
+                                {{ product.product_name }}
+                            </strong>
+
+                            <span>
+                                SKU: {{ product.sku }}
+                            </span>
+
+                        </div>
+
+
+                        <div class="activity-location">
+
+                            {{ product.rack }} -
+                            {{ product.shelf }} -
+                            {{ product.bin }}
+
+                        </div>
+
+                    </div>
+
+                    {% endfor %}
+
+                </div>
+
+            {% else %}
+
+                <div class="empty-state">
+
+                    <div>
+                        📦
+                    </div>
+
+                    <p>
+                        No products available yet.
+                    </p>
+
+                    <button
+                        onclick="location.href='/add-product'"
+                    >
+                        Add First Product
+                    </button>
+
+                </div>
+
+            {% endif %}
+
+        </div>
+
+
+        <!-- SYSTEM STATUS -->
+
+        <div class="dashboard-panel">
+
+            <div class="panel-header">
+
+                <div>
+
+                    <h2>🟢 System Status</h2>
+
+                    <p>
+                        WareFlow AI services
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="status-list">
+
+
+                <div class="status-row">
+
+                    <div>
+
+                        <strong>
+                            Database
+                        </strong>
+
+                        <span>
+                            SQLite Database
+                        </span>
+
+                    </div>
+
+                    <div class="status-badge">
+                        ● Connected
+                    </div>
+
+                </div>
+
+
+                <div class="status-row">
+
+                    <div>
+
+                        <strong>
+                            Authentication
+                        </strong>
+
+                        <span>
+                            Session Protection
+                        </span>
+
+                    </div>
+
+                    <div class="status-badge">
+                        ● Active
+                    </div>
+
+                </div>
+
+
+                <div class="status-row">
+
+                    <div>
+
+                        <strong>
+                            QR Generator
+                        </strong>
+
+                        <span>
+                            QR Code Service
+                        </span>
+
+                    </div>
+
+                    <div class="status-badge">
+                        ● Ready
+                    </div>
+
+                </div>
+
+
+                <div class="status-row">
+
+                    <div>
+
+                        <strong>
+                            Inventory
+                        </strong>
+
+                        <span>
+                            {{ total_products }} products registered
+                        </span>
+
+                    </div>
+
+                    <div class="status-badge">
+                        ● Online
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- ================= WAREHOUSE OVERVIEW ================= -->
+
+    <div class="overview-panel">
+
+        <div class="panel-header">
+
+            <div>
+
+                <h2>🏭 Warehouse Overview</h2>
+
+                <p>
+                    Current warehouse database summary
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div class="overview-grid">
+
+
+            <div class="overview-item">
+
+                <span class="overview-icon">
+                    📦
+                </span>
+
+                <div>
+
+                    <strong>
+                        {{ total_products }}
+                    </strong>
+
+                    <span>
+                        Products Registered
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <div class="overview-item">
+
+                <span class="overview-icon">
+                    📍
+                </span>
+
+                <div>
+
+                    <strong>
+                        {{ total_locations }}
+                    </strong>
+
+                    <span>
+                        Unique Locations
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <div class="overview-item">
+
+                <span class="overview-icon">
+                    👥
+                </span>
+
+                <div>
+
+                    <strong>
+                        {{ total_employees }}
+                    </strong>
+
+                    <span>
+                        Employees
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <div class="overview-item">
+
+                <span class="overview-icon">
+                    🟢
+                </span>
+
+                <div>
+
+                    <strong>
+                        Operational
+                    </strong>
+
+                    <span>
+                        Warehouse Status
+                    </span>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- ================= FOOTER ================= -->
+
+    <footer class="dashboard-footer">
+
+        <div>
+            <strong>WareFlow AI</strong>
+            <span>Smart Warehouse Operations Platform</span>
+        </div>
+
+        <div>
+            Version 1.0 • 2026
+        </div>
+
+    </footer>
+
 
 </div>
+
+
+<!-- ================= LIVE CLOCK ================= -->
+
+<script>
+
+function updateClock() {
+
+    const now = new Date();
+
+
+    const date = now.toLocaleDateString(
+        "en-IN",
+        {
+            weekday: "long",
+            day: "numeric",
+            month: "long",
+            year: "numeric"
+        }
+    );
+
+
+    const time = now.toLocaleTimeString(
+        "en-IN",
+        {
+            hour: "2-digit",
+            minute: "2-digit",
+            second: "2-digit"
+        }
+    );
+
+
+    document.getElementById(
+        "currentDate"
+    ).textContent = date;
+
+
+    document.getElementById(
+        "currentTime"
+    ).textContent = time;
+
+}
+
+
+updateClock();
+
+setInterval(updateClock, 1000);
+
+</script>
+
 
 </body>
 </html>

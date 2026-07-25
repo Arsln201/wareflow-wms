@@ -72,9 +72,32 @@ def dashboard():
     if "employee_id" not in session:
         return redirect("/")
 
+    # Total Products
+    total_products = Product.query.count()
+
+    # Total Unique Warehouse Locations
+    total_locations = db.session.query(
+        Product.rack,
+        Product.shelf,
+        Product.bin
+    ).distinct().count()
+
+    # Total Employees
+    total_employees = Employee.query.count()
+
+    # Recently added products
+    recent_products = Product.query.order_by(
+        Product.id.desc()
+    ).limit(5).all()
+
     return render_template(
         "dashboard.html",
-        employee=session["employee_name"]
+        employee=session["employee_name"],
+        role=session["role"],
+        total_products=total_products,
+        total_locations=total_locations,
+        total_employees=total_employees,
+        recent_products=recent_products
     )
 
 
