@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Warehouse Location | WareFlow WMS</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/style.css') }}"
+    >
+
+</head>
+
+<body>
+
+<div class="qr-container">
+
+    <h1>WareFlow WMS</h1>
+
+    <p>Warehouse Location</p>
+
+    <hr>
+
+    <h2>{{ location }}</h2>
+
+    <div class="location-details">
+
+        <p>
+            <strong>Product</strong><br>
+            {{ product.product_name }}
+        </p>
+
+        <p>
+            <strong>SKU</strong><br>
+            {{ product.sku }}
+        </p>
+
+        <p>
+            <strong>Category</strong><br>
+            {{ product.category }}
+        </p>
+
+        <p>
+            <strong>Quantity</strong><br>
+            {{ product.quantity }}
+        </p>
+
+        <p>
+            <strong>Rack</strong><br>
+            {{ product.rack }}
+        </p>
+
+        <p>
+            <strong>Shelf</strong><br>
+            {{ product.shelf }}
+        </p>
+
+        <p>
+            <strong>Bin</strong><br>
+            {{ product.bin }}
+        </p>
+
+        <p>
+            <strong>Status</strong><br>
+
+            {% if product.stock_status == "In Stock" %}
+
+                <span class="stock-badge stock-good">
+                    In Stock
+                </span>
+
+            {% elif product.stock_status == "Low Stock" %}
+
+                <span class="stock-badge stock-low">
+                    Low Stock
+                </span>
+
+            {% else %}
+
+                <span class="stock-badge stock-out">
+                    Out of Stock
+                </span>
+
+            {% endif %}
+
+        </p>
+
+    </div>
+
+    <div class="qr-actions">
+
+        <button onclick="location.href='/inventory'">
+            Inventory
+        </button>
+
+        <button onclick="location.href='/qr-management'">
+            QR Management
+        </button>
+
+    </div>
+
+</div>
+
+</body>
+</html>

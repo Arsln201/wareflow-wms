@@ -381,9 +381,64 @@ def search():
     return render_template("search.html")
 
 
+@app.route("/qr-management")
+def qr_management():
+
+    if "employee_id" not in session:
+        return redirect("/")
+
+    products = Product.query.order_by(
+        Product.rack,
+        Product.shelf,
+        Product.bin
+    ).all()
+
+    return render_template(
+        "qr_management.html",
+        products=products
+    )
+
+
 # ==========================
 # SEARCH RESULT + QR
 # ==========================
+
+@app.route("/location/<path:location>")
+def warehouse_location(location):
+
+    if "employee_id" not in session:
+        return redirect("/")
+
+    location = location.strip().upper()
+
+    parts = location.split("-")
+
+    if len(parts) != 3:
+        return render_template(
+            "location_not_found.html",
+            location=location
+        )
+
+    rack, shelf, bin_value = parts
+
+    product = Product.query.filter_by(
+        rack=rack,
+        shelf=shelf,
+        bin=bin_value
+    ).first()
+
+    if not product:
+        return render_template(
+            "location_not_found.html",
+            location=location
+        )
+
+    return render_template(
+        "location.html",
+        product=product,
+        location=location
+    )
+
 
 @app.route("/result", methods=["POST"])
 def result():
@@ -391,51 +446,78 @@ def result():
     if "employee_id" not in session:
         return redirect("/")
 
-    location = request.form.get("location").upper()
+    location = request.form.get("location", "").strip().upper()
 
-    try:
-        rack, shelf, bin = location.split("-")
+    if not location:
+        return render_template(
+            "search.html",
+            error="Please enter a warehouse location."
+        )
 
-    except ValueError:
+    parts = location.split("-")
 
-        return """
-        <h1>❌ Invalid Location Format</h1>
-        <br>
-        <a href="/search">
-            <button>Try Again</button>
-        </a>
-        """
+    if len(parts) != 3:
+        return render_template(
+            "search.html",
+            error="Invalid location format. Use Rack-Shelf-Bin."
+        )
+
+    rack, shelf, bin_value = parts
+
+    rack = rack.strip().upper()
+    shelf = shelf.strip()
+    bin_value = bin_value.strip().upper()
+
+    if not rack or not shelf or not bin_value:
+        return render_template(
+            "search.html",
+            error="All location fields are required."
+        )
 
     product = Product.query.filter_by(
         rack=rack,
         shelf=shelf,
-        bin=bin
+        bin=bin_value
     ).first()
 
-    if product:
-
-        filename = f"{location}.png"
-        filepath = os.path.join("static", "qr", filename)
-
-        img = qrcode.make(location)
-        img.save(filepath)
-
+    if not product:
         return render_template(
-            "qr.html",
-            qr_image=f"/static/qr/{filename}",
-            location=location,
-            product=product
+            "location_not_found.html",
+            location=location
         )
 
-    return """
-    <h1>❌ Location Not Found</h1>
+    qr_directory = os.path.join(
+        "static",
+        "qr"
+    )
 
-    <br>
+    os.makedirs(
+        qr_directory,
+        exist_ok=True
+    )
 
-    <a href="/search">
-        <button>Try Again</button>
-    </a>
-    """
+    filename = f"{rack}-{shelf}-{bin_value}.png"
+
+    filepath = os.path.join(
+        qr_directory,
+        filename
+    )
+
+    # URL that the QR code will contain
+    qr_url = request.host_url.rstrip("/") + f"/location/{location}"
+
+    # Generate QR code
+    img = qrcode.make(qr_url)
+
+    # Save QR image
+    img.save(filepath)
+
+    return render_template(
+        "qr.html",
+        qr_image=f"/static/qr/{filename}",
+        location=location,
+        product=product
+    )
 
 
 # ==========================

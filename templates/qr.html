@@ -1,43 +1,116 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Warehouse Label</title>
 
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Warehouse QR Label | WareFlow WMS</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/style.css') }}"
+    >
+
+    <style>
+
+        @media print {
+
+            body {
+                background: white;
+            }
+
+            .qr-container {
+                color: black;
+                box-shadow: none;
+                border: none;
+            }
+
+            .qr-actions {
+                display: none;
+            }
+
+        }
+
+    </style>
+
 </head>
+
 <body>
 
 <div class="qr-container">
 
-    <h1>WareFlow AI</h1>
+    <h1>WareFlow WMS</h1>
 
-    <p>Warehouse Label Generated Successfully</p>
+    <p>Warehouse Location Label</p>
 
-    <hr style="border:1px solid #30363d; margin:20px 0;">
+    <hr>
 
     <h2>{{ product.product_name }}</h2>
 
-    <p><strong>SKU:</strong> {{ product.sku }}</p>
+    <p>
+        <strong>SKU:</strong>
+        {{ product.sku }}
+    </p>
 
-    <p><strong>Rack:</strong> {{ product.rack }}</p>
+    <p>
+        <strong>Category:</strong>
+        {{ product.category }}
+    </p>
 
-    <p><strong>Shelf:</strong> {{ product.shelf }}</p>
+    <p>
+        <strong>Quantity:</strong>
+        {{ product.quantity }}
+    </p>
 
-    <p><strong>Bin:</strong> {{ product.bin }}</p>
+    <p>
+        <strong>Rack:</strong>
+        {{ product.rack }}
+    </p>
 
-    <img src="{{ qr_image }}" alt="QR Code">
+    <p>
+        <strong>Shelf:</strong>
+        {{ product.shelf }}
+    </p>
 
-    <p><strong>Location:</strong> {{ location }}</p>
+    <p>
+        <strong>Bin:</strong>
+        {{ product.bin }}
+    </p>
 
-    <button onclick="window.print()">
-        Print Label
-    </button>
+    <img
+        src="{{ qr_image }}"
+        alt="Warehouse QR Code"
+    >
 
-    <button onclick="location.href='/dashboard'">
-        Back to Dashboard
-    </button>
+    <h2>
+        {{ location }}
+    </h2>
+
+    <div class="qr-actions">
+
+        <button onclick="window.print()">
+            Print Label
+        </button>
+
+        <button onclick="location.href='/qr-management'">
+            QR Management
+        </button>
+
+        <button onclick="location.href='/inventory'">
+            Inventory
+        </button>
+
+        <button onclick="location.href='/dashboard'">
+            Dashboard
+        </button>
+
+    </div>
 
 </div>
 

@@ -1,14 +1,27 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
+
 <head>
-    <title>Search Location</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Location Search | WareFlow WMS</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/style.css') }}"
+    >
+
 </head>
+
 <body>
 
 <div class="login-box">
 
-    <h1>📍 Search Warehouse Location</h1>
+    <h1>Search Warehouse Location</h1>
+
+    <p>Enter a warehouse location to view its product information.</p>
 
     <form action="/result" method="POST">
 
@@ -16,14 +29,29 @@
             type="text"
             name="location"
             placeholder="Example: A12-04-B"
+            autocomplete="off"
             required
         >
 
         <button type="submit">
-            Search
+            Search Location
         </button>
 
     </form>
+
+    <br>
+
+    <button onclick="location.href='/qr-management'">
+        QR Management
+    </button>
+
+    <button onclick="location.href='/inventory'">
+        Inventory
+    </button>
+
+    <button onclick="location.href='/dashboard'">
+        Back to Dashboard
+    </button>
 
 </div>
 

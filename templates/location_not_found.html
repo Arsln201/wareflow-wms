@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Location Not Found | WareFlow WMS</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/style.css') }}"
+    >
+
+</head>
+
+<body>
+
+<div class="login-box">
+
+    <h1>Location Not Found</h1>
+
+    <p>
+        No product is currently assigned to:
+    </p>
+
+    <h2>{{ location }}</h2>
+
+    <button onclick="location.href='/search'">
+        Search Again
+    </button>
+
+    <button onclick="location.href='/inventory'">
+        View Inventory
+    </button>
+
+    <button onclick="location.href='/dashboard'">
+        Back to Dashboard
+    </button>
+
+</div>
+
+</body>
+</html>
