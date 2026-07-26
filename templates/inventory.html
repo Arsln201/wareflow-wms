@@ -1,71 +1,300 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Inventory</title>
 
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <title>Inventory | WareFlow WMS</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
 </head>
+
 <body>
 
 <div class="dashboard-container">
 
-    <h1>Inventory</h1>
+    <div class="inventory-header">
 
-    <p>Manage warehouse products</p>
+        <div>
+            <h1>Inventory</h1>
+            <p>Manage warehouse products and stock levels.</p>
+        </div>
 
-    <button onclick="location.href='/add-product'">
-    Add Product
-    </button>
-
-    <br><br>
-
-    <table>
-
-       <tr>
-    <th>Product</th>
-    <th>SKU</th>
-    <th>Location</th>
-    <th>Action</th>
-</tr>
-        {% for product in products %}
-
-        <tr>
-
-    <td>{{ product.product_name }}</td>
-
-    <td>{{ product.sku }}</td>
-
-    <td>{{ product.rack }}-{{ product.shelf }}-{{ product.bin }}</td>
-
-<td>
-
-    <div class="action-buttons">
-
-        <a href="/edit-product/{{ product.id }}">
-            <button>Edit</button>
-        </a>
-
-        <a href="/delete-product/{{ product.id }}"
-           onclick="return confirm('Delete this product?')">
-            <button>Delete</button>
-        </a>
+        <button onclick="location.href='/add-product'">
+            Add Product
+        </button>
 
     </div>
 
-</td>
 
-</tr>
+    <!-- Inventory Statistics -->
 
-        {% endfor %}
+    <div class="inventory-stats">
 
-    </table>
+        <div class="inventory-stat">
+            <h3>Total Products</h3>
+            <strong>{{ total_products }}</strong>
+        </div>
+
+        <div class="inventory-stat">
+            <h3>Total Units</h3>
+            <strong>{{ total_units }}</strong>
+        </div>
+
+        <div class="inventory-stat">
+            <h3>Low Stock</h3>
+            <strong>{{ low_stock }}</strong>
+        </div>
+
+        <div class="inventory-stat">
+            <h3>Out of Stock</h3>
+            <strong>{{ out_of_stock }}</strong>
+        </div>
+
+    </div>
+
+
+    <!-- Search and Filters -->
+
+    <form
+        method="GET"
+        action="/inventory"
+        class="inventory-filters"
+    >
+
+        <input
+            type="text"
+            name="search"
+            placeholder="Search product, SKU or location..."
+            value="{{ search }}"
+        >
+
+        <select name="category">
+
+            <option value="">
+                All Categories
+            </option>
+
+            {% for category in categories %}
+
+                <option
+                    value="{{ category }}"
+                    {% if selected_category == category %}
+                        selected
+                    {% endif %}
+                >
+                    {{ category }}
+                </option>
+
+            {% endfor %}
+
+        </select>
+
+
+        <select name="status">
+
+            <option value="">
+                All Stock Status
+            </option>
+
+            <option
+                value="in_stock"
+                {% if selected_status == "in_stock" %}
+                    selected
+                {% endif %}
+            >
+                In Stock
+            </option>
+
+            <option
+                value="low_stock"
+                {% if selected_status == "low_stock" %}
+                    selected
+                {% endif %}
+            >
+                Low Stock
+            </option>
+
+            <option
+                value="out_of_stock"
+                {% if selected_status == "out_of_stock" %}
+                    selected
+                {% endif %}
+            >
+                Out of Stock
+            </option>
+
+        </select>
+
+
+        <button type="submit">
+            Search
+        </button>
+
+
+        <button
+            type="button"
+            onclick="location.href='/inventory'"
+        >
+            Clear
+        </button>
+
+    </form>
+
+
+    <!-- Inventory Table -->
+
+    {% if products %}
+
+    <div class="inventory-table-wrapper">
+
+        <table class="inventory-table">
+
+            <thead>
+
+                <tr>
+                    <th>Product</th>
+                    <th>SKU</th>
+                    <th>Category</th>
+                    <th>Quantity</th>
+                    <th>Location</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+
+            </thead>
+
+
+            <tbody>
+
+            {% for product in products %}
+
+                <tr>
+
+                    <td>
+
+                        <div class="product-name">
+                            {{ product.product_name }}
+                        </div>
+
+                    </td>
+
+
+                    <td>
+
+                        <div class="product-sku">
+                            {{ product.sku }}
+                        </div>
+
+                    </td>
+
+
+                    <td>
+                        {{ product.category }}
+                    </td>
+
+
+                    <td>
+
+                        <span class="quantity-value">
+                            {{ product.quantity }}
+                        </span>
+
+                    </td>
+
+
+                    <td>
+
+                        <span class="product-location">
+                            {{ product.rack }}-{{ product.shelf }}-{{ product.bin }}
+                        </span>
+
+                    </td>
+
+
+                    <td>
+
+                        {% if product.stock_status == "In Stock" %}
+
+                            <span class="stock-badge stock-good">
+                                In Stock
+                            </span>
+
+                        {% elif product.stock_status == "Low Stock" %}
+
+                            <span class="stock-badge stock-low">
+                                Low Stock
+                            </span>
+
+                        {% else %}
+
+                            <span class="stock-badge stock-out">
+                                Out of Stock
+                            </span>
+
+                        {% endif %}
+
+                    </td>
+
+
+                    <td>
+
+                        <div class="inventory-actions">
+
+                            <a href="/edit-product/{{ product.id }}">
+                                <button type="button">
+                                    Edit
+                                </button>
+                            </a>
+
+                            <a
+                                href="/delete-product/{{ product.id }}"
+                                onclick="return confirm('Delete this product?')"
+                            >
+                                <button type="button">
+                                    Delete
+                                </button>
+                            </a>
+
+                        </div>
+
+                    </td>
+
+                </tr>
+
+            {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+    {% else %}
+
+        <div class="inventory-empty">
+
+            <h2>No Products Found</h2>
+
+            <p>
+                No inventory items match your current search or filters.
+            </p>
+
+            <button onclick="location.href='/add-product'">
+                Add Product
+            </button>
+
+        </div>
+
+    {% endif %}
+
 
     <br>
 
     <button onclick="location.href='/dashboard'">
-         Back to Dashboard
+        Back to Dashboard
     </button>
 
 </div>

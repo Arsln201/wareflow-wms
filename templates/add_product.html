@@ -3,17 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Add Product</title>
 
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <title>Add Product | WareFlow WMS</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
 </head>
+
 <body>
 
 <div class="login-box">
 
-    <h1>➕ Add Product</h1>
+    <h1>Add Product</h1>
 
     <p>Create a new warehouse product</p>
+
+    {% if error %}
+        <p style="color: #d64545;">
+            {{ error }}
+        </p>
+    {% endif %}
 
     <form method="POST">
 
@@ -29,6 +38,28 @@
             name="sku"
             placeholder="SKU"
             required
+        >
+
+        <input
+            type="text"
+            name="category"
+            placeholder="Category"
+            required
+        >
+
+        <input
+            type="number"
+            name="quantity"
+            placeholder="Quantity"
+            min="0"
+            value="0"
+            required
+        >
+
+        <input
+            type="text"
+            name="supplier"
+            placeholder="Supplier"
         >
 
         <input
@@ -61,7 +92,7 @@
     <br>
 
     <button onclick="location.href='/inventory'">
-        ⬅ Back
+        Back
     </button>
 
 </div>

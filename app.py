@@ -72,23 +72,28 @@ def dashboard():
     if "employee_id" not in session:
         return redirect("/")
 
-    # Total Products
     total_products = Product.query.count()
 
-    # Total Unique Warehouse Locations
     total_locations = db.session.query(
         Product.rack,
         Product.shelf,
         Product.bin
     ).distinct().count()
 
-    # Total Employees
-    total_employees = Employee.query.count()
+    total_units = db.session.query(
+        db.func.coalesce(
+            db.func.sum(Product.quantity),
+            0
+        )
+    ).scalar()
 
-    # Recently added products
-    recent_products = Product.query.order_by(
-        Product.id.desc()
-    ).limit(5).all()
+    low_stock = Product.query.filter(
+        Product.quantity.between(1, 10)
+    ).count()
+
+    out_of_stock = Product.query.filter(
+        Product.quantity <= 0
+    ).count()
 
     return render_template(
         "dashboard.html",
@@ -96,8 +101,9 @@ def dashboard():
         role=session["role"],
         total_products=total_products,
         total_locations=total_locations,
-        total_employees=total_employees,
-        recent_products=recent_products
+        total_units=total_units,
+        low_stock=low_stock,
+        out_of_stock=out_of_stock
     )
 
 
@@ -111,11 +117,75 @@ def inventory():
     if "employee_id" not in session:
         return redirect("/")
 
-    products = Product.query.order_by(Product.product_name).all()
+    search = request.args.get("search", "").strip()
+    category = request.args.get("category", "").strip()
+    status = request.args.get("status", "").strip()
+
+    query = Product.query
+
+    if search:
+        query = query.filter(
+            db.or_(
+                Product.product_name.ilike(f"%{search}%"),
+                Product.sku.ilike(f"%{search}%"),
+                Product.rack.ilike(f"%{search}%"),
+                Product.shelf.ilike(f"%{search}%"),
+                Product.bin.ilike(f"%{search}%")
+            )
+        )
+
+    if category:
+        query = query.filter_by(category=category)
+
+    if status == "in_stock":
+        query = query.filter(Product.quantity > 10)
+
+    elif status == "low_stock":
+        query = query.filter(
+            Product.quantity.between(1, 10)
+        )
+
+    elif status == "out_of_stock":
+        query = query.filter(Product.quantity <= 0)
+
+    products = query.order_by(
+        Product.product_name.asc()
+    ).all()
+
+    categories = db.session.query(
+        Product.category
+    ).distinct().order_by(
+        Product.category.asc()
+    ).all()
+
+    total_products = Product.query.count()
+
+    total_units = db.session.query(
+        db.func.coalesce(
+            db.func.sum(Product.quantity),
+            0
+        )
+    ).scalar()
+
+    low_stock = Product.query.filter(
+        Product.quantity.between(1, 10)
+    ).count()
+
+    out_of_stock = Product.query.filter(
+        Product.quantity <= 0
+    ).count()
 
     return render_template(
         "inventory.html",
-        products=products
+        products=products,
+        categories=[row[0] for row in categories],
+        total_products=total_products,
+        total_units=total_units,
+        low_stock=low_stock,
+        out_of_stock=out_of_stock,
+        search=search,
+        selected_category=category,
+        selected_status=status
     )
 
 
@@ -131,12 +201,47 @@ def add_product():
 
     if request.method == "POST":
 
+        product_name = request.form.get("product_name", "").strip()
+        sku = request.form.get("sku", "").strip().upper()
+        category = request.form.get("category", "").strip()
+        supplier = request.form.get("supplier", "").strip()
+        rack = request.form.get("rack", "").strip().upper()
+        shelf = request.form.get("shelf", "").strip()
+        bin_value = request.form.get("bin", "").strip().upper()
+
+        try:
+            quantity = int(request.form.get("quantity", 0))
+        except ValueError:
+            return render_template(
+                "add_product.html",
+                error="Quantity must be a valid number."
+            )
+
+        if quantity < 0:
+            return render_template(
+                "add_product.html",
+                error="Quantity cannot be negative."
+            )
+
+        existing_product = Product.query.filter_by(
+            sku=sku
+        ).first()
+
+        if existing_product:
+            return render_template(
+                "add_product.html",
+                error="SKU already exists."
+            )
+
         product = Product(
-            product_name=request.form["product_name"],
-            sku=request.form["sku"],
-            rack=request.form["rack"].upper(),
-            shelf=request.form["shelf"],
-            bin=request.form["bin"].upper()
+            product_name=product_name,
+            sku=sku,
+            category=category or "General",
+            quantity=quantity,
+            supplier=supplier or "Unknown",
+            rack=rack,
+            shelf=shelf,
+            bin=bin_value
         )
 
         db.session.add(product)
@@ -161,11 +266,79 @@ def edit_product(id):
 
     if request.method == "POST":
 
-        product.product_name = request.form["product_name"]
-        product.sku = request.form["sku"]
-        product.rack = request.form["rack"].upper()
-        product.shelf = request.form["shelf"]
-        product.bin = request.form["bin"].upper()
+        product_name = request.form.get(
+            "product_name",
+            ""
+        ).strip()
+
+        sku = request.form.get(
+            "sku",
+            ""
+        ).strip().upper()
+
+        category = request.form.get(
+            "category",
+            ""
+        ).strip()
+
+        supplier = request.form.get(
+            "supplier",
+            ""
+        ).strip()
+
+        rack = request.form.get(
+            "rack",
+            ""
+        ).strip().upper()
+
+        shelf = request.form.get(
+            "shelf",
+            ""
+        ).strip()
+
+        bin_value = request.form.get(
+            "bin",
+            ""
+        ).strip().upper()
+
+        try:
+            quantity = int(
+                request.form.get("quantity", 0)
+            )
+        except ValueError:
+            return render_template(
+                "edit_product.html",
+                product=product,
+                error="Quantity must be a valid number."
+            )
+
+        if quantity < 0:
+            return render_template(
+                "edit_product.html",
+                product=product,
+                error="Quantity cannot be negative."
+            )
+
+        duplicate_sku = Product.query.filter(
+            Product.sku == sku,
+            Product.id != product.id
+        ).first()
+
+        if duplicate_sku:
+            return render_template(
+                "edit_product.html",
+                product=product,
+                error="SKU already exists."
+            )
+
+        product.product_name = product_name
+        product.sku = sku
+        product.category = category or "General"
+        product.quantity = quantity
+        product.supplier = supplier or "Unknown"
+        product.rack = rack
+        product.shelf = shelf
+        product.bin = bin_value
 
         db.session.commit()
 

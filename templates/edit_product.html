@@ -3,64 +3,104 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Edit Product</title>
 
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <title>Edit Product | WareFlow WMS</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
 </head>
+
 <body>
 
 <div class="login-box">
 
-<h1>✏ Edit Product</h1>
+    <h1>Edit Product</h1>
 
-<form method="POST">
+    <p>Update warehouse product information</p>
 
-    <input
-        type="text"
-        name="product_name"
-        value="{{ product.product_name }}"
-        required
-    >
+    {% if error %}
+        <p style="color: #d64545;">
+            {{ error }}
+        </p>
+    {% endif %}
 
-    <input
-        type="text"
-        name="sku"
-        value="{{ product.sku }}"
-        required
-    >
+    <form method="POST">
 
-    <input
-        type="text"
-        name="rack"
-        value="{{ product.rack }}"
-        required
-    >
+        <input
+            type="text"
+            name="product_name"
+            value="{{ product.product_name }}"
+            placeholder="Product Name"
+            required
+        >
 
-    <input
-        type="text"
-        name="shelf"
-        value="{{ product.shelf }}"
-        required
-    >
+        <input
+            type="text"
+            name="sku"
+            value="{{ product.sku }}"
+            placeholder="SKU"
+            required
+        >
 
-    <input
-        type="text"
-        name="bin"
-        value="{{ product.bin }}"
-        required
-    >
+        <input
+            type="text"
+            name="category"
+            value="{{ product.category }}"
+            placeholder="Category"
+            required
+        >
 
-    <button type="submit">
-        Save Changes
+        <input
+            type="number"
+            name="quantity"
+            value="{{ product.quantity }}"
+            placeholder="Quantity"
+            min="0"
+            required
+        >
+
+        <input
+            type="text"
+            name="supplier"
+            value="{{ product.supplier }}"
+            placeholder="Supplier"
+        >
+
+        <input
+            type="text"
+            name="rack"
+            value="{{ product.rack }}"
+            placeholder="Rack"
+            required
+        >
+
+        <input
+            type="text"
+            name="shelf"
+            value="{{ product.shelf }}"
+            placeholder="Shelf"
+            required
+        >
+
+        <input
+            type="text"
+            name="bin"
+            value="{{ product.bin }}"
+            placeholder="Bin"
+            required
+        >
+
+        <button type="submit">
+            Save Changes
+        </button>
+
+    </form>
+
+    <br>
+
+    <button onclick="location.href='/inventory'">
+        Back
     </button>
-
-</form>
-
-<br>
-
-<button onclick="location.href='/inventory'">
-    ⬅ Back
-</button>
 
 </div>
 
