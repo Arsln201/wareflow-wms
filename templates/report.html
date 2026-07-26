@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reports | WareFlow WMS</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+<div class="dashboard-container">
+
+    <div class="inventory-header">
+        <div>
+            <h1>Reports</h1>
+            <p>Review inventory health, stock movement and employee activity.</p>
+        </div>
+
+        <button onclick="location.href='/dashboard'">
+            Dashboard
+        </button>
+    </div>
+
+    <div class="report-kpis">
+
+        <div class="report-kpi">
+            <span>Inventory Health</span>
+            <strong>{{ inventory_health }}%</strong>
+        </div>
+
+        <div class="report-kpi">
+            <span>Operations</span>
+            <strong>{{ movement_total }}</strong>
+        </div>
+
+        <div class="report-kpi">
+            <span>Received Units</span>
+            <strong>{{ receive_units }}</strong>
+        </div>
+
+        <div class="report-kpi">
+            <span>Issued Units</span>
+            <strong>{{ issue_units }}</strong>
+        </div>
+
+        <div class="report-kpi">
+            <span>Moved Units</span>
+            <strong>{{ move_units }}</strong>
+        </div>
+
+    </div>
+
+    <div class="report-panel">
+
+        <div class="panel-header">
+            <div>
+                <h2>Report Filters</h2>
+                <p>Filter movement records before exporting.</p>
+            </div>
+        </div>
+
+        <form method="GET" action="/reports" class="report-filters">
+
+            <div>
+                <label>From Date</label>
+                <input type="date" name="date_from" value="{{ date_from }}">
+            </div>
+
+            <div>
+                <label>To Date</label>
+                <input type="date" name="date_to" value="{{ date_to }}">
+            </div>
+
+            <div>
+                <label>Movement Type</label>
+                <select name="movement_type">
+                    <option value="">All Operations</option>
+                    <option value="RECEIVE" {% if selected_movement_type == "RECEIVE" %}selected{% endif %}>Receive</option>
+                    <option value="ISSUE" {% if selected_movement_type == "ISSUE" %}selected{% endif %}>Issue</option>
+                    <option value="MOVE" {% if selected_movement_type == "MOVE" %}selected{% endif %}>Move</option>
+                </select>
+            </div>
+
+            <div>
+                <label>Employee</label>
+                <select name="employee_id">
+                    <option value="">All Employees</option>
+                    {% for employee in employees %}
+                    <option value="{{ employee.id }}" {% if selected_employee == employee.id|string %}selected{% endif %}>
+                        {{ employee.name }} ({{ employee.employee_id }})
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div>
+                <label>Product</label>
+                <select name="product_id">
+                    <option value="">All Products</option>
+                    {% for product in products %}
+                    <option value="{{ product.id }}" {% if selected_product == product.id|string %}selected{% endif %}>
+                        {{ product.product_name }} ({{ product.sku }})
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="report-filter-actions">
+                <button type="submit">Apply Filters</button>
+                <button type="button" onclick="location.href='/reports'">Clear</button>
+            </div>
+
+        </form>
+
+        <div class="report-export">
+            <a href="{{ url_for('export_report',
+                date_from=date_from,
+                date_to=date_to,
+                movement_type=selected_movement_type,
+                employee_id=selected_employee,
+                product_id=selected_product
+            ) }}">
+                <button type="button">Export CSV</button>
+            </a>
+        </div>
+
+    </div>
+
+    <div class="report-grid">
+
+        <div class="report-panel">
+            <div class="panel-header">
+                <div>
+                    <h2>Low Stock</h2>
+                    <p>Products with 1–10 units remaining.</p>
+                </div>
+            </div>
+
+            {% if low_stock_products %}
+            <div class="report-list">
+                {% for product in low_stock_products %}
+                <div class="report-list-row">
+                    <div>
+                        <strong>{{ product.product_name }}</strong>
+                        <span>{{ product.sku }}</span>
+                    </div>
+                    <strong class="report-warning">{{ product.quantity }}</strong>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="empty-state">
+                <p>No low-stock products.</p>
+            </div>
+            {% endif %}
+        </div>
+
+        <div class="report-panel">
+            <div class="panel-header">
+                <div>
+                    <h2>Out of Stock</h2>
+                    <p>Products currently unavailable.</p>
+                </div>
+            </div>
+
+            {% if out_of_stock_products %}
+            <div class="report-list">
+                {% for product in out_of_stock_products %}
+                <div class="report-list-row">
+                    <div>
+                        <strong>{{ product.product_name }}</strong>
+                        <span>{{ product.sku }}</span>
+                    </div>
+                    <strong class="report-danger">0</strong>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="empty-state">
+                <p>No out-of-stock products.</p>
+            </div>
+            {% endif %}
+        </div>
+
+    </div>
+
+    <div class="report-panel">
+
+        <div class="panel-header">
+            <div>
+                <h2>Employee Activity</h2>
+                <p>Operations included in the selected report period.</p>
+            </div>
+        </div>
+
+        {% if employee_activity %}
+
+        <div class="inventory-table-wrapper">
+            <table class="inventory-table">
+                <thead>
+                    <tr>
+                        <th>Employee</th>
+                        <th>Employee ID</th>
+                        <th>Role</th>
+                        <th>Operations</th>
+                        <th>Received</th>
+                        <th>Issued</th>
+                        <th>Moved</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                {% for row in employee_activity %}
+                    <tr>
+                        <td>{{ row.name }}</td>
+                        <td>{{ row.employee_id }}</td>
+                        <td>{{ row.role }}</td>
+                        <td>{{ row.operations }}</td>
+                        <td>{{ row.received }}</td>
+                        <td>{{ row.issued }}</td>
+                        <td>{{ row.moved }}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        {% else %}
+        <div class="empty-state">
+            <p>No employee activity matches the selected filters.</p>
+        </div>
+        {% endif %}
+
+    </div>
+
+    <div class="report-panel">
+
+        <div class="panel-header">
+            <div>
+                <h2>Stock Movement Report</h2>
+                <p>Latest 200 records matching your filters.</p>
+            </div>
+        </div>
+
+        {% if movements %}
+
+        <div class="inventory-table-wrapper">
+            <table class="inventory-table">
+
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Product</th>
+                        <th>Type</th>
+                        <th>Quantity</th>
+                        <th>Employee</th>
+                        <th>From</th>
+                        <th>To</th>
+                        <th>Reason</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                {% for movement in movements %}
+                    <tr>
+                        <td>{{ format_ist(movement.created_at) }}</td>
+                        <td>
+                            {{ movement.product.product_name }}
+                            <div class="table-subtext">{{ movement.product.sku }}</div>
+                        </td>
+                        <td>
+                            <span class="movement-badge movement-{{ movement.movement_type|lower }}">
+                                {{ movement.movement_type }}
+                            </span>
+                        </td>
+                        <td>{{ movement.quantity }}</td>
+                        <td>{{ movement.employee.name }}</td>
+                        <td>{{ movement.from_location or "-" }}</td>
+                        <td>{{ movement.to_location or "-" }}</td>
+                        <td>{{ movement.reason or "-" }}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+
+            </table>
+        </div>
+
+        {% else %}
+        <div class="empty-state">
+            <p>No stock movements match the selected filters.</p>
+        </div>
+        {% endif %}
+
+    </div>
+
+    <button onclick="location.href='/dashboard'">
+        Back to Dashboard
+    </button>
+
+</div>
+
+</body>
+</html>

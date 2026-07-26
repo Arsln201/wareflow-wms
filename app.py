@@ -7,6 +7,8 @@ from models import db, Product, Employee, StockMovement
 from config import Config
 from datetime import datetime
 from zoneinfo import ZoneInfo
+import csv
+import io
 
 def format_ist(dt):
     if not dt:
@@ -24,6 +26,9 @@ def format_ist(dt):
 
 app = Flask(__name__)
 app.config.from_object(Config)
+app.jinja_env.globals.update(
+    format_ist=format_ist
+)
 
 db.init_app(app)
 
@@ -111,6 +116,52 @@ def dashboard():
         Product.quantity <= 0
     ).count()
 
+    total_employees = Employee.query.count()
+
+    recent_products = Product.query.order_by(
+        Product.created_at.desc()
+    ).limit(5).all()
+
+    recent_movements = StockMovement.query.order_by(
+        StockMovement.created_at.desc()
+    ).limit(5).all()
+
+    receive_units = db.session.query(
+        db.func.coalesce(
+            db.func.sum(StockMovement.quantity),
+            0
+        )
+    ).filter(
+        StockMovement.movement_type == "RECEIVE"
+    ).scalar()
+
+    issue_units = db.session.query(
+        db.func.coalesce(
+            db.func.sum(StockMovement.quantity),
+            0
+        )
+    ).filter(
+        StockMovement.movement_type == "ISSUE"
+    ).scalar()
+
+    move_units = db.session.query(
+        db.func.coalesce(
+            db.func.sum(StockMovement.quantity),
+            0
+        )
+    ).filter(
+        StockMovement.movement_type == "MOVE"
+    ).scalar()
+
+    movement_total = StockMovement.query.count()
+
+    if total_products == 0:
+        inventory_health = 100
+    else:
+        inventory_health = round(
+            ((total_products - out_of_stock) / total_products) * 100
+        )
+
     return render_template(
         "dashboard.html",
         employee=session["employee_name"],
@@ -119,7 +170,16 @@ def dashboard():
         total_locations=total_locations,
         total_units=total_units,
         low_stock=low_stock,
-        out_of_stock=out_of_stock
+        out_of_stock=out_of_stock,
+        total_employees=total_employees,
+        recent_products=recent_products,
+        recent_movements=recent_movements,
+        receive_units=receive_units,
+        issue_units=issue_units,
+        move_units=move_units,
+        movement_total=movement_total,
+        inventory_health=inventory_health,
+        format_ist=format_ist
     )
 
 
@@ -853,6 +913,482 @@ def move_stock():
     )
     
     
+
+# ==========================
+# REPORTS
+# ==========================
+
+def parse_report_date(value, end_of_day=False):
+    if not value:
+        return None
+
+    try:
+        parsed = datetime.strptime(value, "%Y-%m-%d")
+    except ValueError:
+        return None
+
+    if end_of_day:
+        parsed = parsed.replace(
+            hour=23,
+            minute=59,
+            second=59,
+            microsecond=999999
+        )
+
+    ist_time = parsed.replace(
+        tzinfo=ZoneInfo("Asia/Kolkata")
+    )
+
+    utc_time = ist_time.astimezone(
+        ZoneInfo("UTC")
+    )
+
+    return utc_time.replace(tzinfo=None)
+
+
+def get_report_query():
+
+    date_from = request.args.get("date_from", "").strip()
+    date_to = request.args.get("date_to", "").strip()
+    movement_type = request.args.get("movement_type", "").strip().upper()
+    employee_id = request.args.get("employee_id", "").strip()
+    product_id = request.args.get("product_id", "").strip()
+
+    query = StockMovement.query
+
+    start_date = parse_report_date(date_from)
+    end_date = parse_report_date(date_to, end_of_day=True)
+
+    if start_date:
+        query = query.filter(
+            StockMovement.created_at >= start_date
+        )
+
+    if end_date:
+        query = query.filter(
+            StockMovement.created_at <= end_date
+        )
+
+    if movement_type in {"RECEIVE", "ISSUE", "MOVE"}:
+        query = query.filter(
+            StockMovement.movement_type == movement_type
+        )
+
+    if employee_id:
+        query = query.filter(
+            StockMovement.employee_id == employee_id
+        )
+
+    if product_id:
+        query = query.filter(
+            StockMovement.product_id == product_id
+        )
+
+    return (
+        query.order_by(
+            StockMovement.created_at.desc()
+        ),
+        date_from,
+        date_to,
+        movement_type,
+        employee_id,
+        product_id
+    )
+
+
+@app.route("/reports")
+def reports():
+
+    if "employee_id" not in session:
+        return redirect("/")
+
+    # -----------------------------------------
+    # Filters
+    # -----------------------------------------
+
+    date_from = request.args.get("date_from", "").strip()
+    date_to = request.args.get("date_to", "").strip()
+    movement_type = request.args.get(
+        "movement_type",
+        ""
+    ).strip().upper()
+
+    employee_id = request.args.get(
+        "employee_id",
+        ""
+    ).strip()
+
+    product_id = request.args.get(
+        "product_id",
+        ""
+    ).strip()
+
+    # -----------------------------------------
+    # Base movement query
+    # -----------------------------------------
+
+    query = StockMovement.query
+
+    # -----------------------------------------
+    # Movement type filter
+    # -----------------------------------------
+
+    if movement_type in [
+        "RECEIVE",
+        "ISSUE",
+        "MOVE"
+    ]:
+
+        query = query.filter(
+            StockMovement.movement_type == movement_type
+        )
+
+    else:
+
+        movement_type = ""
+
+    # -----------------------------------------
+    # Employee filter
+    # -----------------------------------------
+
+    if employee_id:
+
+        try:
+
+            employee_id_int = int(employee_id)
+
+            query = query.filter(
+                StockMovement.employee_id
+                == employee_id_int
+            )
+
+        except ValueError:
+
+            employee_id = ""
+
+    # -----------------------------------------
+    # Product filter
+    # -----------------------------------------
+
+    if product_id:
+
+        try:
+
+            product_id_int = int(product_id)
+
+            query = query.filter(
+                StockMovement.product_id
+                == product_id_int
+            )
+
+        except ValueError:
+
+            product_id = ""
+
+    # -----------------------------------------
+    # Date filters
+    # -----------------------------------------
+
+    if date_from:
+
+        try:
+
+            start_date = datetime.strptime(
+                date_from,
+                "%Y-%m-%d"
+            )
+
+            query = query.filter(
+                StockMovement.created_at >= start_date
+            )
+
+        except ValueError:
+
+            date_from = ""
+
+    if date_to:
+
+        try:
+
+            end_date = datetime.strptime(
+                date_to,
+                "%Y-%m-%d"
+            )
+
+            # Include the entire selected end date
+            end_date = end_date.replace(
+                hour=23,
+                minute=59,
+                second=59
+            )
+
+            query = query.filter(
+                StockMovement.created_at <= end_date
+            )
+
+        except ValueError:
+
+            date_to = ""
+
+    # -----------------------------------------
+    # Get movements
+    # -----------------------------------------
+
+    movements = query.order_by(
+        StockMovement.created_at.desc()
+    ).limit(200).all()
+
+    # -----------------------------------------
+    # Employees and products
+    # -----------------------------------------
+
+    employees = Employee.query.order_by(
+        Employee.name.asc()
+    ).all()
+
+    products = Product.query.order_by(
+        Product.product_name.asc()
+    ).all()
+
+    # -----------------------------------------
+    # Movement statistics
+    # -----------------------------------------
+
+    total_received = sum(
+        m.quantity
+        for m in movements
+        if m.movement_type == "RECEIVE"
+    )
+
+    total_issued = sum(
+        m.quantity
+        for m in movements
+        if m.movement_type == "ISSUE"
+    )
+
+    total_moved = sum(
+        m.quantity
+        for m in movements
+        if m.movement_type == "MOVE"
+    )
+
+    # -----------------------------------------
+    # Inventory statistics
+    # -----------------------------------------
+
+    inventory_total = Product.query.count()
+
+    total_units = db.session.query(
+        db.func.coalesce(
+            db.func.sum(Product.quantity),
+            0
+        )
+    ).scalar()
+
+    low_stock_total = Product.query.filter(
+        Product.quantity > 0,
+        Product.quantity <= 10
+    ).count()
+
+    out_of_stock_total = Product.query.filter(
+        Product.quantity <= 0
+    ).count()
+
+    # -----------------------------------------
+    # Employee activity
+    # -----------------------------------------
+
+    employee_activity = {}
+
+    for movement in movements:
+
+        employee = movement.employee
+
+        # Handle missing/orphan employee records
+        if employee is None:
+
+            employee_key = (
+                f"unknown-{movement.employee_id}"
+            )
+
+            if employee_key not in employee_activity:
+
+                employee_activity[employee_key] = {
+                    "employee_id": str(
+                        movement.employee_id
+                    ),
+                    "name": "Unknown Employee",
+                    "role": "Unknown",
+                    "received": 0,
+                    "issued": 0,
+                    "moved": 0,
+                    "total": 0
+                }
+
+            row = employee_activity[
+                employee_key
+            ]
+
+        else:
+
+            if employee.id not in employee_activity:
+
+                employee_activity[employee.id] = {
+                    "employee_id": employee.employee_id,
+                    "name": employee.name,
+                    "role": employee.role,
+                    "received": 0,
+                    "issued": 0,
+                    "moved": 0,
+                    "total": 0
+                }
+
+            row = employee_activity[
+                employee.id
+            ]
+
+        if movement.movement_type == "RECEIVE":
+
+            row["received"] += movement.quantity
+
+        elif movement.movement_type == "ISSUE":
+
+            row["issued"] += movement.quantity
+
+        elif movement.movement_type == "MOVE":
+
+            row["moved"] += movement.quantity
+
+        row["total"] += movement.quantity
+
+    # -----------------------------------------
+    # Render reports
+    # -----------------------------------------
+
+    return render_template(
+        "report.html",
+
+        movements=movements,
+
+        employees=employees,
+
+        products=products,
+
+        employee_activity=list(
+            employee_activity.values()
+        ),
+
+        inventory_total=inventory_total,
+
+        total_units=total_units,
+
+        low_stock_total=low_stock_total,
+
+        out_of_stock_total=out_of_stock_total,
+
+        total_received=total_received,
+
+        total_issued=total_issued,
+
+        total_moved=total_moved,
+
+        movement_total=len(movements),
+
+        selected_date_from=date_from,
+
+        selected_date_to=date_to,
+
+        selected_movement_type=movement_type,
+
+        selected_employee=employee_id,
+
+        selected_product=product_id
+    )
+
+
+@app.route("/reports/export")
+def export_report():
+
+    if "employee_id" not in session:
+        return redirect("/")
+
+    # Get the same filters used by the Reports page
+    query, date_from, date_to, movement_type, employee_id, product_id = (
+        get_report_query()
+    )
+
+    movements = query.order_by(
+        StockMovement.created_at.desc()
+    ).all()
+
+    output = io.StringIO()
+
+    writer = csv.writer(output)
+
+    writer.writerow([
+        "Date",
+        "Movement Type",
+        "Product",
+        "SKU",
+        "Category",
+        "Quantity",
+        "Employee ID",
+        "Employee",
+        "From Location",
+        "To Location",
+        "Reason"
+    ])
+
+    for movement in movements:
+
+        # Safely handle missing product
+        product = movement.product
+
+        if product:
+            product_name = product.product_name
+            sku = product.sku
+            category = product.category
+        else:
+            product_name = "Unknown Product"
+            sku = "Unknown"
+            category = "Unknown"
+
+        # Safely handle missing employee
+        employee = movement.employee
+
+        if employee:
+            employee_id_value = employee.employee_id
+            employee_name = employee.name
+        else:
+            employee_id_value = "Unknown"
+            employee_name = "Unknown Employee"
+
+        writer.writerow([
+            format_ist(movement.created_at),
+            movement.movement_type,
+            product_name,
+            sku,
+            category,
+            movement.quantity,
+            employee_id_value,
+            employee_name,
+            movement.from_location or "",
+            movement.to_location or "",
+            movement.reason or ""
+        ])
+
+    response = app.response_class(
+        output.getvalue(),
+        mimetype="text/csv"
+    )
+
+    response.headers["Content-Disposition"] = (
+        "attachment; filename=wareflow-stock-report.csv"
+    )
+
+    return response
+
+
 # ==========================
 # START APP
 # ==========================
