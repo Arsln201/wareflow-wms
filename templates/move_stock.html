@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Move Stock | WareFlow WMS</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/style.css') }}"
+    >
+
+</head>
+
+<body>
+
+<div class="login-box">
+
+    <h1>Move Stock</h1>
+
+    <p>Move inventory to another warehouse location.</p>
+
+    {% if error %}
+
+        <div class="form-error">
+            {{ error }}
+        </div>
+
+    {% endif %}
+
+    <form method="POST">
+
+        <select name="product_id" required>
+
+            <option value="">
+                Select Product
+            </option>
+
+            {% for product in products %}
+
+                <option value="{{ product.id }}">
+                    {{ product.product_name }}
+                    — Current:
+                    {{ product.rack }}-{{ product.shelf }}-{{ product.bin }}
+                </option>
+
+            {% endfor %}
+
+        </select>
+
+        <input
+            type="number"
+            name="quantity"
+            min="1"
+            placeholder="Quantity"
+            required
+        >
+
+        <input
+            type="text"
+            name="to_rack"
+            placeholder="Destination Rack"
+            required
+        >
+
+        <input
+            type="text"
+            name="to_shelf"
+            placeholder="Destination Shelf"
+            required
+        >
+
+        <input
+            type="text"
+            name="to_bin"
+            placeholder="Destination Bin"
+            required
+        >
+
+        <input
+            type="text"
+            name="reason"
+            placeholder="Reason or Reference"
+        >
+
+        <button type="submit">
+            Move Stock
+        </button>
+
+    </form>
+
+    <br>
+
+    <button onclick="location.href='/stock-operations'">
+        Stock Operations
+    </button>
+
+    <button onclick="location.href='/dashboard'">
+        Dashboard
+    </button>
+
+</div>
+
+</body>
+</html>

@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Receive Stock | WareFlow WMS</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/style.css') }}"
+    >
+
+</head>
+
+<body>
+
+<div class="login-box">
+
+    <h1>Receive Stock</h1>
+
+    <p>Add incoming stock to the warehouse.</p>
+
+    {% if error %}
+
+        <div class="form-error">
+            {{ error }}
+        </div>
+
+    {% endif %}
+
+    <form method="POST">
+
+        <select name="product_id" required>
+
+            <option value="">
+                Select Product
+            </option>
+
+            {% for product in products %}
+
+                <option value="{{ product.id }}">
+                    {{ product.product_name }} — {{ product.sku }}
+                </option>
+
+            {% endfor %}
+
+        </select>
+
+        <input
+            type="number"
+            name="quantity"
+            min="1"
+            placeholder="Quantity"
+            required
+        >
+
+        <input
+            type="text"
+            name="reason"
+            placeholder="Reference or Note"
+        >
+
+        <button type="submit">
+            Receive Stock
+        </button>
+
+    </form>
+
+    <br>
+
+    <button onclick="location.href='/stock-operations'">
+        Stock Operations
+    </button>
+
+    <button onclick="location.href='/dashboard'">
+        Dashboard
+    </button>
+
+</div>
+
+</body>
+</html>

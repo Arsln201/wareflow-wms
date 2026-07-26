@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Stock Operations | WareFlow WMS</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/style.css') }}"
+    >
+
+</head>
+
+<body>
+
+<div class="dashboard-container">
+
+    <div class="inventory-header">
+
+        <div>
+
+            <h1>Stock Operations</h1>
+
+            <p>Manage warehouse stock movement and activity.</p>
+
+        </div>
+
+        <button onclick="location.href='/dashboard'">
+            Dashboard
+        </button>
+
+    </div>
+
+
+    <div class="operation-actions">
+
+        <button onclick="location.href='/receive-stock'">
+            Receive Stock
+        </button>
+
+        <button onclick="location.href='/move-stock'">
+            Move Stock
+        </button>
+
+        <button onclick="location.href='/issue-stock'">
+            Issue Stock
+        </button>
+
+    </div>
+
+
+    <div class="inventory-table-wrapper">
+
+        <h2>Recent Stock Movements</h2>
+
+        {% if recent_movements %}
+
+        <table class="inventory-table">
+
+            <thead>
+
+                <tr>
+                    <th>Product</th>
+                    <th>Type</th>
+                    <th>Quantity</th>
+                    <th>From</th>
+                    <th>To</th>
+                    <th>Employee</th>
+                    <th>Date</th>
+                </tr>
+
+            </thead>
+
+            <tbody>
+
+            {% for movement in recent_movements %}
+
+                <tr>
+
+                    <td>
+                        {{ movement.product.product_name }}
+                    </td>
+
+                    <td>
+
+                        {% if movement.movement_type == "RECEIVE" %}
+
+                            <span class="movement-badge movement-receive">
+                                RECEIVE
+                            </span>
+
+                        {% elif movement.movement_type == "MOVE" %}
+
+                            <span class="movement-badge movement-move">
+                                MOVE
+                            </span>
+
+                        {% else %}
+
+                            <span class="movement-badge movement-issue">
+                                ISSUE
+                            </span>
+
+                        {% endif %}
+
+                    </td>
+
+                    <td>
+                        {{ movement.quantity }}
+                    </td>
+
+                    <td>
+                        {{ movement.from_location or "-" }}
+                    </td>
+
+                    <td>
+                        {{ movement.to_location or "-" }}
+                    </td>
+
+                    <td>
+                        {{ movement.employee.name }}
+                    </td>
+
+                    <td>
+                        {{ movement_times[movement.id] }}
+                    </td>
+
+                </tr>
+
+            {% endfor %}
+
+            </tbody>
+
+        </table>
+
+        {% else %}
+
+        <div class="inventory-empty">
+
+            <h2>No Stock Movements</h2>
+
+            <p>
+                Stock activity will appear here after your first operation.
+            </p>
+
+        </div>
+
+        {% endif %}
+
+    </div>
+
+    <br>
+
+    <button onclick="location.href='/dashboard'">
+        Back to Dashboard
+    </button>
+
+</div>
+
+</body>
+</html>

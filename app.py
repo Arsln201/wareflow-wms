@@ -3,8 +3,24 @@ import qrcode
 import os
 
 from flask import Flask, render_template, request, redirect, session
-from models import db, Product, Employee
+from models import db, Product, Employee, StockMovement
 from config import Config
+from datetime import datetime
+from zoneinfo import ZoneInfo
+
+def format_ist(dt):
+    if not dt:
+        return "-"
+
+    utc_time = dt.replace(tzinfo=ZoneInfo("UTC"))
+
+    ist_time = utc_time.astimezone(
+        ZoneInfo("Asia/Kolkata")
+    )
+
+    return ist_time.strftime(
+        "%d %b %Y, %I:%M:%S %p"
+    )
 
 app = Flask(__name__)
 app.config.from_object(Config)
@@ -532,8 +548,311 @@ def test_session():
         "employee_name": session.get("employee_name"),
         "role": session.get("role")
     }
+    
+# ==========================
+# STOCK OPERATION
+# ==========================
 
 
+@app.route("/stock-operations")
+def stock_operations():
+
+    if "employee_id" not in session:
+        return redirect("/")
+
+    products = Product.query.order_by(
+        Product.product_name.asc()
+    ).all()
+
+    recent_movements = StockMovement.query.order_by(
+        StockMovement.created_at.desc()
+    ).limit(20).all()
+
+    movement_times = {
+        movement.id: format_ist(movement.created_at)
+        for movement in recent_movements
+    }
+
+    return render_template(
+        "stock_operations.html",
+        products=products,
+        recent_movements=recent_movements,
+        movement_times=movement_times
+    )
+
+
+@app.route("/receive-stock", methods=["GET", "POST"])
+def receive_stock():
+
+    if "employee_id" not in session:
+        return redirect("/")
+
+    products = Product.query.order_by(
+        Product.product_name.asc()
+    ).all()
+
+    if request.method == "POST":
+
+        product_id = request.form.get("product_id")
+        quantity_value = request.form.get("quantity")
+        reason = request.form.get("reason", "").strip()
+
+        try:
+            quantity = int(quantity_value)
+        except (TypeError, ValueError):
+            return render_template(
+                "receive_stock.html",
+                products=products,
+                error="Quantity must be a valid number."
+            )
+
+        if quantity <= 0:
+            return render_template(
+                "receive_stock.html",
+                products=products,
+                error="Quantity must be greater than zero."
+            )
+
+        product = db.session.get(Product, product_id)
+
+        if not product:
+            return render_template(
+                "receive_stock.html",
+                products=products,
+                error="Product not found."
+            )
+
+        location = (
+            f"{product.rack}-"
+            f"{product.shelf}-"
+            f"{product.bin}"
+        )
+
+        product.quantity += quantity
+
+        movement = StockMovement(
+            product_id=product.id,
+            employee_id=session["employee_id"],
+            movement_type="RECEIVE",
+            quantity=quantity,
+            from_location=None,
+            to_location=location,
+            reason=reason or "Stock received"
+        )
+
+        db.session.add(movement)
+        db.session.commit()
+
+        return redirect("/stock-operations")
+
+    return render_template(
+        "receive_stock.html",
+        products=products
+    )
+
+
+@app.route("/issue-stock", methods=["GET", "POST"])
+def issue_stock():
+
+    if "employee_id" not in session:
+        return redirect("/")
+
+    products = Product.query.order_by(
+        Product.product_name.asc()
+    ).all()
+
+    if request.method == "POST":
+
+        product_id = request.form.get("product_id")
+        quantity_value = request.form.get("quantity")
+        reason = request.form.get("reason", "").strip()
+
+        try:
+            quantity = int(quantity_value)
+        except (TypeError, ValueError):
+            return render_template(
+                "issue_stock.html",
+                products=products,
+                error="Quantity must be a valid number."
+            )
+
+        if quantity <= 0:
+            return render_template(
+                "issue_stock.html",
+                products=products,
+                error="Quantity must be greater than zero."
+            )
+
+        product = db.session.get(Product, product_id)
+
+        if not product:
+            return render_template(
+                "issue_stock.html",
+                products=products,
+                error="Product not found."
+            )
+
+        if quantity > product.quantity:
+            return render_template(
+                "issue_stock.html",
+                products=products,
+                error=(
+                    f"Insufficient stock available. "
+                    f"Current stock: {product.quantity}"
+                )
+            )
+
+        location = (
+            f"{product.rack}-"
+            f"{product.shelf}-"
+            f"{product.bin}"
+        )
+
+        product.quantity -= quantity
+
+        movement = StockMovement(
+            product_id=product.id,
+            employee_id=session["employee_id"],
+            movement_type="ISSUE",
+            quantity=quantity,
+            from_location=location,
+            to_location=None,
+            reason=reason or "Stock issued"
+        )
+
+        db.session.add(movement)
+        db.session.commit()
+
+        return redirect("/stock-operations")
+
+    return render_template(
+        "issue_stock.html",
+        products=products
+    )
+
+
+@app.route("/move-stock", methods=["GET", "POST"])
+def move_stock():
+
+    if "employee_id" not in session:
+        return redirect("/")
+
+    products = Product.query.order_by(
+        Product.product_name.asc()
+    ).all()
+
+    if request.method == "POST":
+
+        product_id = request.form.get("product_id")
+        quantity_value = request.form.get("quantity")
+
+        to_rack = request.form.get(
+            "to_rack",
+            ""
+        ).strip().upper()
+
+        to_shelf = request.form.get(
+            "to_shelf",
+            ""
+        ).strip()
+
+        to_bin = request.form.get(
+            "to_bin",
+            ""
+        ).strip().upper()
+
+        reason = request.form.get(
+            "reason",
+            ""
+        ).strip()
+
+        try:
+            quantity = int(quantity_value)
+        except (TypeError, ValueError):
+            return render_template(
+                "move_stock.html",
+                products=products,
+                error="Quantity must be a valid number."
+            )
+
+        if quantity <= 0:
+            return render_template(
+                "move_stock.html",
+                products=products,
+                error="Quantity must be greater than zero."
+            )
+
+        if not to_rack or not to_shelf or not to_bin:
+            return render_template(
+                "move_stock.html",
+                products=products,
+                error="Destination location is required."
+            )
+
+        product = db.session.get(Product, product_id)
+
+        if not product:
+            return render_template(
+                "move_stock.html",
+                products=products,
+                error="Product not found."
+            )
+
+        if quantity > product.quantity:
+            return render_template(
+                "move_stock.html",
+                products=products,
+                error=(
+                    f"Insufficient stock available. "
+                    f"Current stock: {product.quantity}"
+                )
+            )
+
+        from_location = (
+            f"{product.rack}-"
+            f"{product.shelf}-"
+            f"{product.bin}"
+        )
+
+        to_location = (
+            f"{to_rack}-"
+            f"{to_shelf}-"
+            f"{to_bin}"
+        )
+
+        if from_location == to_location:
+            return render_template(
+                "move_stock.html",
+                products=products,
+                error="Destination must be different from the current location."
+            )
+
+        movement = StockMovement(
+            product_id=product.id,
+            employee_id=session["employee_id"],
+            movement_type="MOVE",
+            quantity=quantity,
+            from_location=from_location,
+            to_location=to_location,
+            reason=reason or "Stock moved"
+        )
+
+        db.session.add(movement)
+
+        product.rack = to_rack
+        product.shelf = to_shelf
+        product.bin = to_bin
+
+        db.session.commit()
+
+        return redirect("/stock-operations")
+
+    return render_template(
+        "move_stock.html",
+        products=products
+    )
+    
+    
 # ==========================
 # START APP
 # ==========================

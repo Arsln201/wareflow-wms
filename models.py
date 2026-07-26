@@ -84,10 +84,10 @@ class Product(db.Model):
     )
 
     created_at = db.Column(
-        db.DateTime,
-        default=datetime.utcnow,
-        nullable=False
-    )
+    db.DateTime,
+    default=datetime.utcnow,
+    nullable=False
+)
 
     @property
     def stock_status(self):
@@ -101,3 +101,64 @@ class Product(db.Model):
 
     def __repr__(self):
         return f"<Product {self.product_name}>"
+    
+    
+class StockMovement(db.Model):
+
+    id = db.Column(db.Integer, primary_key=True)
+
+    product_id = db.Column(
+        db.Integer,
+        db.ForeignKey("product.id"),
+        nullable=False
+    )
+
+    employee_id = db.Column(
+        db.Integer,
+        db.ForeignKey("employee.id"),
+        nullable=False
+    )
+
+    movement_type = db.Column(
+        db.String(20),
+        nullable=False
+    )
+
+    quantity = db.Column(
+        db.Integer,
+        nullable=False
+    )
+
+    from_location = db.Column(
+        db.String(50),
+        nullable=True
+    )
+
+    to_location = db.Column(
+        db.String(50),
+        nullable=True
+    )
+
+    reason = db.Column(
+        db.String(255),
+        nullable=True
+    )
+
+    created_at = db.Column(
+        db.DateTime,
+        default=datetime.utcnow,
+        nullable=False
+    )
+
+    product = db.relationship(
+        "Product",
+        backref="stock_movements"
+    )
+
+    employee = db.relationship(
+        "Employee",
+        backref="stock_movements"
+    )
+
+    def __repr__(self):
+        return f"<StockMovement {self.movement_type} {self.quantity}>"
