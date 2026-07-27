@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Scan Result | WareFlow WMS</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/style.css') }}"
+    >
+</head>
+
+<body>
+
+<div class="dashboard-container scan-result-page">
+
+    <div class="page-header">
+
+        <div>
+            <h1>Scan Result</h1>
+
+            <p>
+                Code successfully processed
+            </p>
+        </div>
+
+        <button
+            type="button"
+            onclick="location.href='/scanner'"
+        >
+            Scan Again
+        </button>
+
+    </div>
+
+
+    {% if product %}
+
+    <div class="scan-result-card">
+
+        <div class="scan-result-header">
+
+            <div>
+
+                <span class="result-label">
+                    {{ scan_type }}
+                </span>
+
+                <h2>
+                    {{ product.product_name }}
+                </h2>
+
+            </div>
+
+            <div class="result-status">
+
+                {% if product.quantity <= 0 %}
+                    Out of Stock
+
+                {% elif product.quantity <= 10 %}
+                    Low Stock
+
+                {% else %}
+                    In Stock
+                {% endif %}
+
+            </div>
+
+        </div>
+
+
+        <div class="scan-details-grid">
+
+            <div class="scan-detail">
+                <span>SKU</span>
+                <strong>{{ product.sku }}</strong>
+            </div>
+
+
+            <div class="scan-detail">
+                <span>Category</span>
+                <strong>{{ product.category }}</strong>
+            </div>
+
+
+            <div class="scan-detail">
+                <span>Quantity</span>
+                <strong>{{ product.quantity }}</strong>
+            </div>
+
+
+            <div class="scan-detail">
+                <span>Location</span>
+                <strong>{{ location }}</strong>
+            </div>
+
+
+            <div class="scan-detail">
+                <span>Rack</span>
+                <strong>{{ product.rack }}</strong>
+            </div>
+
+
+            <div class="scan-detail">
+                <span>Shelf</span>
+                <strong>{{ product.shelf }}</strong>
+            </div>
+
+
+            <div class="scan-detail">
+                <span>Bin</span>
+                <strong>{{ product.bin }}</strong>
+            </div>
+
+        </div>
+
+
+        <div class="scan-actions">
+
+            <a
+                href="/receive-stock"
+                class="scan-action-button"
+            >
+                Receive Stock
+            </a>
+
+            <a
+                href="/issue-stock"
+                class="scan-action-button"
+            >
+                Issue Stock
+            </a>
+
+            <a
+                href="/move-stock"
+                class="scan-action-button"
+            >
+                Move Stock
+            </a>
+
+        </div>
+
+    </div>
+
+
+    {% else %}
+
+    <div class="scan-result-card">
+
+        <div class="scan-empty">
+
+            <h2>
+                Code Not Found
+            </h2>
+
+            <p>
+                No product or warehouse location was found for:
+            </p>
+
+            <strong>
+                {{ scanned_value }}
+            </strong>
+
+            <br><br>
+
+            <button
+                type="button"
+                onclick="location.href='/scanner'"
+            >
+                Scan Another Code
+            </button>
+
+        </div>
+
+    </div>
+
+    {% endif %}
+
+</div>
+
+</body>
+</html>

@@ -647,6 +647,14 @@ def receive_stock():
     if "employee_id" not in session:
         return redirect("/")
 
+    employee = Employee.query.filter_by(
+        employee_id=session["employee_id"]
+    ).first()
+
+    if not employee:
+        session.clear()
+        return redirect("/")
+
     products = Product.query.order_by(
         Product.product_name.asc()
     ).all()
@@ -654,11 +662,11 @@ def receive_stock():
     if request.method == "POST":
 
         product_id = request.form.get("product_id")
-        quantity_value = request.form.get("quantity")
+        quantity = request.form.get("quantity")
         reason = request.form.get("reason", "").strip()
 
         try:
-            quantity = int(quantity_value)
+            quantity = int(quantity)
         except (TypeError, ValueError):
             return render_template(
                 "receive_stock.html",
@@ -673,7 +681,7 @@ def receive_stock():
                 error="Quantity must be greater than zero."
             )
 
-        product = db.session.get(Product, product_id)
+        product = Product.query.get(product_id)
 
         if not product:
             return render_template(
@@ -682,21 +690,19 @@ def receive_stock():
                 error="Product not found."
             )
 
-        location = (
-            f"{product.rack}-"
-            f"{product.shelf}-"
-            f"{product.bin}"
-        )
-
         product.quantity += quantity
 
         movement = StockMovement(
             product_id=product.id,
-            employee_id=session["employee_id"],
+            employee_id=employee.id,
             movement_type="RECEIVE",
             quantity=quantity,
             from_location=None,
-            to_location=location,
+            to_location=(
+                f"{product.rack}-"
+                f"{product.shelf}-"
+                f"{product.bin}"
+            ),
             reason=reason or "Stock received"
         )
 
@@ -717,6 +723,14 @@ def issue_stock():
     if "employee_id" not in session:
         return redirect("/")
 
+    employee = Employee.query.filter_by(
+        employee_id=session["employee_id"]
+    ).first()
+
+    if not employee:
+        session.clear()
+        return redirect("/")
+
     products = Product.query.order_by(
         Product.product_name.asc()
     ).all()
@@ -724,11 +738,11 @@ def issue_stock():
     if request.method == "POST":
 
         product_id = request.form.get("product_id")
-        quantity_value = request.form.get("quantity")
+        quantity = request.form.get("quantity")
         reason = request.form.get("reason", "").strip()
 
         try:
-            quantity = int(quantity_value)
+            quantity = int(quantity)
         except (TypeError, ValueError):
             return render_template(
                 "issue_stock.html",
@@ -743,7 +757,7 @@ def issue_stock():
                 error="Quantity must be greater than zero."
             )
 
-        product = db.session.get(Product, product_id)
+        product = Product.query.get(product_id)
 
         if not product:
             return render_template(
@@ -756,26 +770,21 @@ def issue_stock():
             return render_template(
                 "issue_stock.html",
                 products=products,
-                error=(
-                    f"Insufficient stock available. "
-                    f"Current stock: {product.quantity}"
-                )
+                error="Insufficient stock available."
             )
-
-        location = (
-            f"{product.rack}-"
-            f"{product.shelf}-"
-            f"{product.bin}"
-        )
 
         product.quantity -= quantity
 
         movement = StockMovement(
             product_id=product.id,
-            employee_id=session["employee_id"],
+            employee_id=employee.id,
             movement_type="ISSUE",
             quantity=quantity,
-            from_location=location,
+            from_location=(
+                f"{product.rack}-"
+                f"{product.shelf}-"
+                f"{product.bin}"
+            ),
             to_location=None,
             reason=reason or "Stock issued"
         )
@@ -797,6 +806,14 @@ def move_stock():
     if "employee_id" not in session:
         return redirect("/")
 
+    employee = Employee.query.filter_by(
+        employee_id=session["employee_id"]
+    ).first()
+
+    if not employee:
+        session.clear()
+        return redirect("/")
+
     products = Product.query.order_by(
         Product.product_name.asc()
     ).all()
@@ -804,7 +821,7 @@ def move_stock():
     if request.method == "POST":
 
         product_id = request.form.get("product_id")
-        quantity_value = request.form.get("quantity")
+        quantity = request.form.get("quantity")
 
         to_rack = request.form.get(
             "to_rack",
@@ -827,7 +844,7 @@ def move_stock():
         ).strip()
 
         try:
-            quantity = int(quantity_value)
+            quantity = int(quantity)
         except (TypeError, ValueError):
             return render_template(
                 "move_stock.html",
@@ -849,7 +866,7 @@ def move_stock():
                 error="Destination location is required."
             )
 
-        product = db.session.get(Product, product_id)
+        product = Product.query.get(product_id)
 
         if not product:
             return render_template(
@@ -862,10 +879,7 @@ def move_stock():
             return render_template(
                 "move_stock.html",
                 products=products,
-                error=(
-                    f"Insufficient stock available. "
-                    f"Current stock: {product.quantity}"
-                )
+                error="Insufficient stock available."
             )
 
         from_location = (
@@ -880,16 +894,9 @@ def move_stock():
             f"{to_bin}"
         )
 
-        if from_location == to_location:
-            return render_template(
-                "move_stock.html",
-                products=products,
-                error="Destination must be different from the current location."
-            )
-
         movement = StockMovement(
             product_id=product.id,
-            employee_id=session["employee_id"],
+            employee_id=employee.id,
             movement_type="MOVE",
             quantity=quantity,
             from_location=from_location,
@@ -912,8 +919,6 @@ def move_stock():
         products=products
     )
     
-    
-
 # ==========================
 # REPORTS
 # ==========================
@@ -1387,6 +1392,136 @@ def export_report():
     )
 
     return response
+
+# ==========================
+# PHASE 6 - SCANNER
+# ==========================
+
+@app.route("/scanner")
+def scanner():
+
+    if "employee_id" not in session:
+        return redirect("/")
+
+    return render_template("scanner.html")
+
+@app.route("/scanner/result")
+def scanner_result():
+
+    if "employee_id" not in session:
+        return redirect("/")
+
+    scanned_value = request.args.get("value", "").strip()
+
+    if not scanned_value:
+        return render_template(
+            "scanner.html",
+            error="No QR or barcode data was received."
+        )
+
+    product = None
+    location = None
+    scan_type = "UNKNOWN"
+
+    # -----------------------------------------
+    # 1. Existing WareFlow location QR
+    # Example:
+    # http://127.0.0.1:5000/location/A12-04-B
+    # -----------------------------------------
+
+    if "/location/" in scanned_value:
+
+        location = scanned_value.split(
+            "/location/",
+            1
+        )[1].strip().upper()
+
+        scan_type = "LOCATION"
+
+    else:
+
+        # -----------------------------------------
+        # 2. Direct location code
+        # Example:
+        # A12-04-B
+        # -----------------------------------------
+
+        possible_location = scanned_value.upper()
+
+        parts = possible_location.split("-")
+
+        if len(parts) == 3:
+
+            location = possible_location
+            scan_type = "LOCATION"
+
+    # -----------------------------------------
+    # 3. Find product by location
+    # -----------------------------------------
+
+    if location:
+
+        parts = location.split("-")
+
+        if len(parts) == 3:
+
+            rack = parts[0].strip().upper()
+            shelf = parts[1].strip()
+            bin_value = parts[2].strip().upper()
+
+            product = Product.query.filter_by(
+                rack=rack,
+                shelf=shelf,
+                bin=bin_value
+            ).first()
+
+    # -----------------------------------------
+    # 4. If location didn't find product,
+    #    try SKU
+    # -----------------------------------------
+
+    if product is None:
+
+        product = Product.query.filter(
+            db.func.upper(Product.sku)
+            == scanned_value.upper()
+        ).first()
+
+        if product:
+
+            scan_type = "PRODUCT"
+
+            location = (
+                f"{product.rack}-"
+                f"{product.shelf}-"
+                f"{product.bin}"
+            )
+
+    # -----------------------------------------
+    # 5. Product found
+    # -----------------------------------------
+
+    if product:
+
+        return render_template(
+            "scan_result.html",
+            scan_type=scan_type,
+            scanned_value=scanned_value,
+            location=location,
+            product=product
+        )
+
+    # -----------------------------------------
+    # 6. Nothing found
+    # -----------------------------------------
+
+    return render_template(
+        "scan_result.html",
+        scan_type="UNKNOWN",
+        scanned_value=scanned_value,
+        location=None,
+        product=None
+    )
 
 
 # ==========================

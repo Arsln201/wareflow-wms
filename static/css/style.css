@@ -1748,3 +1748,195 @@ a:hover{
     }
 
 }
+
+/* ==========================================
+   PHASE 6 - SCANNER
+   ========================================== */
+
+.scanner-page,
+.scan-result-page {
+    max-width: 1100px;
+    margin: 0 auto;
+}
+
+.scanner-card,
+.scan-result-card,
+.scanner-help {
+    background: rgba(22, 27, 34, 0.92);
+    border: 1px solid #30363d;
+    border-radius: 18px;
+    padding: 28px;
+    margin-top: 24px;
+}
+
+.scanner-title h2 {
+    margin-bottom: 8px;
+}
+
+.scanner-title p {
+    color: #8b949e;
+    margin-bottom: 24px;
+}
+
+.scanner-reader {
+    width: min(100%, 520px);
+    margin: 0 auto;
+    overflow: hidden;
+    border-radius: 14px;
+    border: 1px solid #30363d;
+}
+
+.scanner-reader video {
+    width: 100% !important;
+    border-radius: 14px;
+}
+
+.scanner-status {
+    text-align: center;
+    margin-top: 18px;
+    color: #8b949e;
+    font-size: 14px;
+}
+
+.scanner-restart {
+    display: block;
+    margin: 18px auto 0;
+}
+
+.scanner-help h3 {
+    margin-bottom: 20px;
+}
+
+.scanner-help-grid {
+    display: grid;
+    grid-template-columns: repeat(
+        3,
+        minmax(0, 1fr)
+    );
+    gap: 16px;
+}
+
+.scanner-help-item {
+    padding: 18px;
+    border: 1px solid #30363d;
+    border-radius: 12px;
+    background: rgba(13, 17, 23, 0.75);
+}
+
+.scanner-help-item strong {
+    display: block;
+    margin-bottom: 8px;
+}
+
+.scanner-help-item span {
+    color: #8b949e;
+    font-size: 14px;
+}
+
+.result-label {
+    display: inline-block;
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #8b949e;
+    margin-bottom: 8px;
+}
+
+.scan-result-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 20px;
+}
+
+.result-status {
+    padding: 8px 14px;
+    border-radius: 999px;
+    border: 1px solid #30363d;
+    font-size: 13px;
+    white-space: nowrap;
+}
+
+.scan-details-grid {
+    display: grid;
+    grid-template-columns: repeat(
+        3,
+        minmax(0, 1fr)
+    );
+    gap: 16px;
+    margin-top: 28px;
+}
+
+.scan-detail {
+    border: 1px solid #30363d;
+    border-radius: 12px;
+    padding: 18px;
+    background: rgba(13, 17, 23, 0.75);
+}
+
+.scan-detail span {
+    display: block;
+    color: #8b949e;
+    font-size: 13px;
+    margin-bottom: 8px;
+}
+
+.scan-detail strong {
+    display: block;
+    word-break: break-word;
+}
+
+.scan-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 28px;
+}
+
+.scan-action-button {
+    display: inline-block;
+    text-decoration: none;
+}
+
+.scan-empty {
+    text-align: center;
+    padding: 30px 10px;
+}
+
+.scan-empty p {
+    color: #8b949e;
+}
+
+.scan-empty > strong {
+    display: inline-block;
+    margin-top: 8px;
+    word-break: break-word;
+}
+
+@media (max-width: 700px) {
+
+    .scanner-card,
+    .scan-result-card,
+    .scanner-help {
+        padding: 20px;
+    }
+
+    .scanner-help-grid,
+    .scan-details-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .scan-result-header {
+        flex-direction: column;
+    }
+
+    .scan-actions {
+        flex-direction: column;
+    }
+
+    .scan-action-button {
+        width: 100%;
+        text-align: center;
+    }
+
+}

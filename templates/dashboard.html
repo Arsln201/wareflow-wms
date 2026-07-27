@@ -48,14 +48,40 @@
     <h2 class="section-title">Quick Actions</h2>
 
     <div class="quick-actions">
-        <button onclick="location.href='/search'">Search Warehouse</button>
-        <button onclick="location.href='/inventory'">Inventory</button>
-        <button onclick="location.href='/stock-operations'">Stock Operations</button>
-        <button onclick="location.href='/qr-management'">QR Management</button>
-        <button onclick="location.href='/reports'">Reports</button>
-        <button onclick="location.href='/add-product'">Add Product</button>
-        <button onclick="location.href='/logout'">Logout</button>
-    </div>
+
+    <button onclick="location.href='/search'">
+        Search Warehouse
+    </button>
+
+    <button onclick="location.href='/inventory'">
+        Inventory
+    </button>
+
+    <button onclick="location.href='/stock-operations'">
+        Stock Operations
+    </button>
+
+    <button onclick="location.href='/qr-management'">
+        QR Management
+    </button>
+
+    <button onclick="location.href='/reports'">
+        Reports
+    </button>
+
+    <button onclick="location.href='/scanner'">
+        Scanner
+    </button>
+
+    <button onclick="location.href='/add-product'">
+        Add Product
+    </button>
+
+    <button onclick="location.href='/logout'">
+        Logout
+    </button>
+
+</div>
 
     <h2 class="section-title">Warehouse Analytics</h2>
 
@@ -65,8 +91,10 @@
             <span>Inventory Health</span>
             <strong>{{ inventory_health }}%</strong>
             <div class="progress-track">
-                <div class="progress-fill" style="width: {{ inventory_health }}%;"></div>
-            </div>
+                <div
+    class="progress-fill"
+    data-width="{{ inventory_health }}"
+></div>
         </div>
 
         <div class="analytics-card">
@@ -234,6 +262,40 @@
 <script>
 function updateClock() {
     const now = new Date();
+    
+    document.getElementById("currentDate").textContent =
+        now.toLocaleDateString("en-IN", {
+            weekday: "long",
+            day: "numeric",
+            month: "long",
+            year: "numeric"
+        });
+
+    document.getElementById("currentTime").textContent =
+        now.toLocaleTimeString("en-IN", {
+            hour: "2-digit",
+            minute: "2-digit",
+            second: "2-digit"
+        });
+}
+
+updateClock();
+setInterval(updateClock, 1000);
+</script>
+
+<script>
+function updateProgressBars() {
+    document.querySelectorAll(".progress-fill").forEach(function (bar) {
+        const width = bar.dataset.width;
+
+        if (width) {
+            bar.style.width = width + "%";
+        }
+    });
+}
+
+function updateClock() {
+    const now = new Date();
 
     document.getElementById("currentDate").textContent =
         now.toLocaleDateString("en-IN", {
@@ -252,6 +314,8 @@ function updateClock() {
 }
 
 updateClock();
+updateProgressBars();
+
 setInterval(updateClock, 1000);
 </script>
 

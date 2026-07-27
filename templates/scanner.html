@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Scanner | WareFlow WMS</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/style.css') }}"
+    >
+
+    <script src="https://unpkg.com/html5-qrcode"></script>
+
+</head>
+
+<body>
+
+<div class="dashboard-container scanner-page">
+
+    <div class="page-header">
+
+        <div>
+
+            <h1>Scanner</h1>
+
+            <p>
+                Scan a warehouse QR code or barcode
+            </p>
+
+        </div>
+
+        <button
+            type="button"
+            onclick="location.href='/dashboard'"
+        >
+            Back to Dashboard
+        </button>
+
+    </div>
+
+
+    <div class="scanner-card">
+
+        <div class="scanner-title">
+
+            <h2>Scan Code</h2>
+
+            <p>
+                Allow camera access and point it at a QR code.
+            </p>
+
+        </div>
+
+
+        <div
+            id="reader"
+            class="scanner-reader"
+        ></div>
+
+
+        <div
+            id="scanner-status"
+            class="scanner-status"
+        >
+            Camera scanner ready.
+        </div>
+
+
+        <button
+            type="button"
+            id="restart-scanner"
+            class="scanner-restart"
+            style="display:none;"
+        >
+            Scan Again
+        </button>
+
+    </div>
+
+
+    <div class="scanner-help">
+
+        <h3>Supported Codes</h3>
+
+        <div class="scanner-help-grid">
+
+            <div class="scanner-help-item">
+
+                <strong>Location QR</strong>
+
+                <span>
+                    Example: A12-04-B
+                </span>
+
+            </div>
+
+
+            <div class="scanner-help-item">
+
+                <strong>Product SKU</strong>
+
+                <span>
+                    Scan a barcode containing a SKU
+                </span>
+
+            </div>
+
+
+            <div class="scanner-help-item">
+
+                <strong>Warehouse QR</strong>
+
+                <span>
+                    Existing WareFlow location QR codes
+                </span>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<script>
+
+let scanner;
+let scanLocked = false;
+
+const statusElement =
+    document.getElementById("scanner-status");
+
+const restartButton =
+    document.getElementById("restart-scanner");
+
+
+function updateStatus(message) {
+
+    statusElement.textContent = message;
+
+}
+
+
+function handleScan(decodedText) {
+
+    if (scanLocked) {
+        return;
+    }
+
+    scanLocked = true;
+
+    updateStatus(
+        "Code detected. Opening result..."
+    );
+
+    if (scanner) {
+
+        scanner.stop()
+            .catch(function () {});
+
+    }
+
+    const target =
+        "/scanner/result?value="
+        + encodeURIComponent(decodedText);
+
+    window.location.href = target;
+}
+
+
+function handleScanError(errorMessage) {
+
+    // Scanner continuously reports
+    // non-matching frames.
+    // We intentionally do not display
+    // those messages to the user.
+
+}
+
+
+function startScanner() {
+
+    scanLocked = false;
+
+    restartButton.style.display = "none";
+
+    updateStatus(
+        "Starting camera..."
+    );
+
+    scanner = new Html5Qrcode(
+        "reader"
+    );
+
+    scanner.start(
+
+        {
+            facingMode: "environment"
+        },
+
+        {
+            fps: 10,
+            qrbox: {
+                width: 250,
+                height: 250
+            }
+        },
+
+        handleScan,
+        handleScanError
+
+    ).then(function () {
+
+        updateStatus(
+            "Camera active. Point it at a code."
+        );
+
+    }).catch(function (error) {
+
+        console.error(error);
+
+        updateStatus(
+            "Camera could not be started. Check browser camera permission."
+        );
+
+        restartButton.style.display = "inline-block";
+
+    });
+
+}
+
+
+restartButton.addEventListener(
+    "click",
+    function () {
+
+        if (scanner) {
+
+            scanner.clear()
+                .catch(function () {});
+
+        }
+
+        document.getElementById(
+            "reader"
+        ).innerHTML = "";
+
+        startScanner();
+
+    }
+);
+
+
+startScanner();
+
+</script>
+
+</body>
+
+</html>
