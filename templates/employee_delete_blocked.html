@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Delete Employee | WareFlow WMS</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/style.css') }}"
+    >
+
+    <style>
+
+        /* =========================================
+           DELETE BLOCKED PAGE
+        ========================================= */
+
+        .delete-warning {
+            max-width: 700px;
+
+            margin: 30px auto 0;
+
+            padding: 30px;
+
+            text-align: center;
+
+            background: #151a20;
+
+            border-radius: 14px;
+        }
+
+        .delete-warning h2 {
+            margin-bottom: 10px;
+        }
+
+        .delete-warning .employee-id {
+            color: #9ca3af;
+
+            margin-bottom: 25px;
+        }
+
+        .warning-message {
+            margin: 20px 0;
+
+            line-height: 1.6;
+
+            color: #d1d5db;
+        }
+
+        .movement-count {
+            display: inline-block;
+
+            margin: 10px 0 20px;
+
+            padding: 10px 16px;
+
+            border-radius: 8px;
+
+            background: rgba(255, 255, 255, 0.05);
+
+            font-weight: 600;
+        }
+
+        /* ACTION BUTTONS */
+
+        .delete-page-actions {
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            gap: 12px;
+
+            margin-top: 28px;
+        }
+
+        .delete-page-btn {
+            display: inline-flex !important;
+
+            align-items: center !important;
+            justify-content: center !important;
+
+            width: 150px !important;
+            height: 42px !important;
+
+            margin: 0 !important;
+            padding: 0 !important;
+
+            box-sizing: border-box !important;
+
+            border-radius: 8px !important;
+
+            font-family: inherit;
+
+            font-size: 14px !important;
+
+            font-weight: 600 !important;
+
+            line-height: 1 !important;
+
+            text-decoration: none !important;
+
+            cursor: pointer;
+        }
+
+        .delete-edit-btn {
+            background: #00e5a8 !important;
+
+            border: 1px solid #00e5a8 !important;
+
+            color: #07110d !important;
+        }
+
+        .delete-back-btn {
+            background: transparent !important;
+
+            border: 1px solid #00e5a8 !important;
+
+            color: #00e5a8 !important;
+        }
+
+        .delete-page-btn:hover {
+            opacity: 0.85;
+        }
+
+        /* MOBILE */
+
+        @media (max-width: 600px) {
+
+            .delete-page-actions {
+                flex-direction: column;
+            }
+
+            .delete-page-btn {
+                width: 100% !important;
+                max-width: 300px;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+<div class="dashboard-container">
+
+
+    <!-- HEADER -->
+
+    <div class="dashboard-header">
+
+        <div>
+
+            <h1>
+                Cannot Delete Employee
+            </h1>
+
+            <p class="welcome">
+                Employee history must be preserved.
+            </p>
+
+        </div>
+
+        <div>
+
+            <button
+                type="button"
+                class="small-button"
+                onclick="location.href='/employee-management'"
+            >
+                Back
+            </button>
+
+        </div>
+
+    </div>
+
+
+    <!-- WARNING PANEL -->
+
+    <div class="dashboard-panel">
+
+        <div class="delete-warning">
+
+            <h2>
+                {{ employee.name }}
+            </h2>
+
+            <div class="employee-id">
+
+                Employee ID:
+                <strong>
+                    {{ employee.employee_id }}
+                </strong>
+
+            </div>
+
+
+            <div class="movement-count">
+
+                {{ movement_count }}
+
+                stock movement
+                {% if movement_count != 1 %}
+                    records
+                {% else %}
+                    record
+                {% endif %}
+
+            </div>
+
+
+            <p class="warning-message">
+
+                This employee cannot be deleted because they have
+                existing stock movement records.
+
+                Deleting this employee would break the historical
+                warehouse activity associated with this account.
+
+            </p>
+
+
+            <p class="warning-message">
+
+                You can edit the employee instead while preserving
+                their warehouse history.
+
+            </p>
+
+
+            <!-- ACTIONS -->
+
+            <div class="delete-page-actions">
+
+                <a
+                    href="/employee-management/edit/{{ employee.id }}"
+                    class="delete-page-btn delete-edit-btn"
+                >
+                    Edit Employee
+                </a>
+
+                <a
+                    href="/employee-management"
+                    class="delete-page-btn delete-back-btn"
+                >
+                    Back to Employees
+                </a>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- FOOTER -->
+
+    <footer class="dashboard-footer">
+
+        <div>
+
+            <strong>WareFlow WMS</strong>
+
+            <span>
+                Warehouse Management System
+            </span>
+
+        </div>
+
+        <div>
+            Employee Management
+        </div>
+
+    </footer>
+
+
+</div>
+
+</body>
+
+</html>

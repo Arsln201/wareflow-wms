@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Add Employee | WareFlow WMS</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/style.css') }}"
+    >
+</head>
+
+<body>
+
+<div class="dashboard-container">
+
+    <!-- HEADER -->
+    <div class="dashboard-header">
+
+        <div>
+            <h1>Add Employee</h1>
+
+            <p class="welcome">
+                Create a new WareFlow warehouse employee
+            </p>
+
+            <p class="role">
+                Role:
+                <strong>{{ session.get("role") }}</strong>
+            </p>
+        </div>
+
+        <div class="datetime">
+            <button
+                type="button"
+                class="small-button"
+                onclick="location.href='/employee-management'"
+            >
+                Back
+            </button>
+        </div>
+
+    </div>
+
+
+    <!-- FORM PANEL -->
+    <div class="dashboard-panel">
+
+        <div class="panel-header">
+
+            <div>
+                <h2>Employee Details</h2>
+
+                <p>
+                    Enter the employee's account information.
+                </p>
+            </div>
+
+        </div>
+
+
+        {% if error %}
+
+        <div class="empty-state">
+            <p>{{ error }}</p>
+        </div>
+
+        {% endif %}
+
+
+        <form
+            method="POST"
+            style="max-width: 600px;"
+        >
+
+            <!-- EMPLOYEE ID -->
+            <div style="margin-bottom: 20px;">
+
+                <label for="employee_id">
+                    Employee ID
+                </label>
+
+                <input
+                    type="text"
+                    id="employee_id"
+                    name="employee_id"
+                    placeholder="EMP1002"
+                    autocomplete="off"
+                    required
+                >
+
+            </div>
+
+
+            <!-- NAME -->
+            <div style="margin-bottom: 20px;">
+
+                <label for="name">
+                    Full Name
+                </label>
+
+                <input
+                    type="text"
+                    id="name"
+                    name="name"
+                    placeholder="Employee Name"
+                    autocomplete="name"
+                    required
+                >
+
+            </div>
+
+
+            <!-- PASSWORD -->
+            <div style="margin-bottom: 20px;">
+
+                <label for="password">
+                    Password
+                </label>
+
+                <input
+                    type="password"
+                    id="password"
+                    name="password"
+                    placeholder="Create password"
+                    autocomplete="new-password"
+                    required
+                >
+
+            </div>
+
+
+            <!-- ROLE -->
+            <div style="margin-bottom: 25px;">
+
+                <label for="role">
+                    Role
+                </label>
+
+                <select
+                    id="role"
+                    name="role"
+                    required
+                >
+
+                    <option value="" selected disabled>
+                        Select Role
+                    </option>
+
+                    <option value="Employee">
+                        Employee
+                    </option>
+
+                    <option value="Manager">
+                        Manager
+                    </option>
+
+                    <option value="Admin">
+                        Admin
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <!-- ACTION BUTTONS -->
+           <div class="form-actions">
+
+    <button
+        type="submit"
+        class="primary-action"
+    >
+        Create Employee
+    </button>
+
+    <button
+        type="button"
+        class="cancel-action"
+        onclick="location.href='/employee-management'"
+    >
+        Cancel
+    </button>
+
+
+            </div>
+
+        </form>
+
+    </div>
+
+
+    <!-- FOOTER -->
+    <footer class="dashboard-footer">
+
+        <div>
+            <strong>WareFlow WMS</strong>
+
+            <span>
+                Warehouse Management System
+            </span>
+        </div>
+
+        <div>
+            Employee Management
+        </div>
+
+    </footer>
+
+</div>
+
+</body>
+</html>
+
+<style>
+    .form-actions {
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        gap: 14px;
+        width: 100%;
+        margin-top: 10px;
+    }
+
+    .form-actions button {
+        width: auto !important;
+        min-width: 150px;
+        margin: 0 !important;
+        padding: 12px 22px;
+        box-sizing: border-box;
+    }
+
+    .form-actions .primary-action {
+        min-width: 180px;
+    }
+
+    .form-actions .cancel-action {
+        min-width: 110px;
+    }
+</style>

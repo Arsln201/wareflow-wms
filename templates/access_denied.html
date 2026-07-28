@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Access Denied | WareFlow WMS</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/style.css') }}"
+    >
+</head>
+
+<body>
+
+<div class="dashboard-container">
+
+    <div class="dashboard-panel">
+
+        <div class="panel-header">
+            <div>
+                <h1>Access Denied</h1>
+
+                <p>
+                    You don't have permission to access this page.
+                </p>
+            </div>
+        </div>
+
+        <div class="empty-state">
+
+            <p>
+                Current role:
+                <strong>{{ role }}</strong>
+            </p>
+
+            <button onclick="location.href='/dashboard'">
+                Back to Dashboard
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+</body>
+</html>

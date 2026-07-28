@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Edit Employee | WareFlow WMS</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/style.css') }}"
+    >
+
+    <style>
+        .form-actions {
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            gap: 14px;
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        .form-actions button {
+            width: auto !important;
+            margin: 0 !important;
+            padding: 12px 22px;
+            box-sizing: border-box;
+        }
+
+        .form-actions .save-action {
+            min-width: 150px;
+        }
+
+        .form-actions .cancel-action {
+            min-width: 110px;
+        }
+
+        .employee-info {
+            margin-bottom: 25px;
+            padding: 15px;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.04);
+        }
+
+        .employee-info span {
+            display: block;
+            margin-top: 5px;
+        }
+    </style>
+
+</head>
+
+<body>
+
+<div class="dashboard-container">
+
+    <!-- HEADER -->
+    <div class="dashboard-header">
+
+        <div>
+
+            <h1>Edit Employee</h1>
+
+            <p class="welcome">
+                Update WareFlow employee information
+            </p>
+
+            <p class="role">
+                Role:
+                <strong>{{ session.get("role") }}</strong>
+            </p>
+
+        </div>
+
+        <div class="datetime">
+
+            <button
+                type="button"
+                class="small-button"
+                onclick="location.href='/employee-management'"
+            >
+                Back
+            </button>
+
+        </div>
+
+    </div>
+
+
+    <!-- FORM PANEL -->
+    <div class="dashboard-panel">
+
+        <div class="panel-header">
+
+            <div>
+
+                <h2>Employee Details</h2>
+
+                <p>
+                    Update the employee's account information.
+                </p>
+
+            </div>
+
+        </div>
+
+
+        {% if error %}
+
+        <div class="empty-state">
+
+            <p>{{ error }}</p>
+
+        </div>
+
+        {% endif %}
+
+
+        <!-- EMPLOYEE ID -->
+        <div class="employee-info">
+
+            <strong>Employee ID</strong>
+
+            <span>
+                {{ employee.employee_id }}
+            </span>
+
+        </div>
+
+
+        <form
+            method="POST"
+            style="max-width: 600px;"
+        >
+
+            <!-- NAME -->
+            <div style="margin-bottom: 20px;">
+
+                <label for="name">
+                    Full Name
+                </label>
+
+                <input
+                    type="text"
+                    id="name"
+                    name="name"
+                    value="{{ employee.name }}"
+                    required
+                >
+
+            </div>
+
+
+            <!-- ROLE -->
+            <div style="margin-bottom: 20px;">
+
+                <label for="role">
+                    Role
+                </label>
+
+                <select
+                    id="role"
+                    name="role"
+                    required
+                >
+
+                    <option
+                        value="Employee"
+                        {% if employee.role == "Employee" %}selected{% endif %}
+                    >
+                        Employee
+                    </option>
+
+                    <option
+                        value="Manager"
+                        {% if employee.role == "Manager" %}selected{% endif %}
+                    >
+                        Manager
+                    </option>
+
+                    <option
+                        value="Admin"
+                        {% if employee.role == "Admin" %}selected{% endif %}
+                    >
+                        Admin
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <!-- PASSWORD -->
+            <div style="margin-bottom: 25px;">
+
+                <label for="password">
+                    New Password
+                </label>
+
+                <input
+                    type="password"
+                    id="password"
+                    name="password"
+                    placeholder="Leave blank to keep current password"
+                    autocomplete="new-password"
+                >
+
+                <small>
+                    Leave this empty if you don't want to change the password.
+                </small>
+
+            </div>
+
+
+            <!-- ACTION BUTTONS -->
+            <div class="form-actions">
+
+                <button
+                    type="submit"
+                    class="save-action"
+                >
+                    Save Changes
+                </button>
+
+                <button
+                    type="button"
+                    class="cancel-action"
+                    onclick="location.href='/employee-management'"
+                >
+                    Cancel
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+
+    <!-- FOOTER -->
+    <footer class="dashboard-footer">
+
+        <div>
+
+            <strong>WareFlow WMS</strong>
+
+            <span>
+                Warehouse Management System
+            </span>
+
+        </div>
+
+        <div>
+            Employee Management
+        </div>
+
+    </footer>
+
+</div>
+
+</body>
+</html>

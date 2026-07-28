@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Employee Management | WareFlow WMS</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/style.css') }}"
+    >
+
+    <style>
+        /* =========================================
+           EMPLOYEE MANAGEMENT
+        ========================================= */
+
+        .employee-list {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            margin-top: 20px;
+        }
+
+        .employee-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+
+            width: 100%;
+            box-sizing: border-box;
+
+            padding: 18px;
+
+            background: #151a20;
+            border-radius: 12px;
+        }
+
+        .employee-details {
+            min-width: 0;
+            flex: 1;
+        }
+
+        .employee-details strong {
+            display: block;
+            font-size: 16px;
+            margin-bottom: 5px;
+        }
+
+        .employee-details span {
+            display: block;
+            font-size: 14px;
+            color: #9ca3af;
+        }
+
+        /* ACTION BUTTON CONTAINER */
+
+        .employee-actions {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+
+            gap: 10px;
+
+            flex-shrink: 0;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* BOTH EDIT + DELETE */
+
+        .employee-action-btn {
+            display: inline-flex !important;
+
+            align-items: center !important;
+            justify-content: center !important;
+
+            width: 82px !important;
+            height: 40px !important;
+
+            min-width: 82px !important;
+            max-width: 82px !important;
+
+            margin: 0 !important;
+            padding: 0 !important;
+
+            box-sizing: border-box !important;
+
+            border-radius: 8px !important;
+
+            font-family: inherit;
+            font-size: 14px !important;
+            font-weight: 600 !important;
+
+            line-height: 1 !important;
+
+            text-decoration: none !important;
+
+            cursor: pointer;
+        }
+
+        /* EDIT */
+
+        .employee-edit-btn {
+            background: transparent !important;
+
+            border: 1px solid #00e5a8 !important;
+
+            color: #00e5a8 !important;
+        }
+
+        /* DELETE */
+
+        .employee-delete-form {
+            display: flex;
+
+            align-items: center;
+
+            margin: 0 !important;
+            padding: 0 !important;
+        }
+
+        .employee-delete-btn {
+            background: #00e5a8 !important;
+
+            border: 1px solid #00e5a8 !important;
+
+            color: #07110d !important;
+        }
+
+        /* HOVER */
+
+        .employee-action-btn:hover {
+            opacity: 0.85;
+        }
+
+        /* MOBILE */
+
+        @media (max-width: 650px) {
+
+            .employee-row {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .employee-actions {
+                justify-content: flex-start;
+            }
+
+        }
+    </style>
+
+</head>
+
+<body>
+
+<div class="dashboard-container">
+
+    <!-- HEADER -->
+
+    <div class="dashboard-header">
+
+        <div>
+
+            <h1>Employee Management</h1>
+
+            <p class="welcome">
+                Manage WareFlow warehouse employees
+            </p>
+
+            <p class="role">
+                Role:
+                <strong>{{ session.get("role") }}</strong>
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <!-- DASHBOARD BUTTON -->
+
+    <div class="dashboard-panel">
+
+        <button
+            type="button"
+            class="small-button"
+            onclick="location.href='/dashboard'"
+        >
+            Dashboard
+        </button>
+
+    </div>
+
+
+    <!-- EMPLOYEES -->
+
+    <div class="dashboard-panel">
+
+        <div class="panel-header">
+
+            <div>
+
+                <h2>Employees</h2>
+
+                <p>
+                    {{ employees|length }} registered employees
+                </p>
+
+            </div>
+
+            <button
+                type="button"
+                class="small-button"
+                onclick="location.href='/employee-management/add'"
+            >
+                + Add Employee
+            </button>
+
+        </div>
+
+
+        {% if employees %}
+
+        <div class="employee-list">
+
+            {% for employee in employees %}
+
+            <div class="employee-row">
+
+                <!-- EMPLOYEE INFORMATION -->
+
+                <div class="employee-details">
+
+                    <strong>
+                        {{ employee.name }}
+                    </strong>
+
+                    <span>
+                        Employee ID:
+                        {{ employee.employee_id }}
+                        ·
+                        Role:
+                        {{ employee.role }}
+                    </span>
+
+                </div>
+
+
+                <!-- ACTIONS -->
+
+                <div class="employee-actions">
+
+                    <!-- EDIT -->
+
+                    <a
+                        href="/employee-management/edit/{{ employee.id }}"
+                        class="employee-action-btn employee-edit-btn"
+                    >
+                        Edit
+                    </a>
+
+
+                    <!-- DELETE -->
+
+                    {% if employee.employee_id != session.get("employee_id") %}
+
+                    <form
+                        method="POST"
+                        action="/employee-management/delete/{{ employee.id }}"
+                        class="employee-delete-form"
+                        onsubmit="return confirm('Are you sure you want to delete {{ employee.name }}?');"
+                    >
+
+                        <button
+                            type="submit"
+                            class="employee-action-btn employee-delete-btn"
+                        >
+                            Delete
+                        </button>
+
+                    </form>
+
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+            {% endfor %}
+
+        </div>
+
+        {% else %}
+
+        <div class="empty-state">
+
+            <p>
+                No employees registered yet.
+            </p>
+
+            <button
+                type="button"
+                class="small-button"
+                onclick="location.href='/employee-management/add'"
+            >
+                Add First Employee
+            </button>
+
+        </div>
+
+        {% endif %}
+
+    </div>
+
+
+    <!-- FOOTER -->
+
+    <footer class="dashboard-footer">
+
+        <div>
+
+            <strong>WareFlow WMS</strong>
+
+            <span>
+                Warehouse Management System
+            </span>
+
+        </div>
+
+        <div>
+            Employee Management
+        </div>
+
+    </footer>
+
+</div>
+
+</body>
+</html>

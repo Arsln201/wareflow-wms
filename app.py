@@ -1,14 +1,46 @@
-from werkzeug.security import check_password_hash
+from functools import wraps
+from werkzeug.security import check_password_hash, generate_password_hash
 import qrcode
 import os
 
 from flask import Flask, render_template, request, redirect, session
-from models import db, Product, Employee, StockMovement
+
+from models import (
+    db,
+    Product,
+    Employee,
+    StockMovement,
+    WarehouseAlert
+)
+
 from config import Config
 from datetime import datetime
 from zoneinfo import ZoneInfo
 import csv
 import io
+
+def role_required(*allowed_roles):
+    def decorator(function):
+
+        @wraps(function)
+        def wrapper(*args, **kwargs):
+
+            if "employee_id" not in session:
+                return redirect("/")
+
+            current_role = session.get("role")
+
+            if current_role not in allowed_roles:
+                return render_template(
+                    "access_denied.html",
+                    role=current_role
+                ), 403
+
+            return function(*args, **kwargs)
+
+        return wrapper
+
+    return decorator
 
 def format_ist(dt):
     if not dt:
@@ -34,6 +66,100 @@ db.init_app(app)
 
 with app.app_context():
     db.create_all()
+
+def generate_stock_alerts():
+
+    products = Product.query.all()
+
+    for product in products:
+
+        # ==========================================
+        # OUT OF STOCK
+        # ==========================================
+
+        if product.quantity <= 0:
+
+            # Remove old LOW STOCK alerts
+            WarehouseAlert.query.filter_by(
+                product_id=product.id,
+                alert_type="LOW_STOCK"
+            ).delete()
+
+            # Check if an unread OUT OF STOCK alert exists
+            existing_alert = WarehouseAlert.query.filter_by(
+                product_id=product.id,
+                alert_type="OUT_OF_STOCK",
+                is_read=False
+            ).first()
+
+            if not existing_alert:
+
+                alert = WarehouseAlert(
+                    product_id=product.id,
+                    alert_type="OUT_OF_STOCK",
+                    title="Out of Stock",
+                    message=(
+                        f"{product.product_name} "
+                        f"is currently out of stock."
+                    )
+                )
+
+                db.session.add(alert)
+
+
+        # ==========================================
+        # LOW STOCK
+        # ==========================================
+
+        elif product.quantity <= 10:
+
+            # Remove OUT OF STOCK alerts
+            WarehouseAlert.query.filter_by(
+                product_id=product.id,
+                alert_type="OUT_OF_STOCK"
+            ).delete()
+
+            # Check if unread LOW STOCK alert exists
+            existing_alert = WarehouseAlert.query.filter_by(
+                product_id=product.id,
+                alert_type="LOW_STOCK",
+                is_read=False
+            ).first()
+
+            if not existing_alert:
+
+                alert = WarehouseAlert(
+                    product_id=product.id,
+                    alert_type="LOW_STOCK",
+                    title="Low Stock Warning",
+                    message=(
+                        f"{product.product_name} has only "
+                        f"{product.quantity} units remaining."
+                    )
+                )
+
+                db.session.add(alert)
+
+
+        # ==========================================
+        # NORMAL STOCK
+        # ==========================================
+
+        else:
+
+            # Product has more than 10 units.
+            # Remove active stock warnings.
+            WarehouseAlert.query.filter(
+                WarehouseAlert.product_id == product.id,
+                WarehouseAlert.alert_type.in_([
+                    "OUT_OF_STOCK",
+                    "LOW_STOCK"
+                ])
+            ).delete(
+                synchronize_session=False
+            )
+
+    db.session.commit()
 
 
 # ==========================
@@ -83,15 +209,70 @@ def logout():
     return redirect("/")
 
 
-# ==========================
-# DASHBOARD
-# ==========================
+@app.route("/alerts")
+def alerts():
+
+    if "employee_id" not in session:
+        return redirect("/")
+
+    generate_stock_alerts()
+
+    alert_list = WarehouseAlert.query.order_by(
+        WarehouseAlert.created_at.desc()
+    ).all()
+
+    unread_count = WarehouseAlert.query.filter_by(
+        is_read=False
+    ).count()
+
+    return render_template(
+        "alerts.html",
+        alerts=alert_list,
+        unread_count=unread_count
+    )
+
+@app.route("/alerts/read/<int:alert_id>")
+def mark_alert_read(alert_id):
+
+    if "employee_id" not in session:
+        return redirect("/")
+
+    alert = WarehouseAlert.query.get_or_404(alert_id)
+
+    alert.is_read = True
+
+    db.session.commit()
+
+    return redirect("/alerts")
+
+@app.route("/alerts/read-all")
+def mark_all_alerts_read():
+
+    if "employee_id" not in session:
+        return redirect("/")
+
+    WarehouseAlert.query.filter_by(
+        is_read=False
+    ).update(
+        {
+            WarehouseAlert.is_read: True
+        },
+        synchronize_session=False
+    )
+
+    db.session.commit()
+
+    return redirect("/alerts")
 
 @app.route("/dashboard")
 def dashboard():
 
     if "employee_id" not in session:
         return redirect("/")
+
+    # ==========================================
+    # BASIC INVENTORY STATISTICS
+    # ==========================================
 
     total_products = Product.query.count()
 
@@ -106,7 +287,7 @@ def dashboard():
             db.func.sum(Product.quantity),
             0
         )
-    ).scalar()
+    ).scalar() or 0
 
     low_stock = Product.query.filter(
         Product.quantity.between(1, 10)
@@ -118,13 +299,28 @@ def dashboard():
 
     total_employees = Employee.query.count()
 
+
+    # ==========================================
+    # RECENT PRODUCTS
+    # ==========================================
+
     recent_products = Product.query.order_by(
         Product.created_at.desc()
     ).limit(5).all()
 
+
+    # ==========================================
+    # RECENT STOCK MOVEMENTS
+    # ==========================================
+
     recent_movements = StockMovement.query.order_by(
         StockMovement.created_at.desc()
     ).limit(5).all()
+
+
+    # ==========================================
+    # MOVEMENT TOTALS
+    # ==========================================
 
     receive_units = db.session.query(
         db.func.coalesce(
@@ -133,7 +329,8 @@ def dashboard():
         )
     ).filter(
         StockMovement.movement_type == "RECEIVE"
-    ).scalar()
+    ).scalar() or 0
+
 
     issue_units = db.session.query(
         db.func.coalesce(
@@ -142,7 +339,8 @@ def dashboard():
         )
     ).filter(
         StockMovement.movement_type == "ISSUE"
-    ).scalar()
+    ).scalar() or 0
+
 
     move_units = db.session.query(
         db.func.coalesce(
@@ -151,35 +349,115 @@ def dashboard():
         )
     ).filter(
         StockMovement.movement_type == "MOVE"
-    ).scalar()
+    ).scalar() or 0
+
 
     movement_total = StockMovement.query.count()
 
+
+    # ==========================================
+    # INVENTORY HEALTH
+    # ==========================================
+
     if total_products == 0:
+
         inventory_health = 100
+
     else:
+
         inventory_health = round(
-            ((total_products - out_of_stock) / total_products) * 100
+            (
+                (total_products - out_of_stock)
+                / total_products
+            ) * 100
         )
 
+        inventory_health = max(
+            0,
+            min(inventory_health, 100)
+        )
+
+
+    # ==========================================
+    # STOCK MOVEMENT CHART
+    # ==========================================
+
+    max_movement = max(
+        receive_units,
+        issue_units,
+        move_units,
+        1
+    )
+
+
+    movement_chart = {
+
+        "receive": receive_units,
+
+        "issue": issue_units,
+
+        "move": move_units,
+
+        "receive_percent": round(
+            (receive_units / max_movement) * 100,
+            1
+        ),
+
+        "issue_percent": round(
+            (issue_units / max_movement) * 100,
+            1
+        ),
+
+        "move_percent": round(
+            (move_units / max_movement) * 100,
+            1
+        )
+
+    }
+
+
+    # ==========================================
+    # RENDER DASHBOARD
+    # ==========================================
+
     return render_template(
+
         "dashboard.html",
+
         employee=session["employee_name"],
+
         role=session["role"],
+
         total_products=total_products,
+
         total_locations=total_locations,
+
         total_units=total_units,
+
         low_stock=low_stock,
+
         out_of_stock=out_of_stock,
+
         total_employees=total_employees,
+
         recent_products=recent_products,
+
         recent_movements=recent_movements,
+
         receive_units=receive_units,
+
         issue_units=issue_units,
+
         move_units=move_units,
+
         movement_total=movement_total,
+
         inventory_health=inventory_health,
+
+        movement_chart=movement_chart,
+
         format_ist=format_ist
+
     )
 
 
@@ -269,7 +547,8 @@ def inventory():
 # ADD PRODUCT
 # ==========================
 
-@app.route("/add-product", methods=["GET", "POST"])
+@app.route("/add-product")
+@role_required("Admin", "Manager")
 def add_product():
 
     if "employee_id" not in session:
@@ -458,6 +737,7 @@ def search():
 
 
 @app.route("/qr-management")
+@role_required("Admin", "Manager")
 def qr_management():
 
     if "employee_id" not in session:
@@ -1002,6 +1282,7 @@ def get_report_query():
 
 
 @app.route("/reports")
+@role_required("Admin", "Manager")
 def reports():
 
     if "employee_id" not in session:
@@ -1522,6 +1803,150 @@ def scanner_result():
         location=None,
         product=None
     )
+
+# ==========================
+# EMPLOYEE-MANAGEMENT
+# ==========================
+
+
+@app.route("/employee-management")
+@role_required("Admin")
+def employee_management():
+
+    employees = Employee.query.order_by(
+        Employee.name.asc()
+    ).all()
+
+    return render_template(
+        "employee_management.html",
+        employees=employees
+    )
+
+@app.route("/employee-management/add", methods=["GET", "POST"])
+@role_required("Admin")
+def add_employee():
+
+    if request.method == "POST":
+
+        employee_id = request.form.get("employee_id", "").strip().upper()
+        name = request.form.get("name", "").strip()
+        password = request.form.get("password", "")
+        role = request.form.get("role", "").strip()
+
+        # Validate required fields
+        if not employee_id or not name or not password or not role:
+            return render_template(
+                "add_employee.html",
+                error="All fields are required."
+            )
+
+        # Validate role
+        allowed_roles = ["Admin", "Manager", "Employee"]
+
+        if role not in allowed_roles:
+            return render_template(
+                "add_employee.html",
+                error="Invalid role selected."
+            )
+
+        # Check duplicate Employee ID
+        existing_employee = Employee.query.filter_by(
+            employee_id=employee_id
+        ).first()
+
+        if existing_employee:
+            return render_template(
+                "add_employee.html",
+                error="Employee ID already exists."
+            )
+
+        # Hash password
+        hashed_password = generate_password_hash(password)
+
+        employee = Employee(
+            employee_id=employee_id,
+            name=name,
+            password=hashed_password,
+            role=role
+        )
+
+        db.session.add(employee)
+        db.session.commit()
+
+        return redirect("/employee-management")
+
+    return render_template("add_employee.html")
+
+@app.route("/employee-management/edit/<int:employee_id>", methods=["GET", "POST"])
+@role_required("Admin")
+def edit_employee(employee_id):
+
+    employee = Employee.query.get_or_404(employee_id)
+
+    if request.method == "POST":
+
+        name = request.form.get("name", "").strip()
+        role = request.form.get("role", "").strip()
+        password = request.form.get("password", "")
+
+        if not name or not role:
+            return render_template(
+                "edit_employee.html",
+                employee=employee,
+                error="Name and role are required."
+            )
+
+        allowed_roles = ["Admin", "Manager", "Employee"]
+
+        if role not in allowed_roles:
+            return render_template(
+                "edit_employee.html",
+                employee=employee,
+                error="Invalid role selected."
+            )
+
+        employee.name = name
+        employee.role = role
+
+        # Change password only if a new password was entered
+        if password.strip():
+            employee.password = generate_password_hash(password)
+
+        db.session.commit()
+
+        return redirect("/employee-management")
+
+    return render_template(
+        "edit_employee.html",
+        employee=employee
+    )
+
+@app.route("/employee-management/delete/<int:employee_id>", methods=["POST"])
+@role_required("Admin")
+def delete_employee(employee_id):
+
+    employee = Employee.query.get_or_404(employee_id)
+
+    # Don't allow deleting yourself
+    if employee.employee_id == session.get("employee_id"):
+        return redirect("/employee-management")
+
+    # Check whether this employee has stock movement history
+    movements = StockMovement.query.filter_by(
+        employee_id=employee.id
+    ).all()
+
+    if movements:
+        return render_template(
+            "employee_delete_blocked.html",
+            employee=employee,
+            movement_count=len(movements)
+        ), 409
+
+    db.session.delete(employee)
+    db.session.commit()
+
+    return redirect("/employee-management")
 
 
 # ==========================

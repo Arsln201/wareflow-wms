@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>WareFlow | Alerts</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/style.css') }}"
+    >
+
+</head>
+
+<body>
+
+<div class="dashboard-container">
+
+    <!-- ================================================= -->
+    <!-- HEADER -->
+    <!-- ================================================= -->
+
+    <div class="dashboard-header">
+
+        <div>
+
+            <h1>Warehouse Alerts</h1>
+
+            <p class="welcome">
+                Inventory warnings and system notifications
+            </p>
+
+            <p class="role">
+                Logged in as:
+                <strong>{{ session.get("employee_name", "Employee") }}</strong>
+            </p>
+
+        </div>
+
+        <div class="datetime">
+
+            <h3 id="currentDate"></h3>
+
+            <p id="currentTime"></p>
+
+        </div>
+
+    </div>
+
+
+    <!-- ================================================= -->
+    <!-- ALERT SUMMARY -->
+    <!-- ================================================= -->
+
+    <div class="cards">
+
+        <div class="card">
+
+            <h3>Total Alerts</h3>
+
+            <p>{{ alerts|length }}</p>
+
+        </div>
+
+
+        <div class="card">
+
+            <h3>Unread Alerts</h3>
+
+            <p>{{ unread_count }}</p>
+
+        </div>
+
+
+        <div class="card">
+
+            <h3>Critical</h3>
+
+            <p>
+                {{ alerts|selectattr("severity", "equalto", "critical")|list|length }}
+            </p>
+
+        </div>
+
+
+        <div class="card">
+
+            <h3>Warnings</h3>
+
+            <p>
+                {{ alerts|selectattr("severity", "equalto", "warning")|list|length }}
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <!-- ================================================= -->
+    <!-- ACTIONS -->
+    <!-- ================================================= -->
+
+    <div class="quick-actions">
+
+        <button
+            type="button"
+            onclick="location.href='/dashboard'"
+        >
+            Dashboard
+        </button>
+
+
+        {% if unread_count > 0 %}
+
+        <button
+            type="button"
+            onclick="location.href='/alerts/read-all'"
+        >
+            Mark All as Read
+        </button>
+
+        {% endif %}
+
+
+        <button
+            type="button"
+            onclick="location.href='/inventory'"
+        >
+            Inventory
+        </button>
+
+    </div>
+
+
+    <!-- ================================================= -->
+    <!-- ALERT PANEL -->
+    <!-- ================================================= -->
+
+    <div class="dashboard-panel dashboard-panel-spaced">
+
+        <div class="panel-header">
+
+            <div>
+
+                <h2>Notifications</h2>
+
+                <p>
+                    Current warehouse inventory alerts
+                </p>
+
+            </div>
+
+
+            {% if unread_count > 0 %}
+
+            <span class="panel-status">
+                {{ unread_count }} UNREAD
+            </span>
+
+            {% else %}
+
+            <span class="panel-status">
+                ALL CLEAR
+            </span>
+
+            {% endif %}
+
+        </div>
+
+
+        <!-- ================================================= -->
+        <!-- ALERT LIST -->
+        <!-- ================================================= -->
+
+        {% if alerts %}
+
+        <div class="activity-list">
+
+            {% for alert in alerts %}
+
+            <div
+                class="activity-item alert-item
+                alert-{{ alert.severity }}
+                {% if not alert.is_read %}alert-unread{% endif %}"
+            >
+
+                <!-- ICON -->
+
+                <div class="alert-icon">
+
+                    {{ alert.icon }}
+
+                </div>
+
+
+                <!-- CONTENT -->
+
+                <div class="activity-content">
+
+                    <strong>
+
+                        {{ alert.title }}
+
+                        {% if not alert.is_read %}
+
+                        <span class="alert-new">
+                            NEW
+                        </span>
+
+                        {% endif %}
+
+                    </strong>
+
+
+                    <span>
+
+                        {{ alert.message }}
+
+                    </span>
+
+
+                    {% if alert.product %}
+
+                    <span>
+
+                        SKU:
+                        <strong>{{ alert.product.sku }}</strong>
+
+                        · Location:
+                        <strong>
+                            {{ alert.product.rack }}-{{ alert.product.shelf }}-{{ alert.product.bin }}
+                        </strong>
+
+                    </span>
+
+                    {% endif %}
+
+                </div>
+
+
+                <!-- TIME / ACTION -->
+
+                <div class="activity-location">
+
+                    <span>
+
+                        {{ format_ist(alert.created_at) }}
+
+                    </span>
+
+
+                    {% if not alert.is_read %}
+
+                    <button
+                        type="button"
+                        class="small-button alert-read-button"
+                        onclick="location.href='/alerts/read/{{ alert.id }}'"
+                    >
+                        Mark Read
+                    </button>
+
+                    {% else %}
+
+                    <span class="alert-read-label">
+                        Read
+                    </span>
+
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+            {% endfor %}
+
+        </div>
+
+
+        {% else %}
+
+        <!-- ================================================= -->
+        <!-- NO ALERTS -->
+        <!-- ================================================= -->
+
+        <div class="empty-state">
+
+            <div class="empty-alert-icon">
+                ✓
+            </div>
+
+            <h3>Everything looks good</h3>
+
+            <p>
+                There are currently no warehouse alerts.
+            </p>
+
+        </div>
+
+        {% endif %}
+
+    </div>
+
+
+    <!-- ================================================= -->
+    <!-- ALERT LEGEND -->
+    <!-- ================================================= -->
+
+    <div class="dashboard-panel dashboard-panel-spaced">
+
+        <div class="panel-header">
+
+            <div>
+
+                <h2>Alert Types</h2>
+
+                <p>
+                    Understanding WareFlow inventory notifications
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div class="status-list">
+
+            <div class="status-row">
+
+                <div>
+
+                    <strong>🚨 Out of Stock</strong>
+
+                    <span>
+                        Product quantity is zero or below
+                    </span>
+
+                </div>
+
+                <div class="status-badge">
+                    Critical
+                </div>
+
+            </div>
+
+
+            <div class="status-row">
+
+                <div>
+
+                    <strong>⚠️ Low Stock</strong>
+
+                    <span>
+                        Product has 10 or fewer units remaining
+                    </span>
+
+                </div>
+
+                <div class="status-badge">
+                    Warning
+                </div>
+
+            </div>
+
+
+            <div class="status-row">
+
+                <div>
+
+                    <strong>✓ Stock Recovered</strong>
+
+                    <span>
+                        Previously low stock has been replenished
+                    </span>
+
+                </div>
+
+                <div class="status-badge">
+                    Normal
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- ================================================= -->
+    <!-- FOOTER -->
+    <!-- ================================================= -->
+
+    <footer class="dashboard-footer">
+
+        <div>
+
+            <strong>WareFlow WMS</strong>
+
+            <span>
+                Warehouse Management System
+            </span>
+
+        </div>
+
+        <div>
+            Alerts & Notifications
+        </div>
+
+    </footer>
+
+</div>
+
+
+<!-- ===================================================== -->
+<!-- CLOCK -->
+<!-- ===================================================== -->
+
+<script>
+
+function updateClock() {
+
+    const now = new Date();
+
+
+    const dateElement =
+        document.getElementById("currentDate");
+
+    const timeElement =
+        document.getElementById("currentTime");
+
+
+    if (dateElement) {
+
+        dateElement.textContent =
+            now.toLocaleDateString("en-IN", {
+
+                weekday: "long",
+
+                day: "numeric",
+
+                month: "long",
+
+                year: "numeric"
+
+            });
+
+    }
+
+
+    if (timeElement) {
+
+        timeElement.textContent =
+            now.toLocaleTimeString("en-IN", {
+
+                hour: "2-digit",
+
+                minute: "2-digit",
+
+                second: "2-digit"
+
+            });
+
+    }
+
+}
+
+
+updateClock();
+
+setInterval(updateClock, 1000);
+
+</script>
+
+</body>
+
+</html>

@@ -1,323 +1,886 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
+
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
     <title>WareFlow WMS Dashboard</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/style.css') }}"
+    >
+
 </head>
+
+
 <body>
 
 <div class="dashboard-container">
 
+
+    <!-- ==========================================
+         HEADER
+    ========================================== -->
+
     <div class="dashboard-header">
+
         <div>
+
             <h1>WareFlow WMS</h1>
-            <p class="welcome">Welcome back, <strong>{{ employee }}</strong></p>
-            <p class="role">Role: <strong>{{ role }}</strong></p>
+
+            <p class="welcome">
+                Welcome back,
+                <strong>{{ employee }}</strong>
+            </p>
+
+            <p class="role">
+                Role:
+                <strong>{{ role }}</strong>
+            </p>
+
         </div>
+
 
         <div class="datetime">
+
             <h3 id="currentDate"></h3>
+
             <p id="currentTime"></p>
+
         </div>
+
     </div>
+
+
+
+    <!-- ==========================================
+         MAIN KPI CARDS
+    ========================================== -->
 
     <div class="cards">
+
         <div class="card">
+
             <h3>Total Products</h3>
+
             <p>{{ total_products }}</p>
+
         </div>
 
+
         <div class="card">
+
             <h3>Total Units</h3>
+
             <p>{{ total_units }}</p>
+
         </div>
 
+
         <div class="card">
+
             <h3>Low Stock</h3>
+
             <p>{{ low_stock }}</p>
+
         </div>
 
+
         <div class="card">
+
             <h3>Out of Stock</h3>
+
             <p>{{ out_of_stock }}</p>
+
         </div>
+
     </div>
 
-    <h2 class="section-title">Quick Actions</h2>
+
+
+    <!-- ==========================================
+         QUICK ACTIONS
+    ========================================== -->
+
+    <h2 class="section-title">
+        Quick Actions
+    </h2>
+
 
     <div class="quick-actions">
 
-    <button onclick="location.href='/search'">
-        Search Warehouse
-    </button>
+        <button
+            type="button"
+            onclick="location.href='/search'"
+        >
+            Search Warehouse
+        </button>
 
-    <button onclick="location.href='/inventory'">
-        Inventory
-    </button>
 
-    <button onclick="location.href='/stock-operations'">
-        Stock Operations
-    </button>
+        <button
+            type="button"
+            onclick="location.href='/inventory'"
+        >
+            Inventory
+        </button>
 
-    <button onclick="location.href='/qr-management'">
-        QR Management
-    </button>
 
-    <button onclick="location.href='/reports'">
-        Reports
-    </button>
+        <button
+            type="button"
+            onclick="location.href='/stock-operations'"
+        >
+            Stock Operations
+        </button>
 
-    <button onclick="location.href='/scanner'">
-        Scanner
-    </button>
 
-    <button onclick="location.href='/add-product'">
-        Add Product
-    </button>
+        <button
+            type="button"
+            onclick="location.href='/qr-management'"
+        >
+            QR Management
+        </button>
 
-    <button onclick="location.href='/logout'">
-        Logout
-    </button>
 
-</div>
+        <button
+            type="button"
+            onclick="location.href='/reports'"
+        >
+            Reports
+        </button>
 
-    <h2 class="section-title">Warehouse Analytics</h2>
+
+        <button
+            type="button"
+            onclick="location.href='/scanner'"
+        >
+            Scanner
+        </button>
+
+
+        <button
+            type="button"
+            onclick="location.href='/add-product'"
+        >
+            Add Product
+        </button>
+
+
+        <button
+            type="button"
+            onclick="location.href='/logout'"
+        >
+            Logout
+        </button>
+
+    </div>
+
+
+
+    <!-- ==========================================
+         WAREHOUSE ANALYTICS
+    ========================================== -->
+
+    <h2 class="section-title">
+        Warehouse Analytics
+    </h2>
+
 
     <div class="analytics-grid">
 
+
+        <!-- INVENTORY HEALTH -->
+
         <div class="analytics-card">
-            <span>Inventory Health</span>
-            <strong>{{ inventory_health }}%</strong>
+
+            <span>
+                Inventory Health
+            </span>
+
+            <strong>
+                {{ inventory_health }}%
+            </strong>
+
             <div class="progress-track">
+
                 <div
-    class="progress-fill"
-    data-width="{{ inventory_health }}"
-></div>
+                    class="progress-fill"
+                    data-width="{{ inventory_health }}"
+                ></div>
+
+            </div>
+
         </div>
 
-        <div class="analytics-card">
-            <span>Total Movements</span>
-            <strong>{{ movement_total }}</strong>
-            <small>Recorded stock operations</small>
-        </div>
+
+        <!-- TOTAL MOVEMENTS -->
 
         <div class="analytics-card">
-            <span>Received Units</span>
-            <strong>{{ receive_units }}</strong>
-            <small>Total units received</small>
+
+            <span>
+                Total Movements
+            </span>
+
+            <strong>
+                {{ movement_total }}
+            </strong>
+
+            <small>
+                Recorded stock operations
+            </small>
+
         </div>
 
-        <div class="analytics-card">
-            <span>Issued Units</span>
-            <strong>{{ issue_units }}</strong>
-            <small>Total units issued</small>
-        </div>
+
+        <!-- RECEIVED -->
 
         <div class="analytics-card">
-            <span>Moved Units</span>
-            <strong>{{ move_units }}</strong>
-            <small>Total units relocated</small>
+
+            <span>
+                Received Units
+            </span>
+
+            <strong>
+                {{ receive_units }}
+            </strong>
+
+            <small>
+                Total units received
+            </small>
+
         </div>
 
+
+        <!-- ISSUED -->
+
         <div class="analytics-card">
-            <span>Employees</span>
-            <strong>{{ total_employees }}</strong>
-            <small>Registered warehouse employees</small>
+
+            <span>
+                Issued Units
+            </span>
+
+            <small>
+                Total units issued
+            </small>
+
+            <strong>
+                {{ issue_units }}
+            </strong>
+
+        </div>
+
+
+        <!-- MOVED -->
+
+        <div class="analytics-card">
+
+            <span>
+                Moved Units
+            </span>
+
+            <strong>
+                {{ move_units }}
+            </strong>
+
+            <small>
+                Total units relocated
+            </small>
+
+        </div>
+
+
+        <!-- EMPLOYEES -->
+
+        <div class="analytics-card">
+
+            <span>
+                Employees
+            </span>
+
+            <strong>
+                {{ total_employees }}
+            </strong>
+
+            <small>
+                Registered warehouse employees
+            </small>
+
         </div>
 
     </div>
+
+
+
+    <!-- ==========================================
+         STOCK MOVEMENT OVERVIEW
+    ========================================== -->
+
+    <div class="dashboard-panel analytics-chart-panel">
+
+        <div class="panel-header">
+
+            <div>
+
+                <h2>
+                    Stock Movement Overview
+                </h2>
+
+                <p>
+                    Warehouse activity by movement type
+                </p>
+
+            </div>
+
+            <span class="panel-status">
+                LIVE
+            </span>
+
+        </div>
+
+
+        <div class="movement-chart">
+
+
+            <!-- RECEIVED -->
+
+            <div class="chart-row">
+
+                <div class="chart-label">
+
+                    <span>
+                        Received
+                    </span>
+
+                    <strong>
+                        {{ movement_chart.receive }}
+                    </strong>
+
+                </div>
+
+
+                <div class="chart-track">
+
+                    <div
+                        class="chart-bar receive-bar"
+                        data-width="{{ movement_chart.receive_percent }}"
+                    ></div>
+
+                </div>
+
+            </div>
+
+
+
+            <!-- ISSUED -->
+
+            <div class="chart-row">
+
+                <div class="chart-label">
+
+                    <span>
+                        Issued
+                    </span>
+
+                    <strong>
+                        {{ movement_chart.issue }}
+                    </strong>
+
+                </div>
+
+
+                <div class="chart-track">
+
+                    <div
+                        class="chart-bar issue-bar"
+                        data-width="{{ movement_chart.issue_percent }}"
+                    ></div>
+
+                </div>
+
+            </div>
+
+
+
+            <!-- MOVED -->
+
+            <div class="chart-row">
+
+                <div class="chart-label">
+
+                    <span>
+                        Moved
+                    </span>
+
+                    <strong>
+                        {{ movement_chart.move }}
+                    </strong>
+
+                </div>
+
+
+                <div class="chart-track">
+
+                    <div
+                        class="chart-bar move-bar"
+                        data-width="{{ movement_chart.move_percent }}"
+                    ></div>
+
+                </div>
+
+            </div>
+
+
+        </div>
+
+    </div>
+
+
+
+    <!-- ==========================================
+         DASHBOARD GRID
+    ========================================== -->
 
     <div class="dashboard-grid">
 
+
+        <!-- RECENT STOCK ACTIVITY -->
+
         <div class="dashboard-panel">
+
             <div class="panel-header">
+
                 <div>
-                    <h2>Recent Stock Activity</h2>
-                    <p>Latest warehouse operations</p>
+
+                    <h2>
+                        Recent Stock Activity
+                    </h2>
+
+                    <p>
+                        Latest warehouse operations
+                    </p>
+
                 </div>
-                <span class="panel-status">LIVE</span>
+
+                <span class="panel-status">
+                    LIVE
+                </span>
+
             </div>
 
+
             {% if recent_movements %}
+
             <div class="activity-list">
+
                 {% for movement in recent_movements %}
+
                 <div class="activity-item">
 
                     <div class="activity-content">
-                        <strong>{{ movement.product.product_name }}</strong>
+
+                        <strong>
+                            {{ movement.product.product_name }}
+                        </strong>
 
                         <span>
+
                             {{ movement.movement_type }}
-                            · {{ movement.quantity }} units
-                            · {{ movement.employee.name }}
+
+                            ·
+
+                            {{ movement.quantity }}
+                            units
+
+                            ·
+
+                            {% if movement.employee %}
+                                {{ movement.employee.name }}
+                            {% else %}
+                                Unknown Employee
+                            {% endif %}
+
                         </span>
+
                     </div>
+
 
                     <div class="activity-location">
-                        {{ format_ist(movement.created_at) if format_ist is defined else movement.created_at }}
+
+                        {{ format_ist(movement.created_at) }}
+
                     </div>
 
                 </div>
+
                 {% endfor %}
+
             </div>
+
+
             {% else %}
+
             <div class="empty-state">
-                <p>No stock activity recorded yet.</p>
+
+                <p>
+                    No stock activity recorded yet.
+                </p>
+
             </div>
+
             {% endif %}
+
         </div>
 
+
+
+        <!-- WAREHOUSE OVERVIEW -->
+
         <div class="dashboard-panel">
+
             <div class="panel-header">
+
                 <div>
-                    <h2>Warehouse Overview</h2>
-                    <p>Current system summary</p>
+
+                    <h2>
+                        Warehouse Overview
+                    </h2>
+
+                    <p>
+                        Current system summary
+                    </p>
+
                 </div>
+
             </div>
+
 
             <div class="status-list">
 
-                <div class="status-row">
-                    <div>
-                        <strong>Products</strong>
-                        <span>{{ total_products }} registered</span>
-                    </div>
-                    <div class="status-badge">Active</div>
-                </div>
 
                 <div class="status-row">
+
                     <div>
-                        <strong>Locations</strong>
-                        <span>{{ total_locations }} unique locations</span>
+
+                        <strong>
+                            Products
+                        </strong>
+
+                        <span>
+                            {{ total_products }}
+                            registered
+                        </span>
+
                     </div>
-                    <div class="status-badge">Tracked</div>
+
+                    <div class="status-badge">
+                        Active
+                    </div>
+
                 </div>
 
-                <div class="status-row">
-                    <div>
-                        <strong>Low Stock</strong>
-                        <span>{{ low_stock }} products need attention</span>
-                    </div>
-                    <div class="status-badge">Monitor</div>
-                </div>
 
                 <div class="status-row">
+
                     <div>
-                        <strong>Out of Stock</strong>
-                        <span>{{ out_of_stock }} products unavailable</span>
+
+                        <strong>
+                            Locations
+                        </strong>
+
+                        <span>
+                            {{ total_locations }}
+                            unique locations
+                        </span>
+
                     </div>
-                    <div class="status-badge">Review</div>
+
+                    <div class="status-badge">
+                        Tracked
+                    </div>
+
                 </div>
+
+
+                <div class="status-row">
+
+                    <div>
+
+                        <strong>
+                            Low Stock
+                        </strong>
+
+                        <span>
+                            {{ low_stock }}
+                            products need attention
+                        </span>
+
+                    </div>
+
+                    <div class="status-badge">
+                        Monitor
+                    </div>
+
+                </div>
+
+
+                <div class="status-row">
+
+                    <div>
+
+                        <strong>
+                            Out of Stock
+                        </strong>
+
+                        <span>
+                            {{ out_of_stock }}
+                            products unavailable
+                        </span>
+
+                    </div>
+
+                    <div class="status-badge">
+                        Review
+                    </div>
+
+                </div>
+
 
             </div>
+
         </div>
 
     </div>
+
+
+
+    <!-- ==========================================
+         RECENT PRODUCTS
+    ========================================== -->
 
     <div class="dashboard-panel dashboard-panel-spaced">
 
         <div class="panel-header">
+
             <div>
-                <h2>Recently Added Products</h2>
-                <p>Latest inventory records</p>
+
+                <h2>
+                    Recently Added Products
+                </h2>
+
+                <p>
+                    Latest inventory records
+                </p>
+
             </div>
-            <button class="small-button" onclick="location.href='/inventory'">View Inventory</button>
+
+
+            <button
+                type="button"
+                class="small-button"
+                onclick="location.href='/inventory'"
+            >
+                View Inventory
+            </button>
+
         </div>
 
+
         {% if recent_products %}
+
         <div class="activity-list">
+
             {% for product in recent_products %}
+
             <div class="activity-item">
+
                 <div class="activity-content">
-                    <strong>{{ product.product_name }}</strong>
-                    <span>{{ product.sku }} · {{ product.quantity }} units · {{ product.stock_status }}</span>
+
+                    <strong>
+                        {{ product.product_name }}
+                    </strong>
+
+                    <span>
+                        {{ product.sku }}
+                        ·
+                        {{ product.quantity }} units
+                        ·
+                        {{ product.stock_status }}
+                    </span>
+
                 </div>
+
+
                 <div class="activity-location">
-                    {{ product.rack }}-{{ product.shelf }}-{{ product.bin }}
+
+                    {{ product.rack }}
+                    -
+                    {{ product.shelf }}
+                    -
+                    {{ product.bin }}
+
                 </div>
+
             </div>
+
             {% endfor %}
+
         </div>
+
+
         {% else %}
+
         <div class="empty-state">
-            <p>No products available yet.</p>
-            <button onclick="location.href='/add-product'">Add Product</button>
+
+            <p>
+                No products available yet.
+            </p>
+
+            <button
+                type="button"
+                onclick="location.href='/add-product'"
+            >
+                Add Product
+            </button>
+
         </div>
+
         {% endif %}
 
     </div>
 
+
+
+    <!-- ==========================================
+         FOOTER
+    ========================================== -->
+
     <footer class="dashboard-footer">
+
         <div>
-            <strong>WareFlow WMS</strong>
-            <span>Warehouse Management System</span>
+
+            <strong>
+                WareFlow WMS
+            </strong>
+
+            <span>
+                Warehouse Management System
+            </span>
+
         </div>
-        <div>Version 1.0 · 2026</div>
+
+
+        <div>
+            Version 1.0 · 2026
+        </div>
+
     </footer>
+
 
 </div>
 
-<script>
-function updateClock() {
-    const now = new Date();
-    
-    document.getElementById("currentDate").textContent =
-        now.toLocaleDateString("en-IN", {
-            weekday: "long",
-            day: "numeric",
-            month: "long",
-            year: "numeric"
-        });
 
-    document.getElementById("currentTime").textContent =
-        now.toLocaleTimeString("en-IN", {
-            hour: "2-digit",
-            minute: "2-digit",
-            second: "2-digit"
-        });
+
+<!-- ==========================================
+     JAVASCRIPT
+========================================== -->
+
+<script>
+
+function updateClock() {
+
+    const now = new Date();
+
+    const dateElement =
+        document.getElementById("currentDate");
+
+    const timeElement =
+        document.getElementById("currentTime");
+
+
+    if (dateElement) {
+
+        dateElement.textContent =
+            now.toLocaleDateString(
+                "en-IN",
+                {
+                    weekday: "long",
+                    day: "numeric",
+                    month: "long",
+                    year: "numeric"
+                }
+            );
+
+    }
+
+
+    if (timeElement) {
+
+        timeElement.textContent =
+            now.toLocaleTimeString(
+                "en-IN",
+                {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                    second: "2-digit"
+                }
+            );
+
+    }
+
 }
 
-updateClock();
-setInterval(updateClock, 1000);
-</script>
 
-<script>
 function updateProgressBars() {
-    document.querySelectorAll(".progress-fill").forEach(function (bar) {
-        const width = bar.dataset.width;
 
-        if (width) {
-            bar.style.width = width + "%";
-        }
-    });
-}
+    document
+        .querySelectorAll(
+            ".progress-fill, .chart-bar"
+        )
+        .forEach(function (bar) {
 
-function updateClock() {
-    const now = new Date();
+            const width =
+                parseFloat(
+                    bar.dataset.width
+                );
 
-    document.getElementById("currentDate").textContent =
-        now.toLocaleDateString("en-IN", {
-            weekday: "long",
-            day: "numeric",
-            month: "long",
-            year: "numeric"
+
+            if (!isNaN(width)) {
+
+                const safeWidth =
+                    Math.max(
+                        0,
+                        Math.min(width, 100)
+                    );
+
+
+                bar.style.width =
+                    safeWidth + "%";
+
+            }
+
         });
 
-    document.getElementById("currentTime").textContent =
-        now.toLocaleTimeString("en-IN", {
-            hour: "2-digit",
-            minute: "2-digit",
-            second: "2-digit"
-        });
 }
+
 
 updateClock();
+
 updateProgressBars();
 
-setInterval(updateClock, 1000);
+
+setInterval(
+    updateClock,
+    1000
+);
+
 </script>
+
 
 </body>
 </html>

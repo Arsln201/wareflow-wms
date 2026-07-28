@@ -2,11 +2,20 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin
 from datetime import datetime
 
+
 db = SQLAlchemy()
 
 
+# ============================================================
+# EMPLOYEE
+# ============================================================
+
 class Employee(UserMixin, db.Model):
-    id = db.Column(db.Integer, primary_key=True)
+
+    id = db.Column(
+        db.Integer,
+        primary_key=True
+    )
 
     employee_id = db.Column(
         db.String(20),
@@ -33,7 +42,12 @@ class Employee(UserMixin, db.Model):
         return f"<Employee {self.employee_id}>"
 
 
+# ============================================================
+# PRODUCT
+# ============================================================
+
 class Product(db.Model):
+
     id = db.Column(
         db.Integer,
         primary_key=True
@@ -84,13 +98,18 @@ class Product(db.Model):
     )
 
     created_at = db.Column(
-    db.DateTime,
-    default=datetime.utcnow,
-    nullable=False
-)
+        db.DateTime,
+        default=datetime.utcnow,
+        nullable=False
+    )
+
+    # --------------------------------------------------------
+    # STOCK STATUS
+    # --------------------------------------------------------
 
     @property
     def stock_status(self):
+
         if self.quantity <= 0:
             return "Out of Stock"
 
@@ -99,13 +118,35 @@ class Product(db.Model):
 
         return "In Stock"
 
+    # --------------------------------------------------------
+    # STOCK STATUS TYPE
+    # --------------------------------------------------------
+
+    @property
+    def stock_status_type(self):
+
+        if self.quantity <= 0:
+            return "OUT_OF_STOCK"
+
+        if self.quantity <= 10:
+            return "LOW_STOCK"
+
+        return "IN_STOCK"
+
     def __repr__(self):
         return f"<Product {self.product_name}>"
-    
-    
+
+
+# ============================================================
+# STOCK MOVEMENT
+# ============================================================
+
 class StockMovement(db.Model):
 
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(
+        db.Integer,
+        primary_key=True
+    )
 
     product_id = db.Column(
         db.Integer,
@@ -150,6 +191,10 @@ class StockMovement(db.Model):
         nullable=False
     )
 
+    # --------------------------------------------------------
+    # RELATIONSHIPS
+    # --------------------------------------------------------
+
     product = db.relationship(
         "Product",
         backref="stock_movements"
@@ -161,4 +206,125 @@ class StockMovement(db.Model):
     )
 
     def __repr__(self):
-        return f"<StockMovement {self.movement_type} {self.quantity}>"
+        return (
+            f"<StockMovement "
+            f"{self.movement_type} "
+            f"{self.quantity}>"
+        )
+
+
+# ============================================================
+# WAREHOUSE ALERT
+# ============================================================
+
+class WarehouseAlert(db.Model):
+
+    id = db.Column(
+        db.Integer,
+        primary_key=True
+    )
+
+    # --------------------------------------------------------
+    # PRODUCT
+    # --------------------------------------------------------
+
+    product_id = db.Column(
+        db.Integer,
+        db.ForeignKey("product.id"),
+        nullable=True
+    )
+
+    # --------------------------------------------------------
+    # ALERT TYPE
+    # --------------------------------------------------------
+
+    alert_type = db.Column(
+        db.String(30),
+        nullable=False
+    )
+
+    # Examples:
+    #
+    # LOW_STOCK
+    # OUT_OF_STOCK
+    # STOCK_RECOVERED
+    # SYSTEM
+    #
+    # --------------------------------------------------------
+
+    title = db.Column(
+        db.String(150),
+        nullable=False
+    )
+
+    message = db.Column(
+        db.String(255),
+        nullable=False
+    )
+
+    # --------------------------------------------------------
+    # READ STATUS
+    # --------------------------------------------------------
+
+    is_read = db.Column(
+        db.Boolean,
+        default=False,
+        nullable=False
+    )
+
+    # --------------------------------------------------------
+    # CREATED TIME
+    # --------------------------------------------------------
+
+    created_at = db.Column(
+        db.DateTime,
+        default=datetime.utcnow,
+        nullable=False
+    )
+
+    # --------------------------------------------------------
+    # RELATIONSHIP
+    # --------------------------------------------------------
+
+    product = db.relationship(
+        "Product",
+        backref="warehouse_alerts"
+    )
+
+    # --------------------------------------------------------
+    # DISPLAY HELPERS
+    # --------------------------------------------------------
+
+    @property
+    def severity(self):
+
+        if self.alert_type == "OUT_OF_STOCK":
+            return "critical"
+
+        if self.alert_type == "LOW_STOCK":
+            return "warning"
+
+        if self.alert_type == "STOCK_RECOVERED":
+            return "success"
+
+        return "info"
+
+    @property
+    def icon(self):
+
+        if self.alert_type == "OUT_OF_STOCK":
+            return "🚨"
+
+        if self.alert_type == "LOW_STOCK":
+            return "⚠️"
+
+        if self.alert_type == "STOCK_RECOVERED":
+            return "✓"
+
+        return "ℹ️"
+
+    def __repr__(self):
+        return (
+            f"<WarehouseAlert "
+            f"{self.alert_type}>"
+        )
