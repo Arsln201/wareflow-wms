@@ -172,18 +172,33 @@ def login():
     if "employee_id" in session:
         return redirect("/dashboard")
 
-    return render_template("login.html")
+    login_error = request.args.get("login_error") == "1"
+
+    return render_template(
+        "login.html",
+        login_failed=login_error,
+        error=(
+            "Invalid Employee ID or Password"
+            if login_error
+            else None
+        )
+    )
 
 
 @app.route("/login", methods=["POST"])
 def process_login():
 
-    employee_id = request.form.get("employee_id")
-    password = request.form.get("password")
+    employee_id = request.form.get("employee_id", "").strip()
+    password = request.form.get("password", "")
 
-    employee = Employee.query.filter_by(employee_id=employee_id).first()
+    employee = Employee.query.filter_by(
+        employee_id=employee_id
+    ).first()
 
-    if employee and check_password_hash(employee.password, password):
+    if employee and check_password_hash(
+        employee.password,
+        password
+    ):
 
         session["employee_id"] = employee.employee_id
         session["employee_name"] = employee.name
@@ -191,10 +206,12 @@ def process_login():
 
         return redirect("/dashboard")
 
-    return render_template(
-        "login.html",
-        error="Invalid Employee ID or Password"
-    )
+    # IMPORTANT:
+    # Don't render login.html directly after failed POST.
+    # Redirect instead so browser Back/Refresh won't restore
+    # the old invalid-login response.
+
+    return redirect("/?login_error=1")
 
 
 # ==========================

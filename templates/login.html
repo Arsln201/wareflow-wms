@@ -1,94 +1,841 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WareFlow AI</title>
 
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-</head>
-<body>
-
-<div class="login-box">
-
-    <h1>WareFlow AI</h1>
-
-    <p>Smart Warehouse Operations Platform</p>
-
-   {% if error %}
-<p class="error-text">{{ error }}</p>
-{% endif %}
-
-{% if success %}
-<p class="success-text">{{ success }}</p>
-{% endif %}
-
- <form method="POST" action="/login">
-
-    <input
-        type="text"
-        name="employee_id"
-        placeholder="Employee ID"
-        required
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
     >
 
-    <div class="password-box">
+    <title>WareFlow WMS | Login</title>
 
-        <input
-            type="password"
-            id="password"
-            name="password"
-            placeholder="Password"
-            required
-        >
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/style.css') }}"
+    >
 
-        <span
-         class="toggle-btn"
-         onclick="togglePassword()"
-         id="togglePassword">
-         Show
-       </span>
+    <style>
 
-    </div>
+        /* =====================================================
+           WAREFLOW INTRO SCREEN
+        ===================================================== */
 
-    <button id="loginBtn" type="submit">
-        Login
-    </button>
+        .wareflow-intro {
+            position: fixed;
+            inset: 0;
+            z-index: 9999;
 
-</form>
+            display: flex;
+            align-items: center;
+            justify-content: center;
 
-</div>
+            background:
+                radial-gradient(
+                    circle at center,
+                    rgba(0, 229, 168, 0.08),
+                    transparent 45%
+                ),
+                #0d1117;
 
-<script>
+            animation: introFadeOut 0.8s ease forwards;
 
-function togglePassword(){
+            animation-delay: 3.8s;
+        }
 
-    const password = document.getElementById("password");
-    const toggle = document.getElementById("togglePassword");
 
-    if(password.type === "password"){
-        password.type = "text";
-        toggle.innerHTML = "Hide";
-    }else{
-        password.type = "password";
-        toggle.innerHTML = "Show";
+        .intro-content {
+            text-align: center;
+
+            animation:
+                introZoom 1s ease forwards;
+        }
+
+
+        .intro-logo {
+            width: 76px;
+            height: 76px;
+
+            margin: 0 auto 22px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            border: 1px solid rgba(0, 229, 168, 0.45);
+
+            border-radius: 22px;
+
+            background: rgba(0, 229, 168, 0.06);
+
+            box-shadow:
+                0 0 35px rgba(0, 229, 168, 0.15);
+
+            color: #00e5a8;
+
+            font-size: 32px;
+            font-weight: 800;
+
+            animation: logoPulse 2s ease-in-out infinite;
+        }
+
+
+        .intro-title {
+            margin: 0;
+
+            color: #ffffff;
+
+            font-size: clamp(34px, 6vw, 58px);
+
+            font-weight: 800;
+
+            letter-spacing: 4px;
+        }
+
+
+        .intro-subtitle {
+            margin: 12px 0 0;
+
+            color: #8b949e;
+
+            font-size: 14px;
+
+            letter-spacing: 3px;
+
+            text-transform: uppercase;
+        }
+
+
+        .intro-divider {
+            width: 0;
+
+            height: 1px;
+
+            margin: 28px auto;
+
+            background: #00e5a8;
+
+            animation:
+                dividerGrow 1s ease forwards;
+
+            animation-delay: 0.7s;
+        }
+
+
+        .intro-welcome {
+            margin: 0;
+
+            color: #ffffff;
+
+            font-size: 18px;
+
+            font-weight: 600;
+        }
+
+
+        .intro-builder {
+            margin: 8px 0 0;
+
+            color: #00e5a8;
+
+            font-size: 14px;
+
+            letter-spacing: 0.5px;
+        }
+
+
+        /* =====================================================
+           LOGIN SCREEN
+        ===================================================== */
+
+        .wareflow-login-page {
+
+            min-height: 100vh;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            padding: 24px;
+
+            background:
+                radial-gradient(
+                    circle at top right,
+                    rgba(0, 229, 168, 0.07),
+                    transparent 35%
+                ),
+                #0d1117;
+
+        }
+
+
+        .wareflow-login-box {
+
+            width: 100%;
+
+            max-width: 420px;
+
+            padding: 38px;
+
+            border: 1px solid rgba(255,255,255,0.08);
+
+            border-radius: 20px;
+
+            background: rgba(255,255,255,0.025);
+
+            box-shadow:
+                0 20px 60px rgba(0,0,0,0.35);
+
+            backdrop-filter: blur(12px);
+
+        }
+
+
+        .login-brand {
+
+            text-align: center;
+
+            margin-bottom: 30px;
+
+        }
+
+
+        .login-brand h1 {
+
+            margin: 0;
+
+            color: #ffffff;
+
+            font-size: 30px;
+
+            letter-spacing: 2px;
+
+        }
+
+
+        .login-brand p {
+
+            margin: 8px 0 0;
+
+            color: #8b949e;
+
+            font-size: 13px;
+
+        }
+
+
+        .login-form-group {
+
+            margin-bottom: 18px;
+
+        }
+
+
+        .login-form-group label {
+
+            display: block;
+
+            margin-bottom: 8px;
+
+            color: #c9d1d9;
+
+            font-size: 13px;
+
+            font-weight: 600;
+
+        }
+
+
+        .login-form-group input {
+
+            width: 100%;
+
+            box-sizing: border-box;
+
+            padding: 13px 14px;
+
+            border: 1px solid rgba(255,255,255,0.1);
+
+            border-radius: 10px;
+
+            outline: none;
+
+            background: rgba(255,255,255,0.035);
+
+            color: #ffffff;
+
+            font-size: 14px;
+
+            transition:
+                border-color 0.2s ease,
+                box-shadow 0.2s ease;
+
+        }
+
+
+        .login-form-group input:focus {
+
+            border-color: #00e5a8;
+
+            box-shadow:
+                0 0 0 3px rgba(0,229,168,0.08);
+
+        }
+
+
+        .login-button {
+
+            width: 100%;
+
+            margin-top: 8px;
+
+            padding: 14px;
+
+            border: none;
+
+            border-radius: 10px;
+
+            background: #00e5a8;
+
+            color: #07110d;
+
+            font-size: 14px;
+
+            font-weight: 800;
+
+            cursor: pointer;
+
+            transition:
+                transform 0.2s ease,
+                box-shadow 0.2s ease;
+
+        }
+
+
+        .login-button:hover {
+
+            transform: translateY(-1px);
+
+            box-shadow:
+                0 8px 25px rgba(0,229,168,0.18);
+
+        }
+
+
+        .login-error {
+
+            margin-bottom: 18px;
+
+            padding: 11px 13px;
+
+            border: 1px solid rgba(255,80,80,0.25);
+
+            border-radius: 9px;
+
+            background: rgba(255,80,80,0.06);
+
+            color: #ff8585;
+
+            font-size: 13px;
+
+            text-align: center;
+
+        }
+
+
+        .login-footer {
+
+            margin-top: 24px;
+
+            color: #6e7681;
+
+            font-size: 12px;
+
+            text-align: center;
+
+        }
+
+
+        /* =====================================================
+           ANIMATIONS
+        ===================================================== */
+
+        @keyframes introZoom {
+
+            from {
+
+                opacity: 0;
+
+                transform: scale(0.92);
+
+            }
+
+            to {
+
+                opacity: 1;
+
+                transform: scale(1);
+
+            }
+
+        }
+
+
+        @keyframes logoPulse {
+
+            0%, 100% {
+
+                box-shadow:
+                    0 0 25px rgba(0,229,168,0.10);
+
+            }
+
+            50% {
+
+                box-shadow:
+                    0 0 45px rgba(0,229,168,0.25);
+
+            }
+
+        }
+
+
+        @keyframes dividerGrow {
+
+            from {
+
+                width: 0;
+
+            }
+
+            to {
+
+                width: 90px;
+
+            }
+
+        }
+
+
+        @keyframes introFadeOut {
+
+            0% {
+
+                opacity: 1;
+
+                visibility: visible;
+
+            }
+
+            75% {
+
+                opacity: 1;
+
+            }
+
+            100% {
+
+                opacity: 0;
+
+                visibility: hidden;
+
+                pointer-events: none;
+
+            }
+
+        }
+
+
+        /* =====================================================
+           MOBILE
+        ===================================================== */
+
+        @media (max-width: 600px) {
+
+            .wareflow-login-box {
+
+                padding: 28px 22px;
+
+            }
+
+
+            .intro-title {
+
+                letter-spacing: 2px;
+
+            }
+
+
+            .intro-subtitle {
+
+                font-size: 11px;
+
+                letter-spacing: 2px;
+
+            }
+
+        }
+
+        /* =====================================================
+   FAILED LOGIN — DISABLE INTRO
+===================================================== */
+
+.wareflow-intro.intro-disabled {
+    display: none;
+}
+
+
+/* =====================================================
+   PROFESSIONAL LOGIN ERROR
+===================================================== */
+
+.login-error {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 10px;
+
+    margin-bottom: 20px;
+
+    padding: 12px 14px;
+
+    border: 1px solid rgba(255, 82, 82, 0.25);
+
+    border-radius: 10px;
+
+    background:
+        rgba(255, 82, 82, 0.06);
+
+    color: #ff8585;
+
+    font-size: 13px;
+
+    font-weight: 500;
+
+    animation:
+        loginErrorIn 0.35s ease forwards;
+
+}
+
+
+
+/* =====================================================
+   LOGIN BOX ERROR FEEDBACK
+===================================================== */
+
+.wareflow-login-box.login-failed {
+
+    animation:
+        loginShake 0.35s ease;
+
+}
+
+
+@keyframes loginErrorIn {
+
+    from {
+
+        opacity: 0;
+
+        transform: translateY(-6px);
+
+    }
+
+    to {
+
+        opacity: 1;
+
+        transform: translateY(0);
+
     }
 
 }
 
-document.querySelector("form").addEventListener("submit", function(){
 
-    const btn = document.getElementById("loginBtn");
+@keyframes loginShake {
 
-    btn.innerHTML = "Logging in...";
-    btn.disabled = true;
+    0% {
+        transform: translateX(0);
+    }
+
+    25% {
+        transform: translateX(-5px);
+    }
+
+    50% {
+        transform: translateX(5px);
+    }
+
+    75% {
+        transform: translateX(-3px);
+    }
+
+    100% {
+        transform: translateX(0);
+    }
+
+}
+
+.login-error {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    margin-bottom: 20px;
+    padding: 12px 14px;
+
+    border: 1px solid rgba(255, 82, 82, 0.25);
+    border-radius: 10px;
+
+    background: rgba(255, 82, 82, 0.06);
+    color: #ff8585;
+
+    font-size: 13px;
+    font-weight: 500;
+
+    animation: errorAppear 0.3s ease forwards;
+}
+
+.login-error-icon {
+    width: 22px;
+    height: 22px;
+
+    flex-shrink: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border: 1px solid rgba(255, 82, 82, 0.35);
+    border-radius: 50%;
+
+    font-size: 12px;
+    font-weight: 800;
+}
+
+.login-error.error-hide {
+    animation: errorDisappear 0.4s ease forwards;
+}
+
+@keyframes errorAppear {
+
+    from {
+        opacity: 0;
+        transform: translateY(-6px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+}
+
+@keyframes errorDisappear {
+
+    from {
+        opacity: 1;
+        transform: translateY(0);
+        max-height: 100px;
+    }
+
+    to {
+        opacity: 0;
+        transform: translateY(-6px);
+        max-height: 0;
+        margin-bottom: 0;
+        padding-top: 0;
+        padding-bottom: 0;
+        overflow: hidden;
+    }
+
+}
+
+    </style>
+
+</head>
+
+<script>
+
+document.addEventListener("DOMContentLoaded", function () {
+
+    const error = document.getElementById("loginError");
+
+    if (!error) {
+        return;
+    }
+
+    setTimeout(function () {
+
+        error.classList.add("error-hide");
+
+        setTimeout(function () {
+
+            error.remove();
+
+        }, 450);
+
+    }, 3000);
 
 });
 
 </script>
+
+<body>
+
+
+<!-- =========================================================
+     WAREFLOW INTRO
+========================================================= -->
+
+<div
+    class="wareflow-intro {% if login_failed %}intro-disabled{% endif %}"
+>
+
+    <div class="intro-content">
+
+        <div class="intro-logo">
+            W
+        </div>
+
+
+        <h1 class="intro-title">
+            WAREFLOW
+        </h1>
+
+
+        <p class="intro-subtitle">
+            Warehouse Management System
+        </p>
+
+
+        <div class="intro-divider"></div>
+
+
+        <p class="intro-welcome">
+            Welcome to WareFlow WMS
+        </p>
+
+
+        <p class="intro-builder">
+            Built by Mirza Arsalan
+        </p>
+
+    </div>
+
+</div>
+
+
+<!-- =========================================================
+     LOGIN
+========================================================= -->
+
+<div class="wareflow-login-page">
+
+<div
+    class="wareflow-login-box {% if login_failed %}login-failed{% endif %}"
+>
+
+
+        <div class="login-brand">
+
+            <h1>WareFlow WMS</h1>
+
+            <p>
+                Employee Operations Portal
+            </p>
+
+        </div>
+
+
+{% if error %}
+
+<div
+    class="login-error"
+    id="loginError"
+>
+    <span class="login-error-icon">!</span>
+
+    <span>{{ error }}</span>
+
+</div>
+
+{% endif %}
+
+
+        <form
+            method="POST"
+            action="/login"
+        >
+
+
+            <div class="login-form-group">
+
+                <label for="employee_id">
+                    Employee ID
+                </label>
+
+                <input
+                    type="text"
+                    id="employee_id"
+                    name="employee_id"
+                    placeholder="Enter Employee ID"
+                    autocomplete="username"
+                    required
+                >
+
+            </div>
+
+
+            <div class="login-form-group">
+
+                <label for="password">
+                    Password
+                </label>
+
+                <input
+                    type="password"
+                    id="password"
+                    name="password"
+                    placeholder="Enter Password"
+                    autocomplete="current-password"
+                    required
+                >
+
+            </div>
+
+
+            <button
+                type="submit"
+                class="login-button"
+            >
+                Sign In
+            </button>
+
+
+        </form>
+
+
+        <div class="login-footer">
+
+            Authorized warehouse personnel only
+
+        </div>
+
+
+    </div>
+
+
+
+
+</div>
+
+
 
 </body>
 </html>
