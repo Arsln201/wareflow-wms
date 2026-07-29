@@ -25,15 +25,24 @@ def role_required(*allowed_roles):
         @wraps(function)
         def wrapper(*args, **kwargs):
 
+            # Not logged in
             if "employee_id" not in session:
                 return redirect("/")
 
+            # Get current role
             current_role = session.get("role")
 
+            # Missing/invalid role
+            if not current_role:
+                session.clear()
+                return redirect("/")
+
+            # Role not allowed
             if current_role not in allowed_roles:
                 return render_template(
                     "access_denied.html",
-                    role=current_role
+                    role=current_role,
+                    allowed_roles=allowed_roles
                 ), 403
 
             return function(*args, **kwargs)
@@ -227,6 +236,7 @@ def logout():
 
 
 @app.route("/alerts")
+@role_required("Admin", "Manager", "Employee")
 def alerts():
 
     if "employee_id" not in session:
@@ -249,6 +259,7 @@ def alerts():
     )
 
 @app.route("/alerts/read/<int:alert_id>")
+@role_required("Admin", "Manager", "Employee")
 def mark_alert_read(alert_id):
 
     if "employee_id" not in session:
@@ -263,6 +274,7 @@ def mark_alert_read(alert_id):
     return redirect("/alerts")
 
 @app.route("/alerts/read-all")
+@role_required("Admin", "Manager", "Employee")
 def mark_all_alerts_read():
 
     if "employee_id" not in session:
@@ -282,6 +294,7 @@ def mark_all_alerts_read():
     return redirect("/alerts")
 
 @app.route("/dashboard")
+@role_required("Admin", "Manager", "Employee")
 def dashboard():
 
     if "employee_id" not in session:
@@ -483,6 +496,7 @@ def dashboard():
 # ==========================
 
 @app.route("/inventory")
+@role_required("Admin", "Manager", "Employee")
 def inventory():
 
     if "employee_id" not in session:
@@ -629,6 +643,7 @@ def add_product():
 # ==========================
 
 @app.route("/edit-product/<int:id>", methods=["GET", "POST"])
+@role_required("Admin", "Manager")
 def edit_product(id):
 
     if "employee_id" not in session:
@@ -726,7 +741,8 @@ def edit_product(id):
 # DELETE PRODUCT
 # ==========================
 
-@app.route("/delete-product/<int:id>")
+@app.route("/delete-product/<int:id>", methods=["POST"])
+@role_required("Admin")
 def delete_product(id):
 
     if "employee_id" not in session:
@@ -745,6 +761,7 @@ def delete_product(id):
 # ==========================
 
 @app.route("/search")
+@role_required("Admin", "Manager", "Employee")
 def search():
 
     if "employee_id" not in session:
@@ -912,6 +929,7 @@ def test_session():
 
 
 @app.route("/stock-operations")
+@role_required("Admin", "Manager", "Employee")
 def stock_operations():
 
     if "employee_id" not in session:
@@ -939,6 +957,7 @@ def stock_operations():
 
 
 @app.route("/receive-stock", methods=["GET", "POST"])
+@role_required("Admin", "Manager", "Employee")
 def receive_stock():
 
     if "employee_id" not in session:
@@ -1015,6 +1034,7 @@ def receive_stock():
 
 
 @app.route("/issue-stock", methods=["GET", "POST"])
+@role_required("Admin", "Manager", "Employee")
 def issue_stock():
 
     if "employee_id" not in session:
@@ -1098,6 +1118,7 @@ def issue_stock():
 
 
 @app.route("/move-stock", methods=["GET", "POST"])
+@role_required("Admin", "Manager", "Employee")
 def move_stock():
 
     if "employee_id" not in session:
@@ -1610,6 +1631,7 @@ def reports():
 
 
 @app.route("/reports/export")
+@role_required("Admin", "Manager")
 def export_report():
 
     if "employee_id" not in session:
@@ -1696,6 +1718,7 @@ def export_report():
 # ==========================
 
 @app.route("/scanner")
+@role_required("Admin", "Manager", "Employee")
 def scanner():
 
     if "employee_id" not in session:
@@ -1704,6 +1727,7 @@ def scanner():
     return render_template("scanner.html")
 
 @app.route("/scanner/result")
+@role_required("Admin", "Manager", "Employee")
 def scanner_result():
 
     if "employee_id" not in session:

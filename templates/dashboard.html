@@ -25,9 +25,9 @@
 <div class="dashboard-container">
 
 
-    <!-- ==========================================
+    <!-- ==================================================
          HEADER
-    ========================================== -->
+    ================================================== -->
 
     <div class="dashboard-header">
 
@@ -42,7 +42,10 @@
 
             <p class="role">
                 Role:
-                <strong>{{ role }}</strong>
+
+                <strong class="role-badge">
+                    {{ role }}
+                </strong>
             </p>
 
         </div>
@@ -60,9 +63,9 @@
 
 
 
-    <!-- ==========================================
+    <!-- ==================================================
          MAIN KPI CARDS
-    ========================================== -->
+    ================================================== -->
 
     <div class="cards">
 
@@ -71,6 +74,8 @@
             <h3>Total Products</h3>
 
             <p>{{ total_products }}</p>
+
+            <span>Registered products</span>
 
         </div>
 
@@ -81,6 +86,8 @@
 
             <p>{{ total_units }}</p>
 
+            <span>Current inventory units</span>
+
         </div>
 
 
@@ -89,6 +96,8 @@
             <h3>Low Stock</h3>
 
             <p>{{ low_stock }}</p>
+
+            <span>Products need attention</span>
 
         </div>
 
@@ -99,15 +108,18 @@
 
             <p>{{ out_of_stock }}</p>
 
+            <span>Products unavailable</span>
+
         </div>
 
     </div>
 
 
 
-    <!-- ==========================================
+    <!-- ==================================================
          QUICK ACTIONS
-    ========================================== -->
+         ROLE AWARE
+    ================================================== -->
 
     <h2 class="section-title">
         Quick Actions
@@ -115,6 +127,9 @@
 
 
     <div class="quick-actions">
+
+
+        <!-- ALL LOGGED-IN USERS -->
 
         <button
             type="button"
@@ -142,6 +157,27 @@
 
         <button
             type="button"
+            onclick="location.href='/scanner'"
+        >
+            Scanner
+        </button>
+
+
+        <button
+            type="button"
+            onclick="location.href='/alerts'"
+        >
+            Alerts
+        </button>
+
+
+
+        <!-- ADMIN + MANAGER -->
+
+        {% if role in ["Admin", "Manager"] %}
+
+        <button
+            type="button"
             onclick="location.href='/qr-management'"
         >
             QR Management
@@ -158,19 +194,31 @@
 
         <button
             type="button"
-            onclick="location.href='/scanner'"
-        >
-            Scanner
-        </button>
-
-
-        <button
-            type="button"
             onclick="location.href='/add-product'"
         >
             Add Product
         </button>
 
+        {% endif %}
+
+
+
+        <!-- ADMIN ONLY -->
+
+        {% if role == "Admin" %}
+
+        <button
+            type="button"
+            onclick="location.href='/employee-management'"
+        >
+            Employee Management
+        </button>
+
+        {% endif %}
+
+
+
+        <!-- LOGOUT -->
 
         <button
             type="button"
@@ -183,9 +231,10 @@
 
 
 
-    <!-- ==========================================
+    <!-- ==================================================
          WAREHOUSE ANALYTICS
-    ========================================== -->
+         ONLY 4 CARDS
+    ================================================== -->
 
     <h2 class="section-title">
         Warehouse Analytics
@@ -216,7 +265,12 @@
 
             </div>
 
+            <small>
+                Overall inventory availability
+            </small>
+
         </div>
+
 
 
         <!-- TOTAL MOVEMENTS -->
@@ -238,7 +292,8 @@
         </div>
 
 
-        <!-- RECEIVED -->
+
+        <!-- RECEIVED UNITS -->
 
         <div class="analytics-card">
 
@@ -257,7 +312,8 @@
         </div>
 
 
-        <!-- ISSUED -->
+
+        <!-- ISSUED UNITS -->
 
         <div class="analytics-card">
 
@@ -265,50 +321,12 @@
                 Issued Units
             </span>
 
-            <small>
-                Total units issued
-            </small>
-
             <strong>
                 {{ issue_units }}
             </strong>
 
-        </div>
-
-
-        <!-- MOVED -->
-
-        <div class="analytics-card">
-
-            <span>
-                Moved Units
-            </span>
-
-            <strong>
-                {{ move_units }}
-            </strong>
-
             <small>
-                Total units relocated
-            </small>
-
-        </div>
-
-
-        <!-- EMPLOYEES -->
-
-        <div class="analytics-card">
-
-            <span>
-                Employees
-            </span>
-
-            <strong>
-                {{ total_employees }}
-            </strong>
-
-            <small>
-                Registered warehouse employees
+                Total units issued
             </small>
 
         </div>
@@ -317,9 +335,9 @@
 
 
 
-    <!-- ==========================================
+    <!-- ==================================================
          STOCK MOVEMENT OVERVIEW
-    ========================================== -->
+    ================================================== -->
 
     <div class="dashboard-panel analytics-chart-panel">
 
@@ -435,21 +453,22 @@
 
             </div>
 
-
         </div>
 
     </div>
 
 
 
-    <!-- ==========================================
+    <!-- ==================================================
          DASHBOARD GRID
-    ========================================== -->
+    ================================================== -->
 
     <div class="dashboard-grid">
 
 
-        <!-- RECENT STOCK ACTIVITY -->
+        <!-- ==================================================
+             RECENT STOCK ACTIVITY
+        ================================================== -->
 
         <div class="dashboard-panel">
 
@@ -485,8 +504,19 @@
                     <div class="activity-content">
 
                         <strong>
-                            {{ movement.product.product_name }}
+
+                            {% if movement.product %}
+
+                                {{ movement.product.product_name }}
+
+                            {% else %}
+
+                                Unknown Product
+
+                            {% endif %}
+
                         </strong>
+
 
                         <span>
 
@@ -500,9 +530,13 @@
                             ·
 
                             {% if movement.employee %}
+
                                 {{ movement.employee.name }}
+
                             {% else %}
+
                                 Unknown Employee
+
                             {% endif %}
 
                         </span>
@@ -539,7 +573,9 @@
 
 
 
-        <!-- WAREHOUSE OVERVIEW -->
+        <!-- ==================================================
+             WAREHOUSE OVERVIEW
+        ================================================== -->
 
         <div class="dashboard-panel">
 
@@ -563,6 +599,8 @@
             <div class="status-list">
 
 
+                <!-- PRODUCTS -->
+
                 <div class="status-row">
 
                     <div>
@@ -584,6 +622,9 @@
 
                 </div>
 
+
+
+                <!-- LOCATIONS -->
 
                 <div class="status-row">
 
@@ -607,6 +648,9 @@
                 </div>
 
 
+
+                <!-- LOW STOCK -->
+
                 <div class="status-row">
 
                     <div>
@@ -628,6 +672,9 @@
 
                 </div>
 
+
+
+                <!-- OUT OF STOCK -->
 
                 <div class="status-row">
 
@@ -659,9 +706,9 @@
 
 
 
-    <!-- ==========================================
-         RECENT PRODUCTS
-    ========================================== -->
+    <!-- ==================================================
+         RECENTLY ADDED PRODUCTS
+    ================================================== -->
 
     <div class="dashboard-panel dashboard-panel-spaced">
 
@@ -706,11 +753,18 @@
                     </strong>
 
                     <span>
+
                         {{ product.sku }}
+
                         ·
-                        {{ product.quantity }} units
+
+                        {{ product.quantity }}
+                        units
+
                         ·
+
                         {{ product.stock_status }}
+
                     </span>
 
                 </div>
@@ -741,12 +795,17 @@
                 No products available yet.
             </p>
 
+
+            {% if role in ["Admin", "Manager"] %}
+
             <button
                 type="button"
                 onclick="location.href='/add-product'"
             >
                 Add Product
             </button>
+
+            {% endif %}
 
         </div>
 
@@ -756,9 +815,9 @@
 
 
 
-    <!-- ==========================================
+    <!-- ==================================================
          FOOTER
-    ========================================== -->
+    ================================================== -->
 
     <footer class="dashboard-footer">
 
@@ -786,9 +845,9 @@
 
 
 
-<!-- ==========================================
+<!-- ==================================================
      JAVASCRIPT
-========================================== -->
+================================================== -->
 
 <script>
 
@@ -836,6 +895,7 @@ function updateClock() {
 }
 
 
+
 function updateProgressBars() {
 
     document
@@ -855,7 +915,10 @@ function updateProgressBars() {
                 const safeWidth =
                     Math.max(
                         0,
-                        Math.min(width, 100)
+                        Math.min(
+                            width,
+                            100
+                        )
                     );
 
 
@@ -867,6 +930,7 @@ function updateProgressBars() {
         });
 
 }
+
 
 
 updateClock();
@@ -882,5 +946,44 @@ setInterval(
 </script>
 
 
+<!-- ==================================================
+     ROLE BADGE STYLE
+================================================== -->
+
+<style>
+
+.role-badge {
+
+    display: inline-flex;
+
+    align-items: center;
+
+    padding: 4px 10px;
+
+    margin-left: 4px;
+
+    border:
+        1px solid
+        rgba(0, 229, 168, 0.25);
+
+    border-radius: 999px;
+
+    background:
+        rgba(0, 229, 168, 0.08);
+
+    color: #00e5a8;
+
+    font-size: 12px;
+
+    font-weight: 700;
+
+    letter-spacing: 0.3px;
+
+}
+
+</style>
+
+
 </body>
+
 </html>
