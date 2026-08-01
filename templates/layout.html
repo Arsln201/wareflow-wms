@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>{% block title %}WareFlow WMS{% endblock %}</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+
+    {% block styles %}{% endblock %}
+
+</head>
+
+<body>
+
+<div class="wf-layout">
+
+    {% include "sidebar.html" %}
+
+    <div class="wf-main">
+
+        <header class="wf-topbar">
+
+            <div>
+
+                <h1>
+                    {% block page_title %}
+                    WareFlow
+                    {% endblock %}
+                </h1>
+
+                <p>
+                    {% block page_description %}
+                    Smart Warehouse Operations Platform
+                    {% endblock %}
+                </p>
+
+            </div>
+
+            <div class="wf-user">
+
+                <div>
+
+                    <strong>
+
+                        {{ session.get("employee_name","Employee") }}
+
+                    </strong>
+
+                    <span>
+
+                        {{ session.get("role","Employee") }}
+
+                    </span>
+
+                </div>
+
+            </div>
+
+        </header>
+
+        <section class="wf-content">
+
+            {% block content %}
+            {% endblock %}
+
+        </section>
+
+    </div>
+
+</div>
+
+{% block scripts %}
+{% endblock %}
+
+</body>
+
+</html>

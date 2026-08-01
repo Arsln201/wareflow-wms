@@ -1,101 +1,1484 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>Add Product | WareFlow WMS</title>
 
-    <link rel="stylesheet"
-          href="{{ url_for('static', filename='css/style.css') }}">
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/style.css') }}"
+    >
+
+    <style>
+
+        /* =========================================================
+           WAREFLOW — ADD PRODUCT
+           Production-style warehouse interface
+        ========================================================= */
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            background: #0d1117;
+            color: #ffffff;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        .add-product-page {
+            width: 100%;
+            max-width: 1250px;
+            margin: 0 auto;
+            padding: 35px 28px 60px;
+        }
+
+
+        /* =========================================================
+           HEADER
+        ========================================================= */
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 25px;
+
+            margin-bottom: 28px;
+            padding-bottom: 22px;
+
+            border-bottom: 1px solid #2d333b;
+        }
+
+        .page-header-left {
+            min-width: 0;
+        }
+
+        .eyebrow {
+            margin-bottom: 8px;
+
+            color: #00e5a8;
+            font-size: 11px;
+            font-weight: 800;
+
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+        }
+
+        .page-header h1 {
+            margin: 0 0 8px;
+
+            color: #ffffff;
+
+            font-size: clamp(27px, 3vw, 38px);
+            line-height: 1.1;
+        }
+
+        .page-header p {
+            margin: 0;
+
+            max-width: 650px;
+
+            color: #8b949e;
+
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        .header-status {
+            flex-shrink: 0;
+
+            padding: 12px 16px;
+
+            background: rgba(0, 229, 168, .06);
+
+            border: 1px solid rgba(0, 229, 168, .18);
+            border-radius: 10px;
+
+            color: #00e5a8;
+
+            font-size: 11px;
+            font-weight: 800;
+
+            letter-spacing: .6px;
+        }
+
+
+        /* =========================================================
+           ERROR
+        ========================================================= */
+
+        .form-error {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+
+            margin-bottom: 20px;
+            padding: 13px 16px;
+
+            background: rgba(255, 92, 92, .07);
+
+            border: 1px solid rgba(255, 92, 92, .22);
+            border-radius: 10px;
+
+            color: #ff8b8b;
+
+            font-size: 12px;
+            line-height: 1.5;
+        }
+
+        .form-error-icon {
+            flex-shrink: 0;
+
+            width: 20px;
+            height: 20px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            border-radius: 50%;
+
+            background: rgba(255, 92, 92, .15);
+
+            font-size: 11px;
+            font-weight: 800;
+        }
+
+
+        /* =========================================================
+           MAIN GRID
+        ========================================================= */
+
+        .product-layout {
+            display: grid;
+
+            grid-template-columns:
+                minmax(0, 1.65fr)
+                minmax(280px, .75fr);
+
+            gap: 22px;
+
+            align-items: start;
+        }
+
+
+        /* =========================================================
+           FORM CARD
+        ========================================================= */
+
+        .form-card,
+        .side-card {
+            background: #161b22;
+
+            border: 1px solid #2d333b;
+            border-radius: 15px;
+
+            overflow: hidden;
+        }
+
+        .card-header {
+            padding: 20px 22px;
+
+            border-bottom: 1px solid #2d333b;
+        }
+
+        .card-header h2 {
+            margin: 0 0 5px;
+
+            color: #ffffff;
+
+            font-size: 17px;
+        }
+
+        .card-header p {
+            margin: 0;
+
+            color: #8b949e;
+
+            font-size: 11px;
+            line-height: 1.5;
+        }
+
+        .form-body {
+            padding: 22px;
+        }
+
+
+        /* =========================================================
+           FORM SECTIONS
+        ========================================================= */
+
+        .form-section {
+            margin-bottom: 27px;
+        }
+
+        .form-section:last-child {
+            margin-bottom: 0;
+        }
+
+        .section-heading {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+
+            margin-bottom: 15px;
+        }
+
+        .section-number {
+            width: 24px;
+            height: 24px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            border-radius: 7px;
+
+            background: rgba(0, 229, 168, .08);
+
+            border: 1px solid rgba(0, 229, 168, .20);
+
+            color: #00e5a8;
+
+            font-size: 10px;
+            font-weight: 800;
+        }
+
+        .section-heading strong {
+            color: #ffffff;
+
+            font-size: 12px;
+            letter-spacing: .4px;
+        }
+
+
+        /* =========================================================
+           INPUT GRID
+        ========================================================= */
+
+        .field-grid {
+            display: grid;
+
+            grid-template-columns:
+                repeat(2, minmax(0, 1fr));
+
+            gap: 15px;
+        }
+
+        .field {
+            min-width: 0;
+        }
+
+        .field.full {
+            grid-column: 1 / -1;
+        }
+
+        .field label {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+
+            margin-bottom: 7px;
+
+            color: #c9d1d9;
+
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        .required {
+            color: #00e5a8;
+        }
+
+        .optional {
+            color: #6e7681;
+
+            font-size: 9px;
+            font-weight: 500;
+        }
+
+        .field input {
+            width: 100%;
+            height: 43px;
+
+            margin: 0;
+            padding: 0 13px;
+
+            background: #0d1117;
+
+            border: 1px solid #30363d;
+            border-radius: 8px;
+
+            outline: none;
+
+            color: #ffffff;
+
+            font-family: inherit;
+            font-size: 12px;
+
+            transition:
+                border-color .2s ease,
+                box-shadow .2s ease,
+                background .2s ease;
+        }
+
+        .field input::placeholder {
+            color: #555e68;
+        }
+
+        .field input:hover {
+            border-color: #414b56;
+        }
+
+        .field input:focus {
+            border-color: #00e5a8;
+
+            background: #0f151c;
+
+            box-shadow:
+                0 0 0 3px
+                rgba(0, 229, 168, .07);
+        }
+
+        .field-help {
+            margin-top: 6px;
+
+            color: #6e7681;
+
+            font-size: 9px;
+            line-height: 1.4;
+        }
+
+
+        /* =========================================================
+           LOCATION PREVIEW
+        ========================================================= */
+
+        .location-preview {
+            display: grid;
+
+            grid-template-columns:
+                repeat(3, minmax(0, 1fr));
+
+            gap: 10px;
+
+            margin-top: 14px;
+        }
+
+        .location-box {
+            padding: 12px;
+
+            background: #0d1117;
+
+            border: 1px solid #30363d;
+            border-radius: 9px;
+
+            text-align: center;
+        }
+
+        .location-box span {
+            display: block;
+
+            margin-bottom: 5px;
+
+            color: #6e7681;
+
+            font-size: 9px;
+            font-weight: 800;
+
+            letter-spacing: .8px;
+        }
+
+        .location-box strong {
+            color: #00e5a8;
+
+            font-size: 14px;
+        }
+
+
+        /* =========================================================
+           ACTIONS
+        ========================================================= */
+
+        .form-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+
+            gap: 12px;
+
+            margin-top: 28px;
+            padding-top: 20px;
+
+            border-top: 1px solid #2d333b;
+        }
+
+        .action-left,
+        .action-right {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+        }
+
+        .action-button {
+            width: auto;
+            min-width: 115px;
+            height: 40px;
+
+            margin: 0;
+            padding: 0 16px;
+
+            border-radius: 8px;
+
+            font-family: inherit;
+            font-size: 11px;
+            font-weight: 800;
+
+            cursor: pointer;
+
+            transition:
+                transform .2s ease,
+                background .2s ease,
+                border-color .2s ease;
+        }
+
+        .action-button:hover {
+            transform: translateY(-1px);
+        }
+
+        .action-button.secondary {
+            background: #21262d;
+
+            color: #d1d5db;
+
+            border: 1px solid #30363d;
+        }
+
+        .action-button.secondary:hover {
+            background: #30363d;
+        }
+
+        .action-button.primary {
+            background: #00e5a8;
+
+            color: #07120f;
+
+            border: 1px solid #00e5a8;
+        }
+
+        .action-button.primary:hover {
+            background: #16f0b5;
+        }
+
+
+        /* =========================================================
+           SIDE PANEL
+        ========================================================= */
+
+        .side-column {
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+        }
+
+        .side-card-body {
+            padding: 20px;
+        }
+
+
+        /* =========================================================
+           PRODUCT PREVIEW
+        ========================================================= */
+
+        .product-preview {
+            padding: 18px;
+
+            background: #0d1117;
+
+            border: 1px solid #30363d;
+            border-radius: 11px;
+        }
+
+        .preview-label {
+            margin-bottom: 8px;
+
+            color: #6e7681;
+
+            font-size: 9px;
+            font-weight: 800;
+
+            letter-spacing: 1px;
+        }
+
+        .preview-name {
+            margin-bottom: 5px;
+
+            color: #ffffff;
+
+            font-size: 16px;
+            font-weight: 800;
+
+            word-break: break-word;
+        }
+
+        .preview-sku {
+            color: #00e5a8;
+
+            font-size: 10px;
+            font-weight: 700;
+        }
+
+
+        /* =========================================================
+           INFO LIST
+        ========================================================= */
+
+        .info-list {
+            display: flex;
+            flex-direction: column;
+            gap: 13px;
+        }
+
+        .info-row {
+            display: flex;
+            align-items: flex-start;
+
+            gap: 10px;
+        }
+
+        .info-icon {
+            width: 28px;
+            height: 28px;
+
+            flex-shrink: 0;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            border-radius: 7px;
+
+            background: #21262d;
+
+            border: 1px solid #30363d;
+
+            color: #00e5a8;
+
+            font-size: 11px;
+        }
+
+        .info-text strong {
+            display: block;
+
+            margin-bottom: 3px;
+
+            color: #d1d5db;
+
+            font-size: 11px;
+        }
+
+        .info-text span {
+            display: block;
+
+            color: #6e7681;
+
+            font-size: 9px;
+            line-height: 1.45;
+        }
+
+
+        /* =========================================================
+           DATA RULES
+        ========================================================= */
+
+        .rules {
+            display: flex;
+            flex-direction: column;
+            gap: 9px;
+        }
+
+        .rule {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+
+            color: #8b949e;
+
+            font-size: 10px;
+            line-height: 1.4;
+        }
+
+        .rule-dot {
+            width: 6px;
+            height: 6px;
+
+            flex-shrink: 0;
+
+            border-radius: 50%;
+
+            background: #00e5a8;
+        }
+
+
+        /* =========================================================
+           RESPONSIVE
+        ========================================================= */
+
+        @media (max-width: 900px) {
+
+            .product-layout {
+                grid-template-columns: 1fr;
+            }
+
+            .side-column {
+                display: grid;
+
+                grid-template-columns:
+                    repeat(2, minmax(0, 1fr));
+
+                align-items: start;
+            }
+
+        }
+
+
+        @media (max-width: 700px) {
+
+            .add-product-page {
+                padding: 25px 17px 45px;
+            }
+
+            .page-header {
+                flex-direction: column;
+            }
+
+            .header-status {
+                width: 100%;
+            }
+
+            .field-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .field.full {
+                grid-column: auto;
+            }
+
+            .side-column {
+                grid-template-columns: 1fr;
+            }
+
+            .form-actions {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .action-left,
+            .action-right {
+                width: 100%;
+            }
+
+            .action-button {
+                flex: 1;
+            }
+
+        }
+
+
+        @media (max-width: 430px) {
+
+            .form-body {
+                padding: 17px;
+            }
+
+            .card-header {
+                padding: 17px;
+            }
+
+            .location-preview {
+                grid-template-columns: 1fr;
+            }
+
+            .action-left,
+            .action-right {
+                flex-direction: column;
+            }
+
+            .action-button {
+                width: 100%;
+            }
+
+        }
+
+    </style>
+
 </head>
+
 
 <body>
 
-<div class="login-box">
+<div class="add-product-page">
 
-    <h1>Add Product</h1>
 
-    <p>Create a new warehouse product</p>
+    <!-- =========================================================
+         HEADER
+    ========================================================= -->
+
+    <header class="page-header">
+
+        <div class="page-header-left">
+
+            <div class="eyebrow">
+                Inventory Management
+            </div>
+
+            <h1>
+                Add New Product
+            </h1>
+
+            <p>
+                Register a new product into the WareFlow warehouse
+                inventory and assign its physical storage location.
+            </p>
+
+        </div>
+
+
+        <div class="header-status">
+            ● INVENTORY SYSTEM ONLINE
+        </div>
+
+    </header>
+
+
+    <!-- =========================================================
+         ERROR
+    ========================================================= -->
 
     {% if error %}
-        <p style="color: #d64545;">
+
+    <div class="form-error">
+
+        <div class="form-error-icon">
+            !
+        </div>
+
+        <div>
             {{ error }}
-        </p>
+        </div>
+
+    </div>
+
     {% endif %}
 
-    <form method="POST">
 
-        <input
-            type="text"
-            name="product_name"
-            placeholder="Product Name"
-            required
-        >
+    <!-- =========================================================
+         MAIN LAYOUT
+    ========================================================= -->
 
-        <input
-            type="text"
-            name="sku"
-            placeholder="SKU"
-            required
-        >
+    <div class="product-layout">
 
-        <input
-            type="text"
-            name="category"
-            placeholder="Category"
-            required
-        >
 
-        <input
-            type="number"
-            name="quantity"
-            placeholder="Quantity"
-            min="0"
-            value="0"
-            required
-        >
+        <!-- =====================================================
+             FORM
+        ====================================================== -->
 
-        <input
-            type="text"
-            name="supplier"
-            placeholder="Supplier"
-        >
+        <section class="form-card">
 
-        <input
-            type="text"
-            name="rack"
-            placeholder="Rack"
-            required
-        >
 
-        <input
-            type="text"
-            name="shelf"
-            placeholder="Shelf"
-            required
-        >
+            <div class="card-header">
 
-        <input
-            type="text"
-            name="bin"
-            placeholder="Bin"
-            required
-        >
+                <h2>
+                    Product Registration
+                </h2>
 
-        <button type="submit">
-            Save Product
-        </button>
+                <p>
+                    Enter accurate product and warehouse information
+                    before saving this record.
+                </p>
 
-    </form>
+            </div>
 
-    <br>
 
-    <button onclick="location.href='/inventory'">
-        Back
-    </button>
+            <div class="form-body">
+
+
+                <form method="POST" id="productForm">
+
+
+                    <!-- =================================================
+                         PRODUCT INFORMATION
+                    ================================================== -->
+
+                    <div class="form-section">
+
+                        <div class="section-heading">
+
+                            <div class="section-number">
+                                01
+                            </div>
+
+                            <strong>
+                                Product Information
+                            </strong>
+
+                        </div>
+
+
+                        <div class="field-grid">
+
+
+                            <div class="field full">
+
+                                <label for="product_name">
+                                    Product Name
+                                    <span class="required">*</span>
+                                </label>
+
+                                <input
+                                    type="text"
+                                    id="product_name"
+                                    name="product_name"
+                                    placeholder="e.g. Coca Cola 500ml"
+                                    maxlength="100"
+                                    autocomplete="off"
+                                    required
+                                >
+
+                                <div class="field-help">
+                                    Use the official product name used by your warehouse.
+                                </div>
+
+                            </div>
+
+
+                            <div class="field">
+
+                                <label for="sku">
+                                    SKU
+                                    <span class="required">*</span>
+                                </label>
+
+                                <input
+                                    type="text"
+                                    id="sku"
+                                    name="sku"
+                                    placeholder="e.g. COKE-500-001"
+                                    maxlength="50"
+                                    autocomplete="off"
+                                    required
+                                >
+
+                                <div class="field-help">
+                                    SKU must uniquely identify this product.
+                                </div>
+
+                            </div>
+
+
+                            <div class="field">
+
+                                <label for="category">
+                                    Category
+                                    <span class="required">*</span>
+                                </label>
+
+                                <input
+                                    type="text"
+                                    id="category"
+                                    name="category"
+                                    placeholder="e.g. Beverages"
+                                    maxlength="50"
+                                    required
+                                >
+
+                            </div>
+
+
+                            <div class="field">
+
+                                <label for="supplier">
+                                    Supplier
+                                    <span class="optional">
+                                        Optional
+                                    </span>
+                                </label>
+
+                                <input
+                                    type="text"
+                                    id="supplier"
+                                    name="supplier"
+                                    placeholder="e.g. ABC Distributors"
+                                    maxlength="100"
+                                >
+
+                            </div>
+
+
+                            <div class="field">
+
+                                <label for="quantity">
+                                    Opening Quantity
+                                    <span class="required">*</span>
+                                </label>
+
+                                <input
+                                    type="number"
+                                    id="quantity"
+                                    name="quantity"
+                                    min="0"
+                                    value="0"
+                                    required
+                                >
+
+                                <div class="field-help">
+                                    Initial stock quantity received into the warehouse.
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- =================================================
+                         STORAGE LOCATION
+                    ================================================== -->
+
+                    <div class="form-section">
+
+                        <div class="section-heading">
+
+                            <div class="section-number">
+                                02
+                            </div>
+
+                            <strong>
+                                Warehouse Location
+                            </strong>
+
+                        </div>
+
+
+                        <div class="field-grid">
+
+
+                            <div class="field">
+
+                                <label for="rack">
+                                    Rack
+                                    <span class="required">*</span>
+                                </label>
+
+                                <input
+                                    type="text"
+                                    id="rack"
+                                    name="rack"
+                                    placeholder="e.g. A12"
+                                    maxlength="20"
+                                    required
+                                >
+
+                            </div>
+
+
+                            <div class="field">
+
+                                <label for="shelf">
+                                    Shelf
+                                    <span class="required">*</span>
+                                </label>
+
+                                <input
+                                    type="text"
+                                    id="shelf"
+                                    name="shelf"
+                                    placeholder="e.g. 04"
+                                    maxlength="20"
+                                    required
+                                >
+
+                            </div>
+
+
+                            <div class="field">
+
+                                <label for="bin">
+                                    Bin
+                                    <span class="required">*</span>
+                                </label>
+
+                                <input
+                                    type="text"
+                                    id="bin"
+                                    name="bin"
+                                    placeholder="e.g. B"
+                                    maxlength="20"
+                                    required
+                                >
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="location-preview">
+
+                            <div class="location-box">
+
+                                <span>
+                                    RACK
+                                </span>
+
+                                <strong id="previewRack">
+                                    —
+                                </strong>
+
+                            </div>
+
+
+                            <div class="location-box">
+
+                                <span>
+                                    SHELF
+                                </span>
+
+                                <strong id="previewShelf">
+                                    —
+                                </strong>
+
+                            </div>
+
+
+                            <div class="location-box">
+
+                                <span>
+                                    BIN
+                                </span>
+
+                                <strong id="previewBin">
+                                    —
+                                </strong>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- =================================================
+                         ACTIONS
+                    ================================================== -->
+
+                    <div class="form-actions">
+
+                        <div class="action-left">
+
+                            <button
+                                type="button"
+                                class="action-button secondary"
+                                onclick="location.href='/inventory'"
+                            >
+                                ← Back to Inventory
+                            </button>
+
+                        </div>
+
+
+                        <div class="action-right">
+
+                            <button
+                                type="button"
+                                class="action-button secondary"
+                                onclick="resetProductForm()"
+                            >
+                                Reset
+                            </button>
+
+
+                            <button
+                                type="submit"
+                                class="action-button primary"
+                            >
+                                + Save Product
+                            </button>
+
+                        </div>
+
+                    </div>
+
+
+                </form>
+
+            </div>
+
+        </section>
+
+
+        <!-- =====================================================
+             SIDE INFORMATION
+        ====================================================== -->
+
+        <aside class="side-column">
+
+
+            <!-- PRODUCT PREVIEW -->
+
+            <section class="side-card">
+
+                <div class="card-header">
+
+                    <h2>
+                        Record Preview
+                    </h2>
+
+                    <p>
+                        Live preview of the product being registered.
+                    </p>
+
+                </div>
+
+
+                <div class="side-card-body">
+
+                    <div class="product-preview">
+
+                        <div class="preview-label">
+                            PRODUCT
+                        </div>
+
+                        <div
+                            class="preview-name"
+                            id="previewProductName"
+                        >
+                            New Product
+                        </div>
+
+                        <div
+                            class="preview-sku"
+                            id="previewSku"
+                        >
+                            SKU —
+
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- INFORMATION -->
+
+            <section class="side-card">
+
+                <div class="card-header">
+
+                    <h2>
+                        Registration Guide
+                    </h2>
+
+                    <p>
+                        Important warehouse data rules.
+                    </p>
+
+                </div>
+
+
+                <div class="side-card-body">
+
+                    <div class="info-list">
+
+
+                        <div class="info-row">
+
+                            <div class="info-icon">
+                                ✓
+                            </div>
+
+                            <div class="info-text">
+
+                                <strong>
+                                    Unique SKU
+                                </strong>
+
+                                <span>
+                                    Every product should have a unique SKU.
+                                </span>
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="info-row">
+
+                            <div class="info-icon">
+                                #
+                            </div>
+
+                            <div class="info-text">
+
+                                <strong>
+                                    Accurate Quantity
+                                </strong>
+
+                                <span>
+                                    Enter the physical opening stock currently available.
+                                </span>
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="info-row">
+
+                            <div class="info-icon">
+                                ⌖
+                            </div>
+
+                            <div class="info-text">
+
+                                <strong>
+                                    Storage Location
+                                </strong>
+
+                                <span>
+                                    Rack, shelf and bin determine where the product is stored.
+                                </span>
+
+                            </div>
+
+                        </div>
+
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- VALIDATION RULES -->
+
+            <section class="side-card">
+
+                <div class="card-header">
+
+                    <h2>
+                        Before Saving
+                    </h2>
+
+                    <p>
+                        Quick verification checklist.
+                    </p>
+
+                </div>
+
+
+                <div class="side-card-body">
+
+                    <div class="rules">
+
+                        <div class="rule">
+                            <span class="rule-dot"></span>
+                            Confirm product name and category.
+                        </div>
+
+                        <div class="rule">
+                            <span class="rule-dot"></span>
+                            Verify SKU is correct.
+                        </div>
+
+                        <div class="rule">
+                            <span class="rule-dot"></span>
+                            Confirm physical stock quantity.
+                        </div>
+
+                        <div class="rule">
+                            <span class="rule-dot"></span>
+                            Verify rack, shelf and bin.
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+        </aside>
+
+
+    </div>
 
 </div>
+
+
+<script>
+
+    /* =========================================================
+       LIVE PRODUCT PREVIEW
+    ========================================================= */
+
+    const productNameInput =
+        document.getElementById("product_name");
+
+    const skuInput =
+        document.getElementById("sku");
+
+    const rackInput =
+        document.getElementById("rack");
+
+    const shelfInput =
+        document.getElementById("shelf");
+
+    const binInput =
+        document.getElementById("bin");
+
+
+    const previewProductName =
+        document.getElementById("previewProductName");
+
+    const previewSku =
+        document.getElementById("previewSku");
+
+    const previewRack =
+        document.getElementById("previewRack");
+
+    const previewShelf =
+        document.getElementById("previewShelf");
+
+    const previewBin =
+        document.getElementById("previewBin");
+
+
+    function updatePreview() {
+
+        const productName =
+            productNameInput.value.trim();
+
+        const sku =
+            skuInput.value.trim();
+
+        const rack =
+            rackInput.value.trim();
+
+        const shelf =
+            shelfInput.value.trim();
+
+        const bin =
+            binInput.value.trim();
+
+
+        previewProductName.textContent =
+            productName || "New Product";
+
+        previewSku.textContent =
+            sku ? "SKU " + sku : "SKU —";
+
+        previewRack.textContent =
+            rack || "—";
+
+        previewShelf.textContent =
+            shelf || "—";
+
+        previewBin.textContent =
+            bin || "—";
+
+    }
+
+
+    [
+        productNameInput,
+        skuInput,
+        rackInput,
+        shelfInput,
+        binInput
+    ].forEach(function(input) {
+
+        if (input) {
+
+            input.addEventListener(
+                "input",
+                updatePreview
+            );
+
+        }
+
+    });
+
+
+    /* =========================================================
+       RESET
+    ========================================================= */
+
+    function resetProductForm() {
+
+        const form =
+            document.getElementById("productForm");
+
+        if (!form) {
+            return;
+        }
+
+        form.reset();
+
+        updatePreview();
+
+    }
+
+
+    /* =========================================================
+       FORM SUBMIT PROTECTION
+    ========================================================= */
+
+    const productForm =
+        document.getElementById("productForm");
+
+
+    if (productForm) {
+
+        productForm.addEventListener(
+            "submit",
+            function(event) {
+
+                const quantity =
+                    document.getElementById("quantity");
+
+                if (
+                    quantity &&
+                    Number(quantity.value) < 0
+                ) {
+
+                    event.preventDefault();
+
+                    quantity.value = 0;
+
+                    quantity.focus();
+
+                }
+
+            }
+        );
+
+    }
+
+
+    updatePreview();
+
+</script>
 
 </body>
 </html>

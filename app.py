@@ -16,6 +16,7 @@ from models import (
 from config import Config
 from datetime import datetime
 from zoneinfo import ZoneInfo
+from models import ActivityLog
 import csv
 import io
 
@@ -170,6 +171,26 @@ def generate_stock_alerts():
 
     db.session.commit()
 
+def log_activity(action, details):
+
+    employee = session.get(
+        "employee_name",
+        "System"
+    )
+
+    activity = ActivityLog(
+
+        employee_name=employee,
+
+        action=action,
+
+        details=details
+
+    )
+
+    db.session.add(activity)
+
+    db.session.commit()
 
 # ==========================
 # LOGIN
@@ -211,6 +232,13 @@ def process_login():
 
         session["employee_id"] = employee.employee_id
         session["employee_name"] = employee.name
+        log_activity(
+
+    "LOGIN",
+
+    "Logged into WareFlow"
+
+)
         session["role"] = employee.role
 
         return redirect("/dashboard")
@@ -578,7 +606,7 @@ def inventory():
 # ADD PRODUCT
 # ==========================
 
-@app.route("/add-product")
+@app.route("/add-product", methods=["GET", "POST"])
 @role_required("Admin", "Manager")
 def add_product():
 
@@ -632,6 +660,11 @@ def add_product():
 
         db.session.add(product)
         db.session.commit()
+
+        log_activity(
+            "ADD PRODUCT",
+            f"Added product: {product.product_name} (SKU: {product.sku})"
+        )
 
         return redirect("/inventory")
 
@@ -729,6 +762,11 @@ def edit_product(id):
 
         db.session.commit()
 
+        log_activity(
+            "UPDATE PRODUCT",
+            f"Updated product: {product.product_name} (SKU: {product.sku})"
+        )
+
         return redirect("/inventory")
 
     return render_template(
@@ -750,8 +788,16 @@ def delete_product(id):
 
     product = Product.query.get_or_404(id)
 
+    product_name = product.product_name
+    product_sku = product.sku
+
     db.session.delete(product)
     db.session.commit()
+
+    log_activity(
+        "DELETE PRODUCT",
+        f"Deleted product: {product_name} (SKU: {product_sku})"
+    )
 
     return redirect("/inventory")
 
