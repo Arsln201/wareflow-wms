@@ -2,141 +2,445 @@
 <html lang="en">
 
 <head>
+
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
 
     <title>Add Product | WareFlow WMS</title>
 
-    <link
-        rel="stylesheet"
-        href="{{ url_for('static', filename='css/style.css') }}"
-    >
-
     <style>
-
-        /* =========================================================
-           WAREFLOW — ADD PRODUCT
-           Production-style warehouse interface
-        ========================================================= */
 
         * {
             box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        :root {
+            --bg: #0b1016;
+            --sidebar: #121820;
+            --card: #171f27;
+            --card-2: #1c252e;
+            --border: #2b3741;
+            --border-light: #34414c;
+            --text: #f5f7fa;
+            --muted: #8995a0;
+            --muted-2: #66727e;
+            --green: #00e5a8;
+            --green-soft: rgba(0, 229, 168, .09);
+            --danger: #ff6b72;
+        }
+
+        html,
+        body {
+            min-height: 100%;
+            width: 100%;
         }
 
         body {
-            margin: 0;
+            background: var(--bg);
+            color: var(--text);
+
+            font-family:
+                -apple-system,
+                BlinkMacSystemFont,
+                "Segoe UI",
+                Roboto,
+                Helvetica,
+                Arial,
+                sans-serif;
+
+            overflow-x: hidden;
+        }
+
+
+        /* =====================================================
+           APP
+           ===================================================== */
+
+        .add-product-app {
             min-height: 100vh;
-            background: #0d1117;
-            color: #ffffff;
-            font-family: Arial, Helvetica, sans-serif;
-        }
-
-        .add-product-page {
             width: 100%;
-            max-width: 1250px;
-            margin: 0 auto;
-            padding: 35px 28px 60px;
+
+            display: flex;
         }
 
 
-        /* =========================================================
-           HEADER
-        ========================================================= */
+        /* =====================================================
+           SIDEBAR
+           ===================================================== */
 
-        .page-header {
+        .add-sidebar {
+            position: fixed;
+
+            left: 0;
+            top: 0;
+            bottom: 0;
+
+            width: 278px;
+
+            padding: 30px 24px;
+
+            background: var(--sidebar);
+
+            border-right: 1px solid #28323b;
+
             display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            gap: 25px;
+            flex-direction: column;
+
+            overflow-y: auto;
+
+            z-index: 1000;
+        }
+
+
+        .brand {
+            display: flex;
+            align-items: center;
+
+            gap: 13px;
+
+            padding-bottom: 26px;
 
             margin-bottom: 28px;
-            padding-bottom: 22px;
 
-            border-bottom: 1px solid #2d333b;
+            border-bottom: 1px solid #29333c;
         }
 
-        .page-header-left {
-            min-width: 0;
+
+        .brand-logo {
+            width: 48px;
+            height: 48px;
+
+            border-radius: 13px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            background: var(--green);
+
+            color: #06120e;
+
+            font-size: 24px;
+            font-weight: 900;
         }
 
-        .eyebrow {
-            margin-bottom: 8px;
 
-            color: #00e5a8;
-            font-size: 11px;
-            font-weight: 800;
-
-            letter-spacing: 1.5px;
-            text-transform: uppercase;
-        }
-
-        .page-header h1 {
-            margin: 0 0 8px;
-
+        .brand-name {
             color: #ffffff;
 
-            font-size: clamp(27px, 3vw, 38px);
+            font-size: 21px;
+            font-weight: 850;
+
             line-height: 1.1;
         }
 
+
+        .brand-subtitle {
+            color: #7b8792;
+
+            font-size: 10px;
+            font-weight: 800;
+
+            letter-spacing: 2px;
+
+            margin-top: 4px;
+        }
+
+
+        .nav-label {
+            color: #65717c;
+
+            font-size: 10px;
+            font-weight: 850;
+
+            letter-spacing: 2px;
+
+            margin: 18px 12px 10px;
+        }
+
+
+        .nav {
+            display: flex;
+            flex-direction: column;
+
+            gap: 5px;
+        }
+
+
+        .nav a {
+            width: 100%;
+
+            display: flex;
+            align-items: center;
+
+            gap: 13px;
+
+            padding: 13px 14px;
+
+            border-radius: 10px;
+
+            color: #aab4be;
+
+            text-decoration: none;
+
+            font-size: 14px;
+            font-weight: 650;
+
+            border: 1px solid transparent;
+
+            transition: .2s ease;
+        }
+
+
+        .nav a:hover {
+            color: #ffffff;
+
+            background: #1b252e;
+
+            transform: translateX(2px);
+        }
+
+
+        .nav a.active {
+            color: var(--green);
+
+            background: var(--green-soft);
+
+            border-color: rgba(0, 229, 168, .25);
+
+            box-shadow:
+                inset 3px 0 0 var(--green);
+        }
+
+
+        .nav-icon {
+            width: 18px;
+
+            text-align: center;
+
+            color: #77838e;
+
+            font-size: 14px;
+        }
+
+
+        .nav a.active .nav-icon {
+            color: var(--green);
+        }
+
+
+        .sidebar-bottom {
+            margin-top: auto;
+
+            padding-top: 22px;
+        }
+
+
+        .user-box {
+            padding-top: 20px;
+
+            margin-bottom: 14px;
+
+            border-top: 1px solid #29333c;
+        }
+
+
+        .user-name {
+            color: #ffffff;
+
+            font-size: 14px;
+            font-weight: 750;
+        }
+
+
+        .user-role {
+            color: #78848f;
+
+            font-size: 11px;
+            font-weight: 600;
+
+            margin-top: 3px;
+        }
+
+
+        .logout {
+            width: 100%;
+
+            border: 0;
+
+            border-radius: 10px;
+
+            padding: 13px;
+
+            background: var(--green);
+
+            color: #06120e;
+
+            font-size: 14px;
+            font-weight: 800;
+
+            cursor: pointer;
+
+            transition: .2s ease;
+        }
+
+
+        .logout:hover {
+            background: #18f0b8;
+
+            transform: translateY(-1px);
+        }
+
+
+        /* =====================================================
+           MAIN
+           ===================================================== */
+
+        .add-main {
+            width: calc(100% - 278px);
+
+            margin-left: 278px;
+
+            min-height: 100vh;
+
+            padding: 42px 48px 60px;
+        }
+
+
+        .content {
+            width: 100%;
+
+            max-width: 1280px;
+
+            margin: 0 auto;
+        }
+
+
+        /* =====================================================
+           HEADER
+           ===================================================== */
+
+        .page-header {
+            display: flex;
+
+            justify-content: space-between;
+            align-items: flex-start;
+
+            gap: 30px;
+
+            margin-bottom: 30px;
+        }
+
+
+        .eyebrow {
+            color: var(--green);
+
+            font-size: 11px;
+            font-weight: 850;
+
+            letter-spacing: 3px;
+
+            margin-bottom: 9px;
+        }
+
+
+        .page-header h1 {
+            color: #ffffff;
+
+            font-size: clamp(34px, 4vw, 48px);
+
+            line-height: 1;
+
+            font-weight: 850;
+
+            letter-spacing: -1.5px;
+        }
+
+
         .page-header p {
-            margin: 0;
+            color: var(--muted);
 
-            max-width: 650px;
+            max-width: 690px;
 
-            color: #8b949e;
+            margin-top: 11px;
 
-            font-size: 13px;
+            font-size: 14px;
+
             line-height: 1.6;
         }
 
-        .header-status {
+
+        .header-actions {
             flex-shrink: 0;
-
-            padding: 12px 16px;
-
-            background: rgba(0, 229, 168, .06);
-
-            border: 1px solid rgba(0, 229, 168, .18);
-            border-radius: 10px;
-
-            color: #00e5a8;
-
-            font-size: 11px;
-            font-weight: 800;
-
-            letter-spacing: .6px;
         }
 
 
-        /* =========================================================
+        .dashboard-button {
+            border: 1px solid rgba(0, 229, 168, .28);
+
+            border-radius: 10px;
+
+            padding: 13px 20px;
+
+            background: var(--green);
+
+            color: #06120e;
+
+            font-size: 14px;
+            font-weight: 800;
+
+            cursor: pointer;
+
+            transition: .2s ease;
+        }
+
+
+        .dashboard-button:hover {
+            background: #18f0b8;
+
+            transform: translateY(-1px);
+        }
+
+
+        /* =====================================================
            ERROR
-        ========================================================= */
+           ===================================================== */
 
         .form-error {
             display: flex;
             align-items: flex-start;
-            gap: 10px;
+
+            gap: 11px;
 
             margin-bottom: 20px;
-            padding: 13px 16px;
 
-            background: rgba(255, 92, 92, .07);
+            padding: 14px 16px;
 
-            border: 1px solid rgba(255, 92, 92, .22);
-            border-radius: 10px;
+            border-radius: 11px;
 
-            color: #ff8b8b;
+            background: rgba(255, 107, 114, .07);
 
-            font-size: 12px;
+            border: 1px solid rgba(255, 107, 114, .22);
+
+            color: #ff8d93;
+
+            font-size: 13px;
+
             line-height: 1.5;
         }
 
-        .form-error-icon {
-            flex-shrink: 0;
 
-            width: 20px;
-            height: 20px;
+        .error-icon {
+            width: 22px;
+            height: 22px;
+
+            flex-shrink: 0;
 
             display: flex;
             align-items: center;
@@ -144,23 +448,24 @@
 
             border-radius: 50%;
 
-            background: rgba(255, 92, 92, .15);
+            background: rgba(255, 107, 114, .12);
 
-            font-size: 11px;
-            font-weight: 800;
+            color: var(--danger);
+
+            font-weight: 900;
         }
 
 
-        /* =========================================================
-           MAIN GRID
-        ========================================================= */
+        /* =====================================================
+           LAYOUT
+           ===================================================== */
 
         .product-layout {
             display: grid;
 
             grid-template-columns:
-                minmax(0, 1.65fr)
-                minmax(280px, .75fr);
+                minmax(0, 1.55fr)
+                minmax(310px, .65fr);
 
             gap: 22px;
 
@@ -168,389 +473,509 @@
         }
 
 
-        /* =========================================================
-           FORM CARD
-        ========================================================= */
+        /* =====================================================
+           CARDS
+           ===================================================== */
 
-        .form-card,
-        .side-card {
-            background: #161b22;
+        .card {
+            background: var(--card);
 
-            border: 1px solid #2d333b;
-            border-radius: 15px;
+            border: 1px solid var(--border);
+
+            border-radius: 17px;
 
             overflow: hidden;
+
+            box-shadow:
+                0 18px 45px rgba(0, 0, 0, .16);
         }
+
 
         .card-header {
-            padding: 20px 22px;
+            padding: 24px 26px;
 
-            border-bottom: 1px solid #2d333b;
+            border-bottom: 1px solid var(--border);
         }
+
 
         .card-header h2 {
-            margin: 0 0 5px;
-
             color: #ffffff;
 
-            font-size: 17px;
+            font-size: 19px;
+            font-weight: 800;
         }
 
+
         .card-header p {
-            margin: 0;
+            color: var(--muted-2);
 
-            color: #8b949e;
+            font-size: 12px;
 
-            font-size: 11px;
+            margin-top: 6px;
+
             line-height: 1.5;
         }
 
+
         .form-body {
-            padding: 22px;
+            padding: 27px;
         }
 
 
-        /* =========================================================
-           FORM SECTIONS
-        ========================================================= */
+        /* =====================================================
+           FORM SECTION
+           ===================================================== */
 
         .form-section {
-            margin-bottom: 27px;
+            padding-bottom: 28px;
+
+            margin-bottom: 28px;
+
+            border-bottom: 1px solid #29343e;
         }
+
 
         .form-section:last-child {
             margin-bottom: 0;
+
+            padding-bottom: 0;
+
+            border-bottom: 0;
         }
+
 
         .section-heading {
             display: flex;
             align-items: center;
-            gap: 9px;
 
-            margin-bottom: 15px;
+            gap: 11px;
+
+            margin-bottom: 19px;
         }
 
+
         .section-number {
-            width: 24px;
-            height: 24px;
+            width: 30px;
+            height: 30px;
 
             display: flex;
             align-items: center;
             justify-content: center;
 
-            border-radius: 7px;
+            border-radius: 8px;
 
-            background: rgba(0, 229, 168, .08);
+            background: var(--green-soft);
 
-            border: 1px solid rgba(0, 229, 168, .20);
+            border: 1px solid rgba(0, 229, 168, .22);
 
-            color: #00e5a8;
+            color: var(--green);
 
-            font-size: 10px;
-            font-weight: 800;
+            font-family:
+                "SFMono-Regular",
+                Consolas,
+                monospace;
+
+            font-size: 11px;
+            font-weight: 850;
         }
+
 
         .section-heading strong {
             color: #ffffff;
 
-            font-size: 12px;
-            letter-spacing: .4px;
+            font-size: 14px;
+            font-weight: 800;
         }
 
-
-        /* =========================================================
-           INPUT GRID
-        ========================================================= */
 
         .field-grid {
             display: grid;
 
-            grid-template-columns:
-                repeat(2, minmax(0, 1fr));
+            grid-template-columns: repeat(2, minmax(0, 1fr));
 
-            gap: 15px;
+            gap: 18px;
         }
 
-        .field {
-            min-width: 0;
-        }
 
         .field.full {
             grid-column: 1 / -1;
         }
 
+
         .field label {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+            display: block;
 
-            margin-bottom: 7px;
+            margin-bottom: 8px;
 
-            color: #c9d1d9;
+            color: #dce2e7;
 
-            font-size: 11px;
-            font-weight: 700;
+            font-size: 12px;
+            font-weight: 750;
         }
+
 
         .required {
-            color: #00e5a8;
+            color: var(--green);
+
+            margin-left: 3px;
         }
+
 
         .optional {
-            color: #6e7681;
+            color: #697580;
 
-            font-size: 9px;
-            font-weight: 500;
+            font-size: 10px;
+
+            margin-left: 6px;
+
+            font-weight: 600;
         }
+
 
         .field input {
             width: 100%;
-            height: 43px;
 
-            margin: 0;
-            padding: 0 13px;
+            min-height: 47px;
 
-            background: #0d1117;
+            padding: 12px 13px;
 
-            border: 1px solid #30363d;
-            border-radius: 8px;
+            border-radius: 9px;
+
+            border: 1px solid var(--border-light);
 
             outline: none;
+
+            background: #111820;
 
             color: #ffffff;
 
             font-family: inherit;
-            font-size: 12px;
 
-            transition:
-                border-color .2s ease,
-                box-shadow .2s ease,
-                background .2s ease;
+            font-size: 13px;
+
+            transition: .2s ease;
         }
+
 
         .field input::placeholder {
-            color: #555e68;
+            color: #586570;
         }
+
 
         .field input:hover {
-            border-color: #414b56;
+            border-color: #44525e;
         }
+
 
         .field input:focus {
-            border-color: #00e5a8;
+            border-color: var(--green);
 
-            background: #0f151c;
+            background: #131c23;
 
             box-shadow:
-                0 0 0 3px
-                rgba(0, 229, 168, .07);
+                0 0 0 3px rgba(0, 229, 168, .08);
         }
+
 
         .field-help {
-            margin-top: 6px;
+            color: #65717c;
 
-            color: #6e7681;
+            font-size: 10px;
 
-            font-size: 9px;
-            line-height: 1.4;
+            margin-top: 7px;
+
+            line-height: 1.5;
         }
 
 
-        /* =========================================================
+        /* =====================================================
            LOCATION PREVIEW
-        ========================================================= */
+           ===================================================== */
 
         .location-preview {
             display: grid;
 
-            grid-template-columns:
-                repeat(3, minmax(0, 1fr));
-
-            gap: 10px;
-
-            margin-top: 14px;
-        }
-
-        .location-box {
-            padding: 12px;
-
-            background: #0d1117;
-
-            border: 1px solid #30363d;
-            border-radius: 9px;
-
-            text-align: center;
-        }
-
-        .location-box span {
-            display: block;
-
-            margin-bottom: 5px;
-
-            color: #6e7681;
-
-            font-size: 9px;
-            font-weight: 800;
-
-            letter-spacing: .8px;
-        }
-
-        .location-box strong {
-            color: #00e5a8;
-
-            font-size: 14px;
-        }
-
-
-        /* =========================================================
-           ACTIONS
-        ========================================================= */
-
-        .form-actions {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+            grid-template-columns: repeat(3, 1fr);
 
             gap: 12px;
 
-            margin-top: 28px;
-            padding-top: 20px;
-
-            border-top: 1px solid #2d333b;
+            margin-top: 18px;
         }
+
+
+        .location-box {
+            padding: 15px;
+
+            border-radius: 10px;
+
+            background: #111820;
+
+            border: 1px solid var(--border);
+        }
+
+
+        .location-label {
+            color: #687581;
+
+            font-size: 10px;
+            font-weight: 800;
+
+            letter-spacing: 1px;
+
+            text-transform: uppercase;
+        }
+
+
+        .location-value {
+            color: var(--green);
+
+            font-family:
+                "SFMono-Regular",
+                Consolas,
+                monospace;
+
+            font-size: 17px;
+            font-weight: 800;
+
+            margin-top: 7px;
+        }
+
+
+        /* =====================================================
+           FORM ACTIONS
+           ===================================================== */
+
+        .form-actions {
+            display: flex;
+
+            justify-content: space-between;
+            align-items: center;
+
+            gap: 14px;
+
+            margin-top: 27px;
+
+            padding-top: 23px;
+
+            border-top: 1px solid #29343e;
+        }
+
 
         .action-left,
         .action-right {
             display: flex;
+
             align-items: center;
-            gap: 9px;
+
+            gap: 10px;
         }
 
+
         .action-button {
-            width: auto;
-            min-width: 115px;
-            height: 40px;
+            min-height: 44px;
 
-            margin: 0;
-            padding: 0 16px;
+            padding: 11px 17px;
 
-            border-radius: 8px;
+            border-radius: 9px;
 
-            font-family: inherit;
-            font-size: 11px;
+            font-size: 13px;
             font-weight: 800;
 
             cursor: pointer;
 
-            transition:
-                transform .2s ease,
-                background .2s ease,
-                border-color .2s ease;
+            transition: .2s ease;
         }
 
-        .action-button:hover {
-            transform: translateY(-1px);
-        }
 
         .action-button.secondary {
-            background: #21262d;
+            background: transparent;
 
-            color: #d1d5db;
+            border: 1px solid var(--border-light);
 
-            border: 1px solid #30363d;
+            color: #a5b0ba;
         }
+
 
         .action-button.secondary:hover {
-            background: #30363d;
-        }
-
-        .action-button.primary {
-            background: #00e5a8;
-
-            color: #07120f;
-
-            border: 1px solid #00e5a8;
-        }
-
-        .action-button.primary:hover {
-            background: #16f0b5;
-        }
-
-
-        /* =========================================================
-           SIDE PANEL
-        ========================================================= */
-
-        .side-column {
-            display: flex;
-            flex-direction: column;
-            gap: 18px;
-        }
-
-        .side-card-body {
-            padding: 20px;
-        }
-
-
-        /* =========================================================
-           PRODUCT PREVIEW
-        ========================================================= */
-
-        .product-preview {
-            padding: 18px;
-
-            background: #0d1117;
-
-            border: 1px solid #30363d;
-            border-radius: 11px;
-        }
-
-        .preview-label {
-            margin-bottom: 8px;
-
-            color: #6e7681;
-
-            font-size: 9px;
-            font-weight: 800;
-
-            letter-spacing: 1px;
-        }
-
-        .preview-name {
-            margin-bottom: 5px;
+            border-color: #5a6874;
 
             color: #ffffff;
 
-            font-size: 16px;
+            background: #1c252e;
+        }
+
+
+        .action-button.primary {
+            border: 0;
+
+            background: var(--green);
+
+            color: #06120e;
+        }
+
+
+        .action-button.primary:hover {
+            background: #18f0b8;
+
+            transform: translateY(-1px);
+        }
+
+
+        /* =====================================================
+           RIGHT SIDE
+           ===================================================== */
+
+        .side-column {
+            display: flex;
+
+            flex-direction: column;
+
+            gap: 18px;
+        }
+
+
+        .side-card-body {
+            padding: 21px;
+        }
+
+
+        /* =====================================================
+           LIVE PREVIEW
+           ===================================================== */
+
+        .preview-product {
+            padding: 19px;
+
+            border-radius: 12px;
+
+            background:
+                linear-gradient(
+                    145deg,
+                    #202b34,
+                    #151d25
+                );
+
+            border: 1px solid #34414c;
+        }
+
+
+        .preview-label {
+            color: var(--green);
+
+            font-size: 9px;
+            font-weight: 850;
+
+            letter-spacing: 2px;
+
+            margin-bottom: 10px;
+        }
+
+
+        .preview-name {
+            color: #ffffff;
+
+            font-size: 18px;
             font-weight: 800;
 
             word-break: break-word;
         }
 
-        .preview-sku {
-            color: #00e5a8;
 
-            font-size: 10px;
-            font-weight: 700;
+        .preview-sku {
+            color: #7e8a95;
+
+            font-size: 11px;
+
+            margin-top: 5px;
         }
 
 
-        /* =========================================================
+        .preview-location-title {
+            color: #687581;
+
+            font-size: 9px;
+            font-weight: 800;
+
+            letter-spacing: 1.5px;
+
+            margin-top: 22px;
+            margin-bottom: 9px;
+        }
+
+
+        .preview-location {
+            display: grid;
+
+            grid-template-columns:
+                repeat(3, 1fr);
+
+            gap: 8px;
+        }
+
+
+        .preview-location div {
+            padding: 10px 7px;
+
+            text-align: center;
+
+            border-radius: 8px;
+
+            background: #111820;
+
+            border: 1px solid #2d3943;
+        }
+
+
+        .preview-location small {
+            display: block;
+
+            color: #64717d;
+
+            font-size: 8px;
+            font-weight: 800;
+
+            letter-spacing: 1px;
+        }
+
+
+        .preview-location span {
+            display: block;
+
+            color: var(--green);
+
+            font-family:
+                "SFMono-Regular",
+                Consolas,
+                monospace;
+
+            font-size: 14px;
+            font-weight: 800;
+
+            margin-top: 5px;
+        }
+
+
+        /* =====================================================
            INFO LIST
-        ========================================================= */
+           ===================================================== */
 
         .info-list {
             display: flex;
+
             flex-direction: column;
-            gap: 13px;
+
+            gap: 16px;
         }
+
 
         .info-row {
             display: flex;
+
             align-items: flex-start;
 
-            gap: 10px;
+            gap: 11px;
         }
+
 
         .info-icon {
             width: 28px;
@@ -562,75 +987,96 @@
             align-items: center;
             justify-content: center;
 
-            border-radius: 7px;
+            border-radius: 8px;
 
-            background: #21262d;
+            background: var(--green-soft);
 
-            border: 1px solid #30363d;
+            border: 1px solid rgba(0, 229, 168, .18);
 
-            color: #00e5a8;
+            color: var(--green);
 
-            font-size: 11px;
+            font-size: 12px;
+            font-weight: 900;
         }
+
 
         .info-text strong {
             display: block;
 
-            margin-bottom: 3px;
+            color: #e5e9ed;
 
-            color: #d1d5db;
-
-            font-size: 11px;
+            font-size: 12px;
+            font-weight: 800;
         }
+
 
         .info-text span {
             display: block;
 
-            color: #6e7681;
+            color: #687580;
 
-            font-size: 9px;
-            line-height: 1.45;
+            font-size: 10px;
+
+            line-height: 1.55;
+
+            margin-top: 4px;
         }
 
 
-        /* =========================================================
-           DATA RULES
-        ========================================================= */
+        /* =====================================================
+           RULES
+           ===================================================== */
 
         .rules {
             display: flex;
+
             flex-direction: column;
-            gap: 9px;
+
+            gap: 12px;
         }
+
 
         .rule {
             display: flex;
-            align-items: center;
-            gap: 8px;
 
-            color: #8b949e;
+            align-items: flex-start;
 
-            font-size: 10px;
-            line-height: 1.4;
+            gap: 10px;
+
+            color: #8b97a1;
+
+            font-size: 11px;
+
+            line-height: 1.5;
         }
 
+
         .rule-dot {
-            width: 6px;
-            height: 6px;
+            width: 7px;
+            height: 7px;
 
             flex-shrink: 0;
 
+            margin-top: 5px;
+
             border-radius: 50%;
 
-            background: #00e5a8;
+            background: var(--green);
+
+            box-shadow:
+                0 0 7px rgba(0, 229, 168, .5);
         }
 
 
-        /* =========================================================
+        /* =====================================================
            RESPONSIVE
-        ========================================================= */
+           ===================================================== */
 
-        @media (max-width: 900px) {
+        @media (max-width: 1180px) {
+
+            .add-main {
+                padding: 34px 30px 50px;
+            }
 
             .product-layout {
                 grid-template-columns: 1fr;
@@ -641,24 +1087,74 @@
 
                 grid-template-columns:
                     repeat(2, minmax(0, 1fr));
-
-                align-items: start;
             }
 
         }
 
 
-        @media (max-width: 700px) {
+        @media (max-width: 950px) {
 
-            .add-product-page {
-                padding: 25px 17px 45px;
+            .add-sidebar {
+                width: 225px;
+
+                padding: 24px 16px;
+            }
+
+            .add-main {
+                width: calc(100% - 225px);
+
+                margin-left: 225px;
+
+                padding: 28px 20px 45px;
+            }
+
+            .side-column {
+                grid-template-columns: 1fr;
+            }
+
+        }
+
+
+        @media (max-width: 680px) {
+
+            .add-product-app {
+                display: block;
+            }
+
+            .add-sidebar {
+                position: relative;
+
+                width: 100%;
+
+                height: auto;
+
+                min-height: auto;
+
+                border-right: 0;
+
+                border-bottom: 1px solid #29333c;
+
+                padding: 18px;
+            }
+
+            .sidebar-bottom {
+                margin-top: 20px;
+            }
+
+            .add-main {
+                width: 100%;
+
+                margin-left: 0;
+
+                padding: 24px 16px 40px;
             }
 
             .page-header {
                 flex-direction: column;
             }
 
-            .header-status {
+            .header-actions,
+            .dashboard-button {
                 width: 100%;
             }
 
@@ -670,12 +1166,13 @@
                 grid-column: auto;
             }
 
-            .side-column {
+            .location-preview {
                 grid-template-columns: 1fr;
             }
 
             .form-actions {
                 flex-direction: column;
+
                 align-items: stretch;
             }
 
@@ -686,6 +1183,8 @@
 
             .action-button {
                 flex: 1;
+
+                width: 100%;
             }
 
         }
@@ -694,14 +1193,14 @@
         @media (max-width: 430px) {
 
             .form-body {
-                padding: 17px;
+                padding: 18px;
             }
 
             .card-header {
-                padding: 17px;
+                padding: 19px;
             }
 
-            .location-preview {
+            .preview-location {
                 grid-template-columns: 1fr;
             }
 
@@ -723,614 +1222,855 @@
 
 <body>
 
-<div class="add-product-page">
+
+<div class="add-product-app">
 
 
-    <!-- =========================================================
-         HEADER
-    ========================================================= -->
+    <!-- =====================================================
+         SIDEBAR
+         ===================================================== -->
 
-    <header class="page-header">
+    <aside class="add-sidebar">
 
-        <div class="page-header-left">
 
-            <div class="eyebrow">
-                Inventory Management
+        <div class="brand">
+
+            <div class="brand-logo">
+                W
             </div>
 
-            <h1>
-                Add New Product
-            </h1>
+            <div>
 
-            <p>
-                Register a new product into the WareFlow warehouse
-                inventory and assign its physical storage location.
-            </p>
+                <div class="brand-name">
+                    WareFlow
+                </div>
 
-        </div>
-
-
-        <div class="header-status">
-            ● INVENTORY SYSTEM ONLINE
-        </div>
-
-    </header>
-
-
-    <!-- =========================================================
-         ERROR
-    ========================================================= -->
-
-    {% if error %}
-
-    <div class="form-error">
-
-        <div class="form-error-icon">
-            !
-        </div>
-
-        <div>
-            {{ error }}
-        </div>
-
-    </div>
-
-    {% endif %}
-
-
-    <!-- =========================================================
-         MAIN LAYOUT
-    ========================================================= -->
-
-    <div class="product-layout">
-
-
-        <!-- =====================================================
-             FORM
-        ====================================================== -->
-
-        <section class="form-card">
-
-
-            <div class="card-header">
-
-                <h2>
-                    Product Registration
-                </h2>
-
-                <p>
-                    Enter accurate product and warehouse information
-                    before saving this record.
-                </p>
+                <div class="brand-subtitle">
+                    WAREHOUSE OS
+                </div>
 
             </div>
 
+        </div>
 
-            <div class="form-body">
 
+        <div class="nav-label">
+            WORKSPACE
+        </div>
 
-                <form method="POST" id="productForm">
 
+        <nav class="nav">
 
-                    <!-- =================================================
-                         PRODUCT INFORMATION
-                    ================================================== -->
+            <a href="/dashboard">
+                <span class="nav-icon">▣</span>
+                <span>Dashboard</span>
+            </a>
 
-                    <div class="form-section">
+            <a href="/search">
+                <span class="nav-icon">⌕</span>
+                <span>Search Warehouse</span>
+            </a>
 
-                        <div class="section-heading">
+            <a href="/inventory">
+                <span class="nav-icon">▤</span>
+                <span>Inventory</span>
+            </a>
 
-                            <div class="section-number">
-                                01
-                            </div>
+            <a href="/stock-operations">
+                <span class="nav-icon">⇄</span>
+                <span>Stock Operations</span>
+            </a>
 
-                            <strong>
-                                Product Information
-                            </strong>
+            <a href="/scanner">
+                <span class="nav-icon">#</span>
+                <span>Scanner</span>
+            </a>
 
-                        </div>
+            <a href="/alerts">
+                <span class="nav-icon">!</span>
+                <span>Alerts</span>
+            </a>
 
+        </nav>
 
-                        <div class="field-grid">
 
+        <div class="nav-label">
+            MANAGEMENT
+        </div>
 
-                            <div class="field full">
 
-                                <label for="product_name">
-                                    Product Name
-                                    <span class="required">*</span>
-                                </label>
+        <nav class="nav">
 
-                                <input
-                                    type="text"
-                                    id="product_name"
-                                    name="product_name"
-                                    placeholder="e.g. Coca Cola 500ml"
-                                    maxlength="100"
-                                    autocomplete="off"
-                                    required
-                                >
+            <a href="/qr-management">
+                <span class="nav-icon">▣</span>
+                <span>QR Management</span>
+            </a>
 
-                                <div class="field-help">
-                                    Use the official product name used by your warehouse.
-                                </div>
+            <a href="/reports">
+                <span class="nav-icon">▤</span>
+                <span>Reports</span>
+            </a>
 
-                            </div>
+            <a href="/activity-logs">
+                <span class="nav-icon">≡</span>
+                <span>Activity Logs</span>
+            </a>
 
+            <a
+                href="/add-product"
+                class="active"
+            >
+                <span class="nav-icon">＋</span>
+                <span>Add Product</span>
+            </a>
 
-                            <div class="field">
+        </nav>
 
-                                <label for="sku">
-                                    SKU
-                                    <span class="required">*</span>
-                                </label>
 
-                                <input
-                                    type="text"
-                                    id="sku"
-                                    name="sku"
-                                    placeholder="e.g. COKE-500-001"
-                                    maxlength="50"
-                                    autocomplete="off"
-                                    required
-                                >
+        <div class="sidebar-bottom">
 
-                                <div class="field-help">
-                                    SKU must uniquely identify this product.
-                                </div>
+            <div class="user-box">
 
-                            </div>
+                <div class="user-name">
+                    Mirza Arsalan
+                </div>
 
-
-                            <div class="field">
-
-                                <label for="category">
-                                    Category
-                                    <span class="required">*</span>
-                                </label>
-
-                                <input
-                                    type="text"
-                                    id="category"
-                                    name="category"
-                                    placeholder="e.g. Beverages"
-                                    maxlength="50"
-                                    required
-                                >
-
-                            </div>
-
-
-                            <div class="field">
-
-                                <label for="supplier">
-                                    Supplier
-                                    <span class="optional">
-                                        Optional
-                                    </span>
-                                </label>
-
-                                <input
-                                    type="text"
-                                    id="supplier"
-                                    name="supplier"
-                                    placeholder="e.g. ABC Distributors"
-                                    maxlength="100"
-                                >
-
-                            </div>
-
-
-                            <div class="field">
-
-                                <label for="quantity">
-                                    Opening Quantity
-                                    <span class="required">*</span>
-                                </label>
-
-                                <input
-                                    type="number"
-                                    id="quantity"
-                                    name="quantity"
-                                    min="0"
-                                    value="0"
-                                    required
-                                >
-
-                                <div class="field-help">
-                                    Initial stock quantity received into the warehouse.
-                                </div>
-
-                            </div>
-
-                        </div>
-
-                    </div>
-
-
-                    <!-- =================================================
-                         STORAGE LOCATION
-                    ================================================== -->
-
-                    <div class="form-section">
-
-                        <div class="section-heading">
-
-                            <div class="section-number">
-                                02
-                            </div>
-
-                            <strong>
-                                Warehouse Location
-                            </strong>
-
-                        </div>
-
-
-                        <div class="field-grid">
-
-
-                            <div class="field">
-
-                                <label for="rack">
-                                    Rack
-                                    <span class="required">*</span>
-                                </label>
-
-                                <input
-                                    type="text"
-                                    id="rack"
-                                    name="rack"
-                                    placeholder="e.g. A12"
-                                    maxlength="20"
-                                    required
-                                >
-
-                            </div>
-
-
-                            <div class="field">
-
-                                <label for="shelf">
-                                    Shelf
-                                    <span class="required">*</span>
-                                </label>
-
-                                <input
-                                    type="text"
-                                    id="shelf"
-                                    name="shelf"
-                                    placeholder="e.g. 04"
-                                    maxlength="20"
-                                    required
-                                >
-
-                            </div>
-
-
-                            <div class="field">
-
-                                <label for="bin">
-                                    Bin
-                                    <span class="required">*</span>
-                                </label>
-
-                                <input
-                                    type="text"
-                                    id="bin"
-                                    name="bin"
-                                    placeholder="e.g. B"
-                                    maxlength="20"
-                                    required
-                                >
-
-                            </div>
-
-                        </div>
-
-
-                        <div class="location-preview">
-
-                            <div class="location-box">
-
-                                <span>
-                                    RACK
-                                </span>
-
-                                <strong id="previewRack">
-                                    —
-                                </strong>
-
-                            </div>
-
-
-                            <div class="location-box">
-
-                                <span>
-                                    SHELF
-                                </span>
-
-                                <strong id="previewShelf">
-                                    —
-                                </strong>
-
-                            </div>
-
-
-                            <div class="location-box">
-
-                                <span>
-                                    BIN
-                                </span>
-
-                                <strong id="previewBin">
-                                    —
-                                </strong>
-
-                            </div>
-
-                        </div>
-
-                    </div>
-
-
-                    <!-- =================================================
-                         ACTIONS
-                    ================================================== -->
-
-                    <div class="form-actions">
-
-                        <div class="action-left">
-
-                            <button
-                                type="button"
-                                class="action-button secondary"
-                                onclick="location.href='/inventory'"
-                            >
-                                ← Back to Inventory
-                            </button>
-
-                        </div>
-
-
-                        <div class="action-right">
-
-                            <button
-                                type="button"
-                                class="action-button secondary"
-                                onclick="resetProductForm()"
-                            >
-                                Reset
-                            </button>
-
-
-                            <button
-                                type="submit"
-                                class="action-button primary"
-                            >
-                                + Save Product
-                            </button>
-
-                        </div>
-
-                    </div>
-
-
-                </form>
+                <div class="user-role">
+                    Admin
+                </div>
 
             </div>
 
-        </section>
+            <button
+                type="button"
+                class="logout"
+                onclick="location.href='/logout'"
+            >
+                Logout
+            </button>
+
+        </div>
 
 
-        <!-- =====================================================
-             SIDE INFORMATION
-        ====================================================== -->
-
-        <aside class="side-column">
+    </aside>
 
 
-            <!-- PRODUCT PREVIEW -->
+    <!-- =====================================================
+         MAIN
+         ===================================================== -->
 
-            <section class="side-card">
+    <main class="add-main">
 
-                <div class="card-header">
 
-                    <h2>
-                        Record Preview
-                    </h2>
+        <div class="content">
+
+
+            <!-- HEADER -->
+
+            <header class="page-header">
+
+
+                <div>
+
+                    <div class="eyebrow">
+                        INVENTORY MANAGEMENT
+                    </div>
+
+                    <h1>
+                        Add New Product
+                    </h1>
 
                     <p>
-                        Live preview of the product being registered.
+                        Register a new product into the WareFlow
+                        warehouse inventory and assign its physical
+                        storage location.
                     </p>
 
                 </div>
 
 
-                <div class="side-card-body">
+                <div class="header-actions">
 
-                    <div class="product-preview">
+                    <button
+                        type="button"
+                        class="dashboard-button"
+                        onclick="location.href='/dashboard'"
+                    >
+                        Dashboard
+                    </button>
 
-                        <div class="preview-label">
-                            PRODUCT
-                        </div>
+                </div>
 
-                        <div
-                            class="preview-name"
-                            id="previewProductName"
+
+            </header>
+
+
+            <!-- ERROR -->
+
+            {% if error %}
+
+            <div class="form-error">
+
+                <div class="error-icon">
+                    !
+                </div>
+
+                <div>
+                    {{ error }}
+                </div>
+
+            </div>
+
+            {% endif %}
+
+
+            <!-- MAIN LAYOUT -->
+
+            <div class="product-layout">
+
+
+                <!-- FORM CARD -->
+
+                <section class="card">
+
+
+                    <div class="card-header">
+
+                        <h2>
+                            Product Registration
+                        </h2>
+
+                        <p>
+                            Enter accurate product and warehouse
+                            information before saving this record.
+                        </p>
+
+                    </div>
+
+
+                    <div class="form-body">
+
+
+                        <form
+                            method="POST"
+                            id="productForm"
                         >
-                            New Product
-                        </div>
-
-                        <div
-                            class="preview-sku"
-                            id="previewSku"
-                        >
-                            SKU —
 
 
-                        </div>
+                            <!-- PRODUCT INFORMATION -->
+
+                            <div class="form-section">
+
+
+                                <div class="section-heading">
+
+                                    <div class="section-number">
+                                        01
+                                    </div>
+
+                                    <strong>
+                                        Product Information
+                                    </strong>
+
+                                </div>
+
+
+                                <div class="field-grid">
+
+
+                                    <div class="field full">
+
+                                        <label for="product_name">
+                                            Product Name
+                                            <span class="required">*</span>
+                                        </label>
+
+                                        <input
+                                            type="text"
+                                            id="product_name"
+                                            name="product_name"
+                                            placeholder="e.g. Coca Cola 500ml"
+                                            maxlength="100"
+                                            autocomplete="off"
+                                            required
+                                        >
+
+                                        <div class="field-help">
+                                            Use the official product name used by your warehouse.
+                                        </div>
+
+                                    </div>
+
+
+                                    <div class="field">
+
+                                        <label for="sku">
+                                            SKU
+                                            <span class="required">*</span>
+                                        </label>
+
+                                        <input
+                                            type="text"
+                                            id="sku"
+                                            name="sku"
+                                            placeholder="e.g. COKE-500-001"
+                                            maxlength="50"
+                                            autocomplete="off"
+                                            required
+                                        >
+
+                                        <div class="field-help">
+                                            SKU must uniquely identify this product.
+                                        </div>
+
+                                    </div>
+
+
+                                    <div class="field">
+
+                                        <label for="category">
+                                            Category
+                                            <span class="required">*</span>
+                                        </label>
+
+                                        <input
+                                            type="text"
+                                            id="category"
+                                            name="category"
+                                            placeholder="e.g. Beverages"
+                                            maxlength="50"
+                                            required
+                                        >
+
+                                    </div>
+
+
+                                    <div class="field">
+
+                                        <label for="supplier">
+                                            Supplier
+
+                                            <span class="optional">
+                                                Optional
+                                            </span>
+                                        </label>
+
+                                        <input
+                                            type="text"
+                                            id="supplier"
+                                            name="supplier"
+                                            placeholder="e.g. ABC Distributors"
+                                            maxlength="100"
+                                        >
+
+                                    </div>
+
+
+                                    <div class="field">
+
+                                        <label for="quantity">
+                                            Opening Quantity
+                                            <span class="required">*</span>
+                                        </label>
+
+                                        <input
+                                            type="number"
+                                            id="quantity"
+                                            name="quantity"
+                                            min="0"
+                                            value="0"
+                                            required
+                                        >
+
+                                        <div class="field-help">
+                                            Initial stock quantity received into the warehouse.
+                                        </div>
+
+                                    </div>
+
+
+                                </div>
+
+
+                            </div>
+
+
+                            <!-- STORAGE LOCATION -->
+
+                            <div class="form-section">
+
+
+                                <div class="section-heading">
+
+                                    <div class="section-number">
+                                        02
+                                    </div>
+
+                                    <strong>
+                                        Storage Location
+                                    </strong>
+
+                                </div>
+
+
+                                <div class="field-grid">
+
+
+                                    <div class="field">
+
+                                        <label for="rack">
+                                            Rack
+                                            <span class="required">*</span>
+                                        </label>
+
+                                        <input
+                                            type="text"
+                                            id="rack"
+                                            name="rack"
+                                            placeholder="e.g. A12"
+                                            maxlength="20"
+                                            required
+                                        >
+
+                                    </div>
+
+
+                                    <div class="field">
+
+                                        <label for="shelf">
+                                            Shelf
+                                            <span class="required">*</span>
+                                        </label>
+
+                                        <input
+                                            type="text"
+                                            id="shelf"
+                                            name="shelf"
+                                            placeholder="e.g. 04"
+                                            maxlength="20"
+                                            required
+                                        >
+
+                                    </div>
+
+
+                                    <div class="field">
+
+                                        <label for="bin">
+                                            Bin
+                                            <span class="required">*</span>
+                                        </label>
+
+                                        <input
+                                            type="text"
+                                            id="bin"
+                                            name="bin"
+                                            placeholder="e.g. B"
+                                            maxlength="20"
+                                            required
+                                        >
+
+                                    </div>
+
+
+                                </div>
+
+
+                                <div class="location-preview">
+
+                                    <div class="location-box">
+
+                                        <div class="location-label">
+                                            Rack
+                                        </div>
+
+                                        <div
+                                            class="location-value"
+                                            id="previewRack"
+                                        >
+                                            —
+                                        </div>
+
+                                    </div>
+
+
+                                    <div class="location-box">
+
+                                        <div class="location-label">
+                                            Shelf
+                                        </div>
+
+                                        <div
+                                            class="location-value"
+                                            id="previewShelf"
+                                        >
+                                            —
+                                        </div>
+
+                                    </div>
+
+
+                                    <div class="location-box">
+
+                                        <div class="location-label">
+                                            Bin
+                                        </div>
+
+                                        <div
+                                            class="location-value"
+                                            id="previewBin"
+                                        >
+                                            —
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+
+                            </div>
+
+
+                            <!-- ACTIONS -->
+
+                            <div class="form-actions">
+
+
+                                <div class="action-left">
+
+                                    <button
+                                        type="button"
+                                        class="action-button secondary"
+                                        onclick="resetProductForm()"
+                                    >
+                                        Reset
+                                    </button>
+
+                                    <button
+                                        type="button"
+                                        class="action-button secondary"
+                                        onclick="location.href='/inventory'"
+                                    >
+                                        Inventory
+                                    </button>
+
+                                </div>
+
+
+                                <div class="action-right">
+
+                                    <button
+                                        type="submit"
+                                        class="action-button primary"
+                                    >
+                                        + Save Product
+                                    </button>
+
+                                </div>
+
+
+                            </div>
+
+
+                        </form>
+
 
                     </div>
 
-                </div>
 
-            </section>
-
-
-            <!-- INFORMATION -->
-
-            <section class="side-card">
-
-                <div class="card-header">
-
-                    <h2>
-                        Registration Guide
-                    </h2>
-
-                    <p>
-                        Important warehouse data rules.
-                    </p>
-
-                </div>
+                </section>
 
 
-                <div class="side-card-body">
+                <!-- SIDE COLUMN -->
 
-                    <div class="info-list">
+                <aside class="side-column">
 
 
-                        <div class="info-row">
+                    <!-- LIVE PREVIEW -->
 
-                            <div class="info-icon">
-                                ✓
+                    <section class="card">
+
+
+                        <div class="card-header">
+
+                            <h2>
+                                Live Preview
+                            </h2>
+
+                            <p>
+                                See how the product record will appear.
+                            </p>
+
+                        </div>
+
+
+                        <div class="side-card-body">
+
+
+                            <div class="preview-product">
+
+
+                                <div class="preview-label">
+                                    PRODUCT RECORD
+                                </div>
+
+
+                                <div
+                                    class="preview-name"
+                                    id="previewProductName"
+                                >
+                                    New Product
+                                </div>
+
+
+                                <div
+                                    class="preview-sku"
+                                    id="previewSku"
+                                >
+                                    SKU —
+                                </div>
+
+
+                                <div class="preview-location-title">
+                                    STORAGE LOCATION
+                                </div>
+
+
+                                <div class="preview-location">
+
+
+                                    <div>
+
+                                        <small>
+                                            RACK
+                                        </small>
+
+                                        <span id="previewRack">
+                                            —
+                                        </span>
+
+                                    </div>
+
+
+                                    <div>
+
+                                        <small>
+                                            SHELF
+                                        </small>
+
+                                        <span id="previewShelf">
+                                            —
+                                        </span>
+
+                                    </div>
+
+
+                                    <div>
+
+                                        <small>
+                                            BIN
+                                        </small>
+
+                                        <span id="previewBin">
+                                            —
+                                        </span>
+
+                                    </div>
+
+
+                                </div>
+
+
                             </div>
 
-                            <div class="info-text">
 
-                                <strong>
-                                    Unique SKU
-                                </strong>
+                        </div>
 
-                                <span>
-                                    Every product should have a unique SKU.
-                                </span>
+
+                    </section>
+
+
+                    <!-- REGISTRATION GUIDE -->
+
+                    <section class="card">
+
+
+                        <div class="card-header">
+
+                            <h2>
+                                Registration Guide
+                            </h2>
+
+                            <p>
+                                Important warehouse data rules.
+                            </p>
+
+                        </div>
+
+
+                        <div class="side-card-body">
+
+
+                            <div class="info-list">
+
+
+                                <div class="info-row">
+
+                                    <div class="info-icon">
+                                        ✓
+                                    </div>
+
+                                    <div class="info-text">
+
+                                        <strong>
+                                            Unique SKU
+                                        </strong>
+
+                                        <span>
+                                            Every product should have a unique SKU.
+                                        </span>
+
+                                    </div>
+
+                                </div>
+
+
+                                <div class="info-row">
+
+                                    <div class="info-icon">
+                                        #
+                                    </div>
+
+                                    <div class="info-text">
+
+                                        <strong>
+                                            Accurate Quantity
+                                        </strong>
+
+                                        <span>
+                                            Enter the physical opening stock currently available.
+                                        </span>
+
+                                    </div>
+
+                                </div>
+
+
+                                <div class="info-row">
+
+                                    <div class="info-icon">
+                                        ⌖
+                                    </div>
+
+                                    <div class="info-text">
+
+                                        <strong>
+                                            Storage Location
+                                        </strong>
+
+                                        <span>
+                                            Rack, shelf and bin determine where the product is stored.
+                                        </span>
+
+                                    </div>
+
+                                </div>
+
 
                             </div>
 
+
                         </div>
 
 
-                        <div class="info-row">
+                    </section>
 
-                            <div class="info-icon">
-                                #
+
+                    <!-- CHECKLIST -->
+
+                    <section class="card">
+
+
+                        <div class="card-header">
+
+                            <h2>
+                                Before Saving
+                            </h2>
+
+                            <p>
+                                Quick verification checklist.
+                            </p>
+
+                        </div>
+
+
+                        <div class="side-card-body">
+
+
+                            <div class="rules">
+
+
+                                <div class="rule">
+
+                                    <span class="rule-dot"></span>
+
+                                    Confirm product name and category.
+
+                                </div>
+
+
+                                <div class="rule">
+
+                                    <span class="rule-dot"></span>
+
+                                    Verify SKU is correct.
+
+                                </div>
+
+
+                                <div class="rule">
+
+                                    <span class="rule-dot"></span>
+
+                                    Confirm physical stock quantity.
+
+                                </div>
+
+
+                                <div class="rule">
+
+                                    <span class="rule-dot"></span>
+
+                                    Verify rack, shelf and bin.
+
+                                </div>
+
+
                             </div>
 
-                            <div class="info-text">
-
-                                <strong>
-                                    Accurate Quantity
-                                </strong>
-
-                                <span>
-                                    Enter the physical opening stock currently available.
-                                </span>
-
-                            </div>
 
                         </div>
 
 
-                        <div class="info-row">
-
-                            <div class="info-icon">
-                                ⌖
-                            </div>
-
-                            <div class="info-text">
-
-                                <strong>
-                                    Storage Location
-                                </strong>
-
-                                <span>
-                                    Rack, shelf and bin determine where the product is stored.
-                                </span>
-
-                            </div>
-
-                        </div>
+                    </section>
 
 
-                    </div>
-
-                </div>
-
-            </section>
+                </aside>
 
 
-            <!-- VALIDATION RULES -->
-
-            <section class="side-card">
-
-                <div class="card-header">
-
-                    <h2>
-                        Before Saving
-                    </h2>
-
-                    <p>
-                        Quick verification checklist.
-                    </p>
-
-                </div>
+            </div>
 
 
-                <div class="side-card-body">
-
-                    <div class="rules">
-
-                        <div class="rule">
-                            <span class="rule-dot"></span>
-                            Confirm product name and category.
-                        </div>
-
-                        <div class="rule">
-                            <span class="rule-dot"></span>
-                            Verify SKU is correct.
-                        </div>
-
-                        <div class="rule">
-                            <span class="rule-dot"></span>
-                            Confirm physical stock quantity.
-                        </div>
-
-                        <div class="rule">
-                            <span class="rule-dot"></span>
-                            Verify rack, shelf and bin.
-                        </div>
-
-                    </div>
-
-                </div>
-
-            </section>
+        </div>
 
 
-        </aside>
+    </main>
 
-
-    </div>
 
 </div>
 
 
 <script>
-
-    /* =========================================================
-       LIVE PRODUCT PREVIEW
-    ========================================================= */
 
     const productNameInput =
         document.getElementById("product_name");
@@ -1367,35 +2107,71 @@
     function updatePreview() {
 
         const productName =
-            productNameInput.value.trim();
+            productNameInput ?
+            productNameInput.value.trim() :
+            "";
 
         const sku =
-            skuInput.value.trim();
+            skuInput ?
+            skuInput.value.trim() :
+            "";
 
         const rack =
-            rackInput.value.trim();
+            rackInput ?
+            rackInput.value.trim() :
+            "";
 
         const shelf =
-            shelfInput.value.trim();
+            shelfInput ?
+            shelfInput.value.trim() :
+            "";
 
         const bin =
-            binInput.value.trim();
+            binInput ?
+            binInput.value.trim() :
+            "";
 
 
-        previewProductName.textContent =
-            productName || "New Product";
+        if (previewProductName) {
 
-        previewSku.textContent =
-            sku ? "SKU " + sku : "SKU —";
+            previewProductName.textContent =
+                productName || "New Product";
 
-        previewRack.textContent =
-            rack || "—";
+        }
 
-        previewShelf.textContent =
-            shelf || "—";
 
-        previewBin.textContent =
-            bin || "—";
+        if (previewSku) {
+
+            previewSku.textContent =
+                sku ?
+                "SKU " + sku :
+                "SKU —";
+
+        }
+
+
+        if (previewRack) {
+
+            previewRack.textContent =
+                rack || "—";
+
+        }
+
+
+        if (previewShelf) {
+
+            previewShelf.textContent =
+                shelf || "—";
+
+        }
+
+
+        if (previewBin) {
+
+            previewBin.textContent =
+                bin || "—";
+
+        }
 
     }
 
@@ -1420,10 +2196,6 @@
     });
 
 
-    /* =========================================================
-       RESET
-    ========================================================= */
-
     function resetProductForm() {
 
         const form =
@@ -1439,10 +2211,6 @@
 
     }
 
-
-    /* =========================================================
-       FORM SUBMIT PROTECTION
-    ========================================================= */
 
     const productForm =
         document.getElementById("productForm");
@@ -1480,5 +2248,7 @@
 
 </script>
 
+
 </body>
+
 </html>

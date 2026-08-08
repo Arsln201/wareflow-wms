@@ -12,257 +12,1504 @@
 
     <title>Scanner | WareFlow WMS</title>
 
-    <link
-        rel="stylesheet"
-        href="{{ url_for('static', filename='css/style.css') }}"
-    >
-
     <script src="https://unpkg.com/html5-qrcode"></script>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html,
+        body {
+            min-height: 100%;
+            width: 100%;
+        }
+
+        body {
+            background: #0b1016;
+            color: #f5f7fa;
+
+            font-family:
+                -apple-system,
+                BlinkMacSystemFont,
+                "Segoe UI",
+                Roboto,
+                Helvetica,
+                Arial,
+                sans-serif;
+
+            overflow-x: hidden;
+        }
+
+
+        /* =====================================================
+           APP
+           ===================================================== */
+
+        .scanner-app {
+            min-height: 100vh;
+            width: 100%;
+
+            display: flex;
+
+            background: #0b1016;
+        }
+
+
+        /* =====================================================
+           SIDEBAR
+           ===================================================== */
+
+        .scanner-sidebar {
+            position: fixed;
+
+            left: 0;
+            top: 0;
+            bottom: 0;
+
+            width: 278px;
+
+            padding: 30px 24px;
+
+            background: #121820;
+
+            border-right: 1px solid #28313a;
+
+            display: flex;
+            flex-direction: column;
+
+            overflow-y: auto;
+
+            z-index: 1000;
+        }
+
+
+        .scanner-brand {
+            display: flex;
+            align-items: center;
+
+            gap: 13px;
+
+            padding-bottom: 26px;
+
+            margin-bottom: 28px;
+
+            border-bottom: 1px solid #29323b;
+        }
+
+
+        .scanner-brand-logo {
+            width: 48px;
+            height: 48px;
+
+            border-radius: 13px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            background: #00e5a8;
+
+            color: #06120e;
+
+            font-size: 24px;
+            font-weight: 900;
+        }
+
+
+        .scanner-brand-name {
+            color: #ffffff;
+
+            font-size: 21px;
+            font-weight: 800;
+
+            line-height: 1.1;
+        }
+
+
+        .scanner-brand-subtitle {
+            color: #89939f;
+
+            font-size: 11px;
+            font-weight: 700;
+
+            letter-spacing: 2px;
+
+            margin-top: 4px;
+        }
+
+
+        .scanner-section-title {
+            color: #65717d;
+
+            font-size: 10px;
+            font-weight: 800;
+
+            letter-spacing: 2px;
+
+            margin: 18px 12px 10px;
+        }
+
+
+        .scanner-nav {
+            display: flex;
+            flex-direction: column;
+
+            gap: 5px;
+        }
+
+
+        .scanner-nav a {
+            display: flex;
+            align-items: center;
+
+            gap: 13px;
+
+            width: 100%;
+
+            padding: 13px 14px;
+
+            border-radius: 10px;
+
+            color: #aeb7c1;
+
+            text-decoration: none;
+
+            font-size: 14px;
+            font-weight: 650;
+
+            transition:
+                background 0.2s ease,
+                color 0.2s ease,
+                transform 0.2s ease;
+        }
+
+
+        .scanner-nav a:hover {
+            background: #1c262e;
+
+            color: #ffffff;
+
+            transform: translateX(2px);
+        }
+
+
+        .scanner-nav a.active {
+            background: rgba(0, 229, 168, 0.10);
+
+            color: #00e5a8;
+
+            border: 1px solid rgba(0, 229, 168, 0.30);
+
+            box-shadow:
+                inset 3px 0 0 #00e5a8;
+        }
+
+
+        .scanner-nav-icon {
+            width: 18px;
+
+            text-align: center;
+
+            color: #78848f;
+
+            font-size: 14px;
+        }
+
+
+        .scanner-nav a.active .scanner-nav-icon {
+            color: #00e5a8;
+        }
+
+
+        .scanner-sidebar-bottom {
+            margin-top: auto;
+
+            padding-top: 24px;
+        }
+
+
+        .scanner-user {
+            padding-top: 20px;
+
+            margin-bottom: 14px;
+
+            border-top: 1px solid #29323b;
+        }
+
+
+        .scanner-user-name {
+            color: #ffffff;
+
+            font-size: 14px;
+            font-weight: 750;
+        }
+
+
+        .scanner-user-role {
+            color: #78838e;
+
+            font-size: 11px;
+            font-weight: 600;
+
+            margin-top: 3px;
+        }
+
+
+        .scanner-logout {
+            width: 100%;
+
+            border: 0;
+
+            border-radius: 10px;
+
+            padding: 13px;
+
+            background: #00e5a8;
+
+            color: #06120e;
+
+            font-size: 14px;
+            font-weight: 800;
+
+            cursor: pointer;
+
+            transition: 0.2s ease;
+        }
+
+
+        .scanner-logout:hover {
+            background: #19f0b8;
+
+            transform: translateY(-1px);
+        }
+
+
+        /* =====================================================
+           MAIN
+           ===================================================== */
+
+        .scanner-main {
+            width: calc(100% - 278px);
+
+            margin-left: 278px;
+
+            min-height: 100vh;
+
+            padding: 42px 48px 60px;
+        }
+
+
+        .scanner-container {
+            width: 100%;
+
+            max-width: 1250px;
+
+            margin: 0 auto;
+        }
+
+
+        /* =====================================================
+           HEADER
+           ===================================================== */
+
+        .scanner-page-header {
+            display: flex;
+
+            align-items: flex-start;
+            justify-content: space-between;
+
+            gap: 30px;
+
+            margin-bottom: 32px;
+        }
+
+
+        .scanner-eyebrow {
+            color: #00e5a8;
+
+            font-size: 11px;
+            font-weight: 850;
+
+            letter-spacing: 3px;
+
+            margin-bottom: 8px;
+        }
+
+
+        .scanner-page-title {
+            color: #ffffff;
+
+            font-size: clamp(34px, 4vw, 50px);
+
+            line-height: 1;
+
+            font-weight: 850;
+
+            letter-spacing: -1.5px;
+        }
+
+
+        .scanner-page-description {
+            color: #8d98a4;
+
+            font-size: 15px;
+
+            margin-top: 11px;
+
+            line-height: 1.5;
+        }
+
+
+        .scanner-dashboard-btn {
+            flex-shrink: 0;
+
+            border: 0;
+
+            border-radius: 10px;
+
+            padding: 14px 22px;
+
+            background: #00e5a8;
+
+            color: #06120e;
+
+            font-size: 14px;
+            font-weight: 800;
+
+            cursor: pointer;
+
+            transition: 0.2s ease;
+        }
+
+
+        .scanner-dashboard-btn:hover {
+            background: #19f0b8;
+
+            transform: translateY(-1px);
+        }
+
+
+        /* =====================================================
+           SCANNER LAYOUT
+           ===================================================== */
+
+        .scanner-grid {
+            display: grid;
+
+            grid-template-columns:
+                minmax(0, 1.35fr)
+                minmax(300px, 0.65fr);
+
+            gap: 22px;
+
+            align-items: start;
+        }
+
+
+        /* =====================================================
+           SCANNER CARD
+           ===================================================== */
+
+        .scanner-card {
+            background: #1b222a;
+
+            border: 1px solid #2d3741;
+
+            border-radius: 18px;
+
+            padding: 28px;
+
+            box-shadow:
+                0 20px 50px rgba(0, 0, 0, 0.18);
+        }
+
+
+        .scanner-card-header {
+            margin-bottom: 22px;
+        }
+
+
+        .scanner-card-title {
+            color: #ffffff;
+
+            font-size: 21px;
+            font-weight: 800;
+        }
+
+
+        .scanner-card-description {
+            color: #7f8b96;
+
+            font-size: 13px;
+
+            margin-top: 7px;
+
+            line-height: 1.5;
+        }
+
+
+        /* =====================================================
+           READER
+           ===================================================== */
+
+        .scanner-reader-shell {
+            width: 100%;
+
+            min-height: 390px;
+
+            padding: 14px;
+
+            border-radius: 14px;
+
+            background: #0d1319;
+
+            border: 1px solid #303b45;
+
+            display: flex;
+
+            align-items: center;
+            justify-content: center;
+        }
+
+
+        #reader {
+            width: 100%;
+
+            max-width: 620px;
+
+            border: 0 !important;
+
+            color: #ffffff;
+        }
+
+
+        #reader video {
+            width: 100% !important;
+
+            border-radius: 10px;
+
+            display: block;
+        }
+
+
+        #reader img {
+            max-width: 100%;
+        }
+
+
+        #reader button {
+            border: 1px solid #35424d !important;
+
+            border-radius: 8px !important;
+
+            background: #202a33 !important;
+
+            color: #ffffff !important;
+
+            padding: 9px 14px !important;
+
+            cursor: pointer;
+
+            font-weight: 700;
+        }
+
+
+        #reader select {
+            background: #151d24 !important;
+
+            color: #ffffff !important;
+
+            border: 1px solid #35424d !important;
+
+            border-radius: 8px !important;
+
+            padding: 9px !important;
+        }
+
+
+        /* =====================================================
+           STATUS
+           ===================================================== */
+
+        .scanner-status {
+            display: flex;
+
+            align-items: center;
+
+            gap: 9px;
+
+            min-height: 46px;
+
+            margin-top: 16px;
+
+            padding: 12px 14px;
+
+            border-radius: 9px;
+
+            background: rgba(0, 229, 168, 0.06);
+
+            border: 1px solid rgba(0, 229, 168, 0.18);
+
+            color: #9eaaa4;
+
+            font-size: 13px;
+
+            line-height: 1.4;
+        }
+
+
+        .scanner-status.success {
+            color: #00e5a8;
+
+            background: rgba(0, 229, 168, 0.08);
+
+            border-color: rgba(0, 229, 168, 0.28);
+        }
+
+
+        .scanner-status.error {
+            color: #ff7c82;
+
+            background: rgba(255, 107, 114, 0.08);
+
+            border-color: rgba(255, 107, 114, 0.25);
+        }
+
+
+        .scanner-status.warning {
+            color: #ffc857;
+
+            background: rgba(255, 200, 87, 0.07);
+
+            border-color: rgba(255, 200, 87, 0.22);
+        }
+
+
+        /* =====================================================
+           SCAN AGAIN
+           ===================================================== */
+
+        .scanner-restart {
+            width: 100%;
+
+            min-height: 46px;
+
+            margin-top: 12px;
+
+            border: 0;
+
+            border-radius: 9px;
+
+            background: #00e5a8;
+
+            color: #06120e;
+
+            font-size: 14px;
+            font-weight: 800;
+
+            cursor: pointer;
+
+            transition: 0.2s ease;
+        }
+
+
+        .scanner-restart:hover {
+            background: #19f0b8;
+
+            transform: translateY(-1px);
+        }
+
+
+        /* =====================================================
+           HELP PANEL
+           ===================================================== */
+
+        .scanner-help {
+            background: #1b222a;
+
+            border: 1px solid #2d3741;
+
+            border-radius: 18px;
+
+            padding: 25px;
+        }
+
+
+        .scanner-help-title {
+            color: #ffffff;
+
+            font-size: 19px;
+            font-weight: 800;
+
+            margin-bottom: 6px;
+        }
+
+
+        .scanner-help-description {
+            color: #7f8b96;
+
+            font-size: 12px;
+
+            line-height: 1.5;
+
+            margin-bottom: 20px;
+        }
+
+
+        .scanner-help-list {
+            display: flex;
+
+            flex-direction: column;
+
+            gap: 10px;
+        }
+
+
+        .scanner-help-item {
+            padding: 16px;
+
+            border-radius: 11px;
+
+            background: #222b34;
+
+            border: 1px solid #303b45;
+        }
+
+
+        .scanner-help-item strong {
+            display: block;
+
+            color: #ffffff;
+
+            font-size: 13px;
+            font-weight: 800;
+
+            margin-bottom: 5px;
+        }
+
+
+        .scanner-help-item span {
+            display: block;
+
+            color: #78848f;
+
+            font-size: 12px;
+
+            line-height: 1.5;
+        }
+
+
+        .scanner-code {
+            display: inline-block;
+
+            margin-top: 8px;
+
+            padding: 5px 8px;
+
+            border-radius: 6px;
+
+            background: #151c23;
+
+            border: 1px solid #34404b;
+
+            color: #00e5a8;
+
+            font-family:
+                "SFMono-Regular",
+                Consolas,
+                monospace;
+
+            font-size: 11px;
+        }
+
+
+        /* =====================================================
+           QUICK ACTIONS
+           ===================================================== */
+
+        .scanner-quick-actions {
+            display: flex;
+
+            flex-direction: column;
+
+            gap: 9px;
+
+            margin-top: 18px;
+        }
+
+
+        .scanner-quick-button {
+            width: 100%;
+
+            min-height: 44px;
+
+            border: 1px solid #34404b;
+
+            border-radius: 9px;
+
+            background: transparent;
+
+            color: #aab4bd;
+
+            font-size: 13px;
+            font-weight: 700;
+
+            cursor: pointer;
+
+            transition: 0.2s ease;
+        }
+
+
+        .scanner-quick-button:hover {
+            color: #ffffff;
+
+            border-color: #00e5a8;
+
+            background: rgba(0,229,168,0.04);
+        }
+
+
+        /* =====================================================
+           FOOTER
+           ===================================================== */
+
+        .scanner-footer {
+            margin-top: 22px;
+
+            color: #596570;
+
+            font-size: 11px;
+
+            text-align: center;
+        }
+
+
+        /* =====================================================
+           RESPONSIVE
+           ===================================================== */
+
+        @media (max-width: 1150px) {
+
+            .scanner-main {
+                padding: 34px 30px 50px;
+            }
+
+            .scanner-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .scanner-help {
+                width: 100%;
+            }
+
+        }
+
+
+        @media (max-width: 950px) {
+
+            .scanner-sidebar {
+                width: 225px;
+
+                padding: 24px 16px;
+            }
+
+            .scanner-main {
+                width: calc(100% - 225px);
+
+                margin-left: 225px;
+
+                padding: 28px 20px 45px;
+            }
+
+        }
+
+
+        @media (max-width: 650px) {
+
+            .scanner-app {
+                display: block;
+            }
+
+            .scanner-sidebar {
+                position: relative;
+
+                width: 100%;
+
+                height: auto;
+
+                min-height: auto;
+
+                border-right: 0;
+
+                border-bottom: 1px solid #29323b;
+
+                padding: 18px;
+            }
+
+            .scanner-sidebar-bottom {
+                margin-top: 20px;
+            }
+
+            .scanner-main {
+                width: 100%;
+
+                margin-left: 0;
+
+                padding: 24px 16px 40px;
+            }
+
+            .scanner-page-header {
+                flex-direction: column;
+            }
+
+            .scanner-dashboard-btn {
+                width: 100%;
+            }
+
+            .scanner-card {
+                padding: 18px;
+            }
+
+            .scanner-reader-shell {
+                min-height: 300px;
+
+                padding: 8px;
+            }
+
+        }
+
+    </style>
 
 </head>
 
+
 <body>
 
-<div class="dashboard-container scanner-page">
 
-    <div class="page-header">
-
-        <div>
-
-            <h1>Scanner</h1>
-
-            <p>
-                Scan a warehouse QR code or barcode
-            </p>
-
-        </div>
-
-        <button
-            type="button"
-            onclick="location.href='/dashboard'"
-        >
-            Back to Dashboard
-        </button>
-
-    </div>
+<div class="scanner-app">
 
 
-    <div class="scanner-card">
+    <!-- =====================================================
+         SIDEBAR
+         ===================================================== -->
 
-        <div class="scanner-title">
-
-            <h2>Scan Code</h2>
-
-            <p>
-                Allow camera access and point it at a QR code.
-            </p>
-
-        </div>
+    <aside class="scanner-sidebar">
 
 
-        <div
-            id="reader"
-            class="scanner-reader"
-        ></div>
+        <div class="scanner-brand">
 
-
-        <div
-            id="scanner-status"
-            class="scanner-status"
-        >
-            Camera scanner ready.
-        </div>
-
-
-        <button
-            type="button"
-            id="restart-scanner"
-            class="scanner-restart"
-            style="display:none;"
-        >
-            Scan Again
-        </button>
-
-    </div>
-
-
-    <div class="scanner-help">
-
-        <h3>Supported Codes</h3>
-
-        <div class="scanner-help-grid">
-
-            <div class="scanner-help-item">
-
-                <strong>Location QR</strong>
-
-                <span>
-                    Example: A12-04-B
-                </span>
-
+            <div class="scanner-brand-logo">
+                W
             </div>
 
+            <div>
 
-            <div class="scanner-help-item">
+                <div class="scanner-brand-name">
+                    WareFlow
+                </div>
 
-                <strong>Product SKU</strong>
-
-                <span>
-                    Scan a barcode containing a SKU
-                </span>
-
-            </div>
-
-
-            <div class="scanner-help-item">
-
-                <strong>Warehouse QR</strong>
-
-                <span>
-                    Existing WareFlow location QR codes
-                </span>
+                <div class="scanner-brand-subtitle">
+                    WAREHOUSE OS
+                </div>
 
             </div>
 
         </div>
 
-    </div>
+
+        <div class="scanner-section-title">
+            WORKSPACE
+        </div>
+
+
+        <nav class="scanner-nav">
+
+
+            <a href="/dashboard">
+
+                <span class="scanner-nav-icon">
+                    ▣
+                </span>
+
+                <span>
+                    Dashboard
+                </span>
+
+            </a>
+
+
+            <a href="/search">
+
+                <span class="scanner-nav-icon">
+                    ⌕
+                </span>
+
+                <span>
+                    Search Warehouse
+                </span>
+
+            </a>
+
+
+            <a href="/inventory">
+
+                <span class="scanner-nav-icon">
+                    ▤
+                </span>
+
+                <span>
+                    Inventory
+                </span>
+
+            </a>
+
+
+            <a href="/stock-operations">
+
+                <span class="scanner-nav-icon">
+                    ⇄
+                </span>
+
+                <span>
+                    Stock Operations
+                </span>
+
+            </a>
+
+
+            <a
+                href="/scanner"
+                class="active"
+            >
+
+                <span class="scanner-nav-icon">
+                    #
+                </span>
+
+                <span>
+                    Scanner
+                </span>
+
+            </a>
+
+
+            <a href="/alerts">
+
+                <span class="scanner-nav-icon">
+                    !
+                </span>
+
+                <span>
+                    Alerts
+                </span>
+
+            </a>
+
+
+        </nav>
+
+
+        <div class="scanner-section-title">
+            MANAGEMENT
+        </div>
+
+
+        <nav class="scanner-nav">
+
+
+            <a href="/qr-management">
+
+                <span class="scanner-nav-icon">
+                    ▣
+                </span>
+
+                <span>
+                    QR Management
+                </span>
+
+            </a>
+
+
+            <a href="/reports">
+
+                <span class="scanner-nav-icon">
+                    ▤
+                </span>
+
+                <span>
+                    Reports
+                </span>
+
+            </a>
+
+
+            <a href="/activity-logs">
+
+                <span class="scanner-nav-icon">
+                    ≡
+                </span>
+
+                <span>
+                    Activity Logs
+                </span>
+
+            </a>
+
+
+            <a href="/add-product">
+
+                <span class="scanner-nav-icon">
+                    ＋
+                </span>
+
+                <span>
+                    Add Product
+                </span>
+
+            </a>
+
+
+        </nav>
+
+
+        <div class="scanner-sidebar-bottom">
+
+
+            <div class="scanner-user">
+
+                <div class="scanner-user-name">
+                    Mirza Arsalan
+                </div>
+
+                <div class="scanner-user-role">
+                    Admin
+                </div>
+
+            </div>
+
+
+            <button
+                type="button"
+                class="scanner-logout"
+                onclick="location.href='/logout'"
+            >
+                Logout
+            </button>
+
+
+        </div>
+
+
+    </aside>
+
+
+    <!-- =====================================================
+         MAIN
+         ===================================================== -->
+
+    <main class="scanner-main">
+
+
+        <div class="scanner-container">
+
+
+            <!-- HEADER -->
+
+            <header class="scanner-page-header">
+
+
+                <div>
+
+                    <div class="scanner-eyebrow">
+                        WAREHOUSE TOOLS
+                    </div>
+
+                    <h1 class="scanner-page-title">
+                        Scanner
+                    </h1>
+
+                    <p class="scanner-page-description">
+                        Scan a warehouse QR code or barcode
+                        to identify a product or location.
+                    </p>
+
+                </div>
+
+
+                <button
+                    type="button"
+                    class="scanner-dashboard-btn"
+                    onclick="location.href='/dashboard'"
+                >
+                    Dashboard
+                </button>
+
+
+            </header>
+
+
+            <!-- MAIN GRID -->
+
+            <div class="scanner-grid">
+
+
+                <!-- SCANNER -->
+
+                <section class="scanner-card">
+
+
+                    <div class="scanner-card-header">
+
+                        <h2 class="scanner-card-title">
+                            Scan Code
+                        </h2>
+
+                        <p class="scanner-card-description">
+                            Allow camera access and point it
+                            directly at a QR code or barcode.
+                        </p>
+
+                    </div>
+
+
+                    <div class="scanner-reader-shell">
+
+                        <div
+                            id="reader"
+                            class="scanner-reader"
+                        ></div>
+
+                    </div>
+
+
+                    <div
+                        id="scanner-status"
+                        class="scanner-status"
+                    >
+                        Camera scanner ready.
+                    </div>
+
+
+                    <button
+                        type="button"
+                        id="restart-scanner"
+                        class="scanner-restart"
+                        style="display:none;"
+                    >
+                        Scan Again
+                    </button>
+
+
+                </section>
+
+
+                <!-- HELP -->
+
+                <aside class="scanner-help">
+
+
+                    <h2 class="scanner-help-title">
+                        Supported Codes
+                    </h2>
+
+
+                    <p class="scanner-help-description">
+                        WareFlow can work with warehouse
+                        locations and product identifiers.
+                    </p>
+
+
+                    <div class="scanner-help-list">
+
+
+                        <div class="scanner-help-item">
+
+                            <strong>
+                                Location QR
+                            </strong>
+
+                            <span>
+                                Scan a QR code representing
+                                a warehouse location.
+                            </span>
+
+                            <span class="scanner-code">
+                                A12-04-B
+                            </span>
+
+                        </div>
+
+
+                        <div class="scanner-help-item">
+
+                            <strong>
+                                Product SKU
+                            </strong>
+
+                            <span>
+                                Scan a barcode containing
+                                a product SKU.
+                            </span>
+
+                        </div>
+
+
+                        <div class="scanner-help-item">
+
+                            <strong>
+                                Warehouse QR
+                            </strong>
+
+                            <span>
+                                Existing WareFlow location
+                                QR labels are supported.
+                            </span>
+
+                        </div>
+
+
+                    </div>
+
+
+                    <div class="scanner-quick-actions">
+
+
+                        <button
+                            type="button"
+                            class="scanner-quick-button"
+                            onclick="location.href='/qr-management'"
+                        >
+                            Open QR Management
+                        </button>
+
+
+                        <button
+                            type="button"
+                            class="scanner-quick-button"
+                            onclick="location.href='/search'"
+                        >
+                            Search Warehouse
+                        </button>
+
+
+                        <button
+                            type="button"
+                            class="scanner-quick-button"
+                            onclick="location.href='/inventory'"
+                        >
+                            Open Inventory
+                        </button>
+
+
+                    </div>
+
+
+                </aside>
+
+
+            </div>
+
+
+            <div class="scanner-footer">
+                WareFlow WMS · Warehouse scanning interface
+            </div>
+
+
+        </div>
+
+
+    </main>
+
 
 </div>
 
 
 <script>
 
-let scanner;
-let scanLocked = false;
+    let scanner = null;
 
-const statusElement =
-    document.getElementById("scanner-status");
+    const statusBox =
+        document.getElementById("scanner-status");
 
-const restartButton =
-    document.getElementById("restart-scanner");
-
-
-function updateStatus(message) {
-
-    statusElement.textContent = message;
-
-}
+    const restartButton =
+        document.getElementById("restart-scanner");
 
 
-function handleScan(decodedText) {
+    function setStatus(message, type = "") {
 
-    if (scanLocked) {
-        return;
-    }
+        statusBox.textContent = message;
 
-    scanLocked = true;
+        statusBox.className =
+            "scanner-status";
 
-    updateStatus(
-        "Code detected. Opening result..."
-    );
-
-    if (scanner) {
-
-        scanner.stop()
-            .catch(function () {});
+        if (type) {
+            statusBox.classList.add(type);
+        }
 
     }
 
-    const target =
-        "/scanner/result?value="
-        + encodeURIComponent(decodedText);
 
-    window.location.href = target;
-}
+    function stopScanner() {
+
+        if (!scanner) {
+            return Promise.resolve();
+        }
+
+        return scanner.stop()
+            .then(() => {
+
+                scanner.clear();
+
+            })
+            .catch(() => {
+
+                try {
+                    scanner.clear();
+                } catch (error) {
+                    console.log(error);
+                }
+
+            });
+
+    }
 
 
-function handleScanError(errorMessage) {
+    function startScanner() {
 
-    // Scanner continuously reports
-    // non-matching frames.
-    // We intentionally do not display
-    // those messages to the user.
+        restartButton.style.display = "none";
 
-}
+        setStatus(
+            "Starting camera scanner..."
+        );
 
 
-function startScanner() {
+        scanner = new Html5Qrcode("reader");
 
-    scanLocked = false;
 
-    restartButton.style.display = "none";
+        const config = {
 
-    updateStatus(
-        "Starting camera..."
-    );
-
-    scanner = new Html5Qrcode(
-        "reader"
-    );
-
-    scanner.start(
-
-        {
-            facingMode: "environment"
-        },
-
-        {
             fps: 10,
+
             qrbox: {
                 width: 250,
                 height: 250
+            },
+
+            aspectRatio: 1.0
+
+        };
+
+
+        scanner.start(
+
+            {
+                facingMode: "environment"
+            },
+
+            config,
+
+            function(decodedText) {
+
+                setStatus(
+                    "Code detected: " + decodedText,
+                    "success"
+                );
+
+
+                stopScanner()
+                    .then(() => {
+
+                        /*
+                         * Preserve the scanned value for
+                         * the existing WareFlow workflow.
+                         *
+                         * The result is sent to /search
+                         * using the query parameter.
+                         */
+
+                        window.location.href =
+                            "/search?query=" +
+                            encodeURIComponent(decodedText);
+
+                    });
+
+
+            },
+
+            function(errorMessage) {
+
+                /*
+                 * Ignore normal frame-by-frame
+                 * QR detection failures.
+                 */
+
             }
-        },
 
-        handleScan,
-        handleScanError
+        )
 
-    ).then(function () {
+        .then(() => {
 
-        updateStatus(
-            "Camera active. Point it at a code."
-        );
+            setStatus(
+                "Scanner active. Point the camera at a QR code.",
+                "success"
+            );
 
-    }).catch(function (error) {
+        })
 
-        console.error(error);
+        .catch(function(error) {
 
-        updateStatus(
-            "Camera could not be started. Check browser camera permission."
-        );
+            console.error(error);
 
-        restartButton.style.display = "inline-block";
+            setStatus(
+                "Camera could not be started. Please allow camera access and try again.",
+                "error"
+            );
 
-    });
+            restartButton.style.display = "block";
 
-}
-
-
-restartButton.addEventListener(
-    "click",
-    function () {
-
-        if (scanner) {
-
-            scanner.clear()
-                .catch(function () {});
-
-        }
-
-        document.getElementById(
-            "reader"
-        ).innerHTML = "";
-
-        startScanner();
+        });
 
     }
-);
 
 
-startScanner();
+    restartButton.addEventListener(
+        "click",
+        function() {
+
+            stopScanner()
+                .then(() => {
+
+                    startScanner();
+
+                });
+
+        }
+    );
+
+
+    window.addEventListener(
+        "beforeunload",
+        function() {
+
+            if (scanner) {
+
+                scanner.stop()
+                    .catch(() => {});
+
+            }
+
+        }
+    );
+
+
+    startScanner();
 
 </script>
+
 
 </body>
 

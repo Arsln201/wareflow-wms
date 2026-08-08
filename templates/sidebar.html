@@ -1,74 +1,197 @@
-<aside class="wf2-sidebar" id="wf2Sidebar">
+<aside class="wf2-sidebar">
 
-    <div class="wf2-logo">
+    <!-- BRAND -->
 
-        <div class="wf2-logo-icon">
+    <div class="wf2-brand">
+
+        <div class="wf2-brand-mark">
             W
         </div>
 
-        <div>
-
+        <div class="wf2-brand-text">
             <h2>WareFlow</h2>
-
-            <span>Warehouse Management System</span>
-
+            <span>WAREHOUSE OS</span>
         </div>
 
     </div>
 
 
-    <nav class="wf2-menu">
+    <!-- NAVIGATION -->
 
-        <a href="/dashboard" class="wf2-link">
-            <span>🏠</span>
-            Dashboard
+    <nav class="wf2-nav">
+
+        <div class="wf2-nav-section">
+            WORKSPACE
+        </div>
+
+
+        <a
+            href="/dashboard"
+            class="wf2-nav-link {% if request.path == '/dashboard' %}active{% endif %}"
+        >
+
+            <span class="wf2-nav-icon">▣</span>
+
+            <span>Dashboard</span>
+
         </a>
 
-        <a href="/inventory" class="wf2-link">
-            <span>📦</span>
-            Inventory
+
+        <a
+            href="/search"
+            class="wf2-nav-link {% if request.path == '/search' %}active{% endif %}"
+        >
+
+            <span class="wf2-nav-icon">⌕</span>
+
+            <span>Search Warehouse</span>
+
         </a>
 
-        <a href="/add-product" class="wf2-link">
-            <span>➕</span>
-            Add Product
+
+        <a
+            href="/inventory"
+            class="wf2-nav-link {% if request.path == '/inventory' %}active{% endif %}"
+        >
+
+            <span class="wf2-nav-icon">▤</span>
+
+            <span>Inventory</span>
+
         </a>
 
-        <a href="/employee-management" class="wf2-link">
-            <span>👥</span>
-            Employees
+
+        <a
+            href="/stock-operations"
+            class="wf2-nav-link {% if request.path == '/stock-operations' %}active{% endif %}"
+        >
+
+            <span class="wf2-nav-icon">⇄</span>
+
+            <span>Stock Operations</span>
+
         </a>
 
-        <a href="/stock-operations" class="wf2-link">
-            <span>📋</span>
-            Stock Operations
+
+        <a
+            href="/scanner"
+            class="wf2-nav-link {% if request.path == '/scanner' %}active{% endif %}"
+        >
+
+            <span class="wf2-nav-icon">⌗</span>
+
+            <span>Scanner</span>
+
         </a>
 
-        <a href="/scanner" class="wf2-link">
-            <span>📱</span>
-            Scanner
+
+        <a
+            href="/alerts"
+            class="wf2-nav-link {% if request.path == '/alerts' %}active{% endif %}"
+        >
+
+            <span class="wf2-nav-icon">!</span>
+
+            <span>Alerts</span>
+
         </a>
 
-        <a href="/qr-management" class="wf2-link">
-            <span>🔳</span>
-            QR Management
+
+        <div class="wf2-nav-section wf2-nav-section-management">
+            MANAGEMENT
+        </div>
+
+
+        <a
+            href="/qr-management"
+            class="wf2-nav-link {% if request.path == '/qr-management' %}active{% endif %}"
+        >
+
+            <span class="wf2-nav-icon">▦</span>
+
+            <span>QR Management</span>
+
         </a>
 
-        <a href="/reports" class="wf2-link">
-            <span>📊</span>
-            Reports
+
+        <a
+            href="/reports"
+            class="wf2-nav-link {% if request.path == '/reports' %}active{% endif %}"
+        >
+
+            <span class="wf2-nav-icon">▥</span>
+
+            <span>Reports</span>
+
         </a>
 
-        <a href="/alerts" class="wf2-link">
-            <span>🚨</span>
-            Alerts
+
+        <a
+            href="/activity-logs"
+            class="wf2-nav-link {% if request.path == '/activity-logs' %}active{% endif %}"
+        >
+
+            <span class="wf2-nav-icon">≡</span>
+
+            <span>Activity Logs</span>
+
         </a>
 
-        <a href="/logout" class="wf2-link logout">
-            <span>🚪</span>
-            Logout
+
+        {% if session.get("role") in ["Admin", "Manager"] %}
+
+        <a
+            href="/add-product"
+            class="wf2-nav-link {% if request.path == '/add-product' %}active{% endif %}"
+        >
+
+            <span class="wf2-nav-icon">＋</span>
+
+            <span>Add Product</span>
+
         </a>
+
+        {% endif %}
 
     </nav>
+
+
+    <!-- USER -->
+
+    <div class="wf2-sidebar-footer">
+
+        <div class="wf2-user-card">
+
+            <div class="wf2-user-avatar">
+                {{ session.get("employee_name", "U")[0] | upper }}
+            </div>
+
+            <div class="wf2-user-info">
+
+                <strong>
+                    {{ session.get("employee_name", "User") }}
+                </strong>
+
+                <span>
+                    {{ session.get("role", "Employee") }}
+                </span>
+
+            </div>
+
+        </div>
+
+
+        <button
+            class="wf2-logout"
+            onclick="location.href='/logout'"
+        >
+
+            <span>↪</span>
+
+            <span>Logout</span>
+
+        </button>
+
+    </div>
 
 </aside>

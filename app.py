@@ -601,6 +601,28 @@ def inventory():
         selected_status=status
     )
 
+# ==========================================
+# ACTIVITY LOGS
+# ==========================================
+
+@app.route("/activity-logs")
+@role_required("Admin", "Manager")
+def activity_logs():
+
+    if "employee_id" not in session:
+        return redirect("/")
+
+    logs = (
+        ActivityLog.query
+        .order_by(ActivityLog.created_at.desc())
+        .all()
+    )
+
+    return render_template(
+        "activity_logs.html",
+        logs=logs
+    )
+
 
 # ==========================
 # ADD PRODUCT
@@ -2034,6 +2056,7 @@ def delete_employee(employee_id):
     db.session.commit()
 
     return redirect("/employee-management")
+
 
 
 # ==========================

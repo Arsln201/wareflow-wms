@@ -1,301 +1,1925 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
+
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
     <title>Reports | WareFlow WMS</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
+    <style>
+
+        /* =========================================================
+           WAREFLOW REPORTS PAGE
+           Self-contained styling
+           ========================================================= */
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html,
+        body {
+            width: 100%;
+            min-height: 100%;
+        }
+
+        body {
+            background: #0b1016 !important;
+            color: #f5f7fa !important;
+            font-family:
+                -apple-system,
+                BlinkMacSystemFont,
+                "Segoe UI",
+                Roboto,
+                Helvetica,
+                Arial,
+                sans-serif !important;
+            overflow-x: hidden;
+        }
+
+
+        /* =========================================================
+           APP LAYOUT
+           ========================================================= */
+
+        .reports-app {
+            display: flex;
+            width: 100%;
+            min-height: 100vh;
+            background: #0b1016;
+        }
+
+
+        /* =========================================================
+           SIDEBAR
+           ========================================================= */
+
+        .reports-sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            bottom: 0;
+
+            width: 278px;
+
+            background: #121820;
+
+            border-right: 1px solid #28313a;
+
+            padding: 30px 24px;
+
+            display: flex;
+            flex-direction: column;
+
+            z-index: 1000;
+
+            overflow-y: auto;
+        }
+
+
+        .reports-brand {
+            display: flex;
+            align-items: center;
+            gap: 13px;
+
+            padding-bottom: 26px;
+
+            border-bottom: 1px solid #29323b;
+
+            margin-bottom: 28px;
+        }
+
+
+        .reports-brand-logo {
+            width: 48px;
+            height: 48px;
+
+            border-radius: 13px;
+
+            background: #00e5a8;
+
+            color: #07110e;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            font-size: 24px;
+            font-weight: 900;
+        }
+
+
+        .reports-brand-text {
+            line-height: 1.1;
+        }
+
+
+        .reports-brand-name {
+            color: #ffffff;
+            font-size: 21px;
+            font-weight: 800;
+        }
+
+
+        .reports-brand-subtitle {
+            color: #89939f;
+            font-size: 11px;
+            font-weight: 700;
+
+            letter-spacing: 2px;
+
+            margin-top: 4px;
+        }
+
+
+        .reports-section-title {
+            color: #65717d;
+
+            font-size: 10px;
+            font-weight: 800;
+
+            letter-spacing: 2px;
+
+            margin: 18px 12px 10px;
+        }
+
+
+        .reports-nav {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+
+        .reports-nav a {
+            display: flex;
+            align-items: center;
+            gap: 13px;
+
+            width: 100%;
+
+            padding: 13px 14px;
+
+            border-radius: 10px;
+
+            color: #aeb7c1 !important;
+
+            text-decoration: none !important;
+
+            font-size: 14px;
+            font-weight: 650;
+
+            transition:
+                background 0.2s ease,
+                color 0.2s ease,
+                transform 0.2s ease;
+        }
+
+
+        .reports-nav a:hover {
+            background: #1c262e;
+            color: #ffffff !important;
+
+            transform: translateX(2px);
+        }
+
+
+        .reports-nav a.active {
+            background: rgba(0, 229, 168, 0.10);
+
+            color: #00e5a8 !important;
+
+            border: 1px solid rgba(0, 229, 168, 0.30);
+
+            box-shadow:
+                inset 3px 0 0 #00e5a8;
+        }
+
+
+        .reports-nav-icon {
+            width: 18px;
+
+            text-align: center;
+
+            color: #78848f;
+
+            font-size: 14px;
+        }
+
+
+        .reports-nav a.active .reports-nav-icon {
+            color: #00e5a8;
+        }
+
+
+        .reports-sidebar-bottom {
+            margin-top: auto;
+
+            padding-top: 24px;
+        }
+
+
+        .reports-user {
+            border-top: 1px solid #29323b;
+
+            padding-top: 20px;
+
+            margin-bottom: 14px;
+        }
+
+
+        .reports-user-name {
+            color: #ffffff;
+
+            font-size: 14px;
+            font-weight: 750;
+        }
+
+
+        .reports-user-role {
+            color: #78838e;
+
+            font-size: 11px;
+            font-weight: 600;
+
+            margin-top: 3px;
+        }
+
+
+        .reports-logout {
+            width: 100%;
+
+            border: 0;
+
+            border-radius: 10px;
+
+            padding: 13px;
+
+            background: #00e5a8;
+
+            color: #06120e;
+
+            font-size: 14px;
+            font-weight: 800;
+
+            cursor: pointer;
+
+            transition: 0.2s ease;
+        }
+
+
+        .reports-logout:hover {
+            background: #19f0b8;
+
+            transform: translateY(-1px);
+        }
+
+
+        /* =========================================================
+           MAIN CONTENT
+           ========================================================= */
+
+        .reports-main {
+            width: calc(100% - 278px);
+
+            margin-left: 278px;
+
+            min-height: 100vh;
+
+            padding: 42px 48px 60px;
+        }
+
+
+        .reports-container {
+            width: 100%;
+            max-width: 1500px;
+
+            margin: 0 auto;
+        }
+
+
+        /* =========================================================
+           PAGE HEADER
+           ========================================================= */
+
+        .reports-page-header {
+            display: flex;
+
+            align-items: flex-start;
+            justify-content: space-between;
+
+            gap: 30px;
+
+            margin-bottom: 34px;
+        }
+
+
+        .reports-eyebrow {
+            color: #00e5a8;
+
+            font-size: 11px;
+            font-weight: 850;
+
+            letter-spacing: 3px;
+
+            margin-bottom: 8px;
+        }
+
+
+        .reports-page-title {
+            color: #ffffff;
+
+            font-size: clamp(34px, 4vw, 52px);
+
+            line-height: 1;
+
+            font-weight: 850;
+
+            letter-spacing: -1.5px;
+        }
+
+
+        .reports-page-description {
+            color: #8d98a4;
+
+            font-size: 15px;
+            font-weight: 500;
+
+            margin-top: 11px;
+
+            max-width: 650px;
+        }
+
+
+        .reports-dashboard-btn {
+            flex-shrink: 0;
+
+            border: 0;
+
+            border-radius: 10px;
+
+            background: #00e5a8;
+
+            color: #06120e;
+
+            padding: 14px 22px;
+
+            font-size: 14px;
+            font-weight: 800;
+
+            cursor: pointer;
+
+            transition: 0.2s ease;
+        }
+
+
+        .reports-dashboard-btn:hover {
+            background: #19f0b8;
+
+            transform: translateY(-1px);
+        }
+
+
+        /* =========================================================
+           KPI CARDS
+           ========================================================= */
+
+        .reports-kpis {
+            display: grid;
+
+            grid-template-columns:
+                repeat(5, minmax(0, 1fr));
+
+            gap: 16px;
+
+            margin-bottom: 24px;
+        }
+
+
+        .reports-kpi {
+            min-height: 128px;
+
+            padding: 24px;
+
+            background: #1b222a;
+
+            border: 1px solid #2d3741;
+
+            border-radius: 16px;
+
+            display: flex;
+            flex-direction: column;
+
+            justify-content: space-between;
+        }
+
+
+        .reports-kpi-label {
+            color: #89939e;
+
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+
+        .reports-kpi-value {
+            color: #00e5a8;
+
+            font-size: 32px;
+            line-height: 1;
+
+            font-weight: 850;
+        }
+
+
+        /* =========================================================
+           PANELS
+           ========================================================= */
+
+        .reports-panel {
+            background: #1b222a;
+
+            border: 1px solid #2d3741;
+
+            border-radius: 16px;
+
+            padding: 26px;
+
+            margin-bottom: 22px;
+
+            overflow: hidden;
+        }
+
+
+        .reports-panel-header {
+            display: flex;
+
+            align-items: flex-start;
+            justify-content: space-between;
+
+            gap: 20px;
+
+            margin-bottom: 24px;
+        }
+
+
+        .reports-panel-title {
+            color: #f5f7fa;
+
+            font-size: 20px;
+            font-weight: 800;
+        }
+
+
+        .reports-panel-description {
+            color: #7e8994;
+
+            font-size: 13px;
+            font-weight: 500;
+
+            margin-top: 6px;
+        }
+
+
+        /* =========================================================
+           FILTERS
+           ========================================================= */
+
+        .reports-filters {
+            display: grid;
+
+            grid-template-columns:
+                repeat(3, minmax(0, 1fr));
+
+            gap: 20px;
+
+            align-items: end;
+        }
+
+
+        .reports-field {
+            min-width: 0;
+        }
+
+
+        .reports-field label {
+            display: block;
+
+            color: #b4bdc6;
+
+            font-size: 13px;
+            font-weight: 750;
+
+            margin-bottom: 8px;
+        }
+
+
+        .reports-field input,
+        .reports-field select {
+            width: 100%;
+
+            min-height: 50px;
+
+            border: 1px solid #35414c;
+
+            border-radius: 9px;
+
+            background: #222b35;
+
+            color: #f5f7fa;
+
+            padding: 0 14px;
+
+            font-size: 14px;
+            font-weight: 550;
+
+            outline: none;
+        }
+
+
+        .reports-field input:focus,
+        .reports-field select:focus {
+            border-color: #00e5a8;
+
+            box-shadow:
+                0 0 0 3px rgba(0, 229, 168, 0.10);
+        }
+
+
+        .reports-filter-actions {
+            display: flex;
+
+            gap: 10px;
+
+            grid-column: 3;
+        }
+
+
+        .reports-btn {
+            min-height: 50px;
+
+            border: 0;
+
+            border-radius: 9px;
+
+            padding: 0 20px;
+
+            font-size: 14px;
+            font-weight: 800;
+
+            cursor: pointer;
+
+            transition: 0.2s ease;
+        }
+
+
+        .reports-btn-primary {
+            background: #00e5a8;
+
+            color: #06120e;
+
+            flex: 1;
+        }
+
+
+        .reports-btn-secondary {
+            background: #26313b;
+
+            color: #ffffff;
+
+            border: 1px solid #394650;
+
+            flex: 1;
+        }
+
+
+        .reports-btn:hover {
+            transform: translateY(-1px);
+        }
+
+
+        .reports-btn-primary:hover {
+            background: #19f0b8;
+        }
+
+
+        .reports-btn-secondary:hover {
+            background: #303c47;
+        }
+
+
+        .reports-export {
+            margin-top: 20px;
+        }
+
+
+        .reports-export-btn {
+            display: inline-flex;
+
+            align-items: center;
+            justify-content: center;
+
+            min-height: 46px;
+
+            padding: 0 20px;
+
+            border-radius: 9px;
+
+            background: #00e5a8;
+
+            color: #06120e !important;
+
+            text-decoration: none !important;
+
+            font-size: 14px;
+            font-weight: 800;
+
+            transition: 0.2s ease;
+        }
+
+
+        .reports-export-btn:hover {
+            background: #19f0b8;
+            transform: translateY(-1px);
+        }
+
+
+        /* =========================================================
+           TWO COLUMN REPORTS
+           ========================================================= */
+
+        .reports-two-column {
+            display: grid;
+
+            grid-template-columns:
+                repeat(2, minmax(0, 1fr));
+
+            gap: 22px;
+
+            margin-bottom: 22px;
+        }
+
+
+        .reports-two-column .reports-panel {
+            margin-bottom: 0;
+        }
+
+
+        /* =========================================================
+           EMPTY STATE
+           ========================================================= */
+
+        .reports-empty {
+            min-height: 180px;
+
+            display: flex;
+
+            align-items: center;
+            justify-content: center;
+
+            text-align: center;
+
+            color: #77838e;
+
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+
+        /* =========================================================
+           PRODUCT LIST
+           ========================================================= */
+
+        .reports-list {
+            display: flex;
+
+            flex-direction: column;
+
+            border-top: 1px solid #2b353e;
+        }
+
+
+        .reports-list-row {
+            display: flex;
+
+            align-items: center;
+            justify-content: space-between;
+
+            gap: 20px;
+
+            padding: 16px 4px;
+
+            border-bottom: 1px solid #2b353e;
+        }
+
+
+        .reports-product-name {
+            color: #f4f6f8;
+
+            font-size: 14px;
+            font-weight: 750;
+        }
+
+
+        .reports-product-sku {
+            color: #76828d;
+
+            font-size: 12px;
+            font-weight: 550;
+
+            margin-top: 4px;
+        }
+
+
+        .reports-warning {
+            color: #ffb547;
+
+            font-size: 18px;
+            font-weight: 850;
+        }
+
+
+        .reports-danger {
+            color: #ff5f64;
+
+            font-size: 18px;
+            font-weight: 850;
+        }
+
+
+        /* =========================================================
+           TABLE
+           ========================================================= */
+
+        .reports-table-wrapper {
+            width: 100%;
+
+            overflow-x: auto;
+
+            border: 1px solid #2d3741;
+
+            border-radius: 12px;
+        }
+
+
+        .reports-table {
+            width: 100%;
+
+            border-collapse: collapse;
+
+            min-width: 850px;
+        }
+
+
+        .reports-table th {
+            background: #222b34;
+
+            color: #87939e;
+
+            text-align: left;
+
+            font-size: 11px;
+            font-weight: 800;
+
+            text-transform: uppercase;
+
+            letter-spacing: 0.8px;
+
+            padding: 15px 16px;
+
+            border-bottom: 1px solid #303b45;
+        }
+
+
+        .reports-table td {
+            color: #dfe4e8;
+
+            font-size: 13px;
+            font-weight: 550;
+
+            padding: 16px;
+
+            border-bottom: 1px solid #29333d;
+
+            vertical-align: middle;
+        }
+
+
+        .reports-table tbody tr:last-child td {
+            border-bottom: 0;
+        }
+
+
+        .reports-table tbody tr:hover {
+            background: rgba(255,255,255,0.025);
+        }
+
+
+        .reports-table-main {
+            color: #ffffff;
+
+            font-weight: 750;
+        }
+
+
+        .reports-table-subtext {
+            color: #73808b;
+
+            font-size: 11px;
+
+            margin-top: 4px;
+        }
+
+
+        /* =========================================================
+           MOVEMENT BADGES
+           ========================================================= */
+
+        .movement-badge {
+            display: inline-flex;
+
+            align-items: center;
+            justify-content: center;
+
+            min-width: 75px;
+
+            padding: 6px 10px;
+
+            border-radius: 999px;
+
+            font-size: 11px;
+            font-weight: 800;
+
+            border: 1px solid transparent;
+        }
+
+
+        .movement-receive {
+            color: #00e5a8;
+
+            background: rgba(0,229,168,0.08);
+
+            border-color: rgba(0,229,168,0.25);
+        }
+
+
+        .movement-issue {
+            color: #ff6b72;
+
+            background: rgba(255,107,114,0.08);
+
+            border-color: rgba(255,107,114,0.25);
+        }
+
+
+        .movement-move {
+            color: #61a8ff;
+
+            background: rgba(97,168,255,0.08);
+
+            border-color: rgba(97,168,255,0.25);
+        }
+
+
+        /* =========================================================
+           BACK BUTTON
+           ========================================================= */
+
+        .reports-back {
+            margin-top: 8px;
+
+            width: 100%;
+
+            min-height: 48px;
+
+            border-radius: 9px;
+
+            border: 1px solid #34404b;
+
+            background: transparent;
+
+            color: #9ba6b0;
+
+            font-size: 14px;
+            font-weight: 700;
+
+            cursor: pointer;
+
+            transition: 0.2s ease;
+        }
+
+
+        .reports-back:hover {
+            background: #182129;
+
+            color: #ffffff;
+
+            border-color: #00e5a8;
+        }
+
+
+        /* =========================================================
+           RESPONSIVE
+           ========================================================= */
+
+        @media (max-width: 1250px) {
+
+            .reports-main {
+                padding: 34px 30px 50px;
+            }
+
+            .reports-kpis {
+                grid-template-columns:
+                    repeat(3, minmax(0, 1fr));
+            }
+
+            .reports-filters {
+                grid-template-columns:
+                    repeat(2, minmax(0, 1fr));
+            }
+
+            .reports-filter-actions {
+                grid-column: auto;
+            }
+
+        }
+
+
+        @media (max-width: 900px) {
+
+            .reports-sidebar {
+                width: 225px;
+
+                padding: 24px 16px;
+            }
+
+            .reports-main {
+                width: calc(100% - 225px);
+
+                margin-left: 225px;
+
+                padding: 28px 20px 45px;
+            }
+
+            .reports-kpis {
+                grid-template-columns:
+                    repeat(2, minmax(0, 1fr));
+            }
+
+            .reports-two-column {
+                grid-template-columns: 1fr;
+            }
+
+            .reports-two-column .reports-panel {
+                margin-bottom: 0;
+            }
+
+        }
+
+
+        @media (max-width: 650px) {
+
+            .reports-app {
+                display: block;
+            }
+
+            .reports-sidebar {
+                position: relative;
+
+                width: 100%;
+
+                height: auto;
+
+                min-height: auto;
+
+                border-right: 0;
+
+                border-bottom: 1px solid #29323b;
+
+                padding: 18px;
+            }
+
+            .reports-sidebar-bottom {
+                margin-top: 20px;
+            }
+
+            .reports-main {
+                width: 100%;
+
+                margin-left: 0;
+
+                padding: 24px 16px 40px;
+            }
+
+            .reports-page-header {
+                flex-direction: column;
+            }
+
+            .reports-dashboard-btn {
+                width: 100%;
+            }
+
+            .reports-kpis {
+                grid-template-columns: 1fr;
+            }
+
+            .reports-filters {
+                grid-template-columns: 1fr;
+            }
+
+            .reports-filter-actions {
+                grid-column: auto;
+
+                flex-direction: column;
+            }
+
+            .reports-panel {
+                padding: 20px;
+            }
+
+        }
+
+    </style>
+
 </head>
+
+
 <body>
 
-<div class="dashboard-container">
+<div class="reports-app">
 
-    <div class="inventory-header">
-        <div>
-            <h1>Reports</h1>
-            <p>Review inventory health, stock movement and employee activity.</p>
-        </div>
 
-        <button onclick="location.href='/dashboard'">
-            Dashboard
-        </button>
-    </div>
+    <!-- =========================================================
+         SIDEBAR
+         ========================================================= -->
 
-    <div class="report-kpis">
+    <aside class="reports-sidebar">
 
-        <div class="report-kpi">
-            <span>Inventory Health</span>
-            <strong>{{ inventory_health }}%</strong>
-        </div>
 
-        <div class="report-kpi">
-            <span>Operations</span>
-            <strong>{{ movement_total }}</strong>
-        </div>
+        <div class="reports-brand">
 
-        <div class="report-kpi">
-            <span>Received Units</span>
-            <strong>{{ receive_units }}</strong>
-        </div>
-
-        <div class="report-kpi">
-            <span>Issued Units</span>
-            <strong>{{ issue_units }}</strong>
-        </div>
-
-        <div class="report-kpi">
-            <span>Moved Units</span>
-            <strong>{{ move_units }}</strong>
-        </div>
-
-    </div>
-
-    <div class="report-panel">
-
-        <div class="panel-header">
-            <div>
-                <h2>Report Filters</h2>
-                <p>Filter movement records before exporting.</p>
-            </div>
-        </div>
-
-        <form method="GET" action="/reports" class="report-filters">
-
-            <div>
-                <label>From Date</label>
-                <input type="date" name="date_from" value="{{ date_from }}">
+            <div class="reports-brand-logo">
+                W
             </div>
 
-            <div>
-                <label>To Date</label>
-                <input type="date" name="date_to" value="{{ date_to }}">
+            <div class="reports-brand-text">
+
+                <div class="reports-brand-name">
+                    WareFlow
+                </div>
+
+                <div class="reports-brand-subtitle">
+                    WAREHOUSE OS
+                </div>
+
             </div>
 
-            <div>
-                <label>Movement Type</label>
-                <select name="movement_type">
-                    <option value="">All Operations</option>
-                    <option value="RECEIVE" {% if selected_movement_type == "RECEIVE" %}selected{% endif %}>Receive</option>
-                    <option value="ISSUE" {% if selected_movement_type == "ISSUE" %}selected{% endif %}>Issue</option>
-                    <option value="MOVE" {% if selected_movement_type == "MOVE" %}selected{% endif %}>Move</option>
-                </select>
-            </div>
+        </div>
 
-            <div>
-                <label>Employee</label>
-                <select name="employee_id">
-                    <option value="">All Employees</option>
-                    {% for employee in employees %}
-                    <option value="{{ employee.id }}" {% if selected_employee == employee.id|string %}selected{% endif %}>
-                        {{ employee.name }} ({{ employee.employee_id }})
-                    </option>
-                    {% endfor %}
-                </select>
-            </div>
 
-            <div>
-                <label>Product</label>
-                <select name="product_id">
-                    <option value="">All Products</option>
-                    {% for product in products %}
-                    <option value="{{ product.id }}" {% if selected_product == product.id|string %}selected{% endif %}>
-                        {{ product.product_name }} ({{ product.sku }})
-                    </option>
-                    {% endfor %}
-                </select>
-            </div>
+        <div class="reports-section-title">
+            WORKSPACE
+        </div>
 
-            <div class="report-filter-actions">
-                <button type="submit">Apply Filters</button>
-                <button type="button" onclick="location.href='/reports'">Clear</button>
-            </div>
 
-        </form>
+        <nav class="reports-nav">
 
-        <div class="report-export">
-            <a href="{{ url_for('export_report',
-                date_from=date_from,
-                date_to=date_to,
-                movement_type=selected_movement_type,
-                employee_id=selected_employee,
-                product_id=selected_product
-            ) }}">
-                <button type="button">Export CSV</button>
+            <a href="/dashboard">
+                <span class="reports-nav-icon">▣</span>
+                <span>Dashboard</span>
             </a>
+
+            <a href="/search">
+                <span class="reports-nav-icon">⌕</span>
+                <span>Search Warehouse</span>
+            </a>
+
+            <a href="/inventory">
+                <span class="reports-nav-icon">▤</span>
+                <span>Inventory</span>
+            </a>
+
+            <a href="/stock-operations">
+                <span class="reports-nav-icon">⇄</span>
+                <span>Stock Operations</span>
+            </a>
+
+            <a href="/scanner">
+                <span class="reports-nav-icon">#</span>
+                <span>Scanner</span>
+            </a>
+
+            <a href="/alerts">
+                <span class="reports-nav-icon">!</span>
+                <span>Alerts</span>
+            </a>
+
+        </nav>
+
+
+        <div class="reports-section-title">
+            MANAGEMENT
         </div>
 
-    </div>
 
-    <div class="report-grid">
+        <nav class="reports-nav">
 
-        <div class="report-panel">
-            <div class="panel-header">
+            <a href="/qr-management">
+                <span class="reports-nav-icon">▣</span>
+                <span>QR Management</span>
+            </a>
+
+            <a
+                href="/reports"
+                class="active"
+            >
+                <span class="reports-nav-icon">▤</span>
+                <span>Reports</span>
+            </a>
+
+            <a href="/activity-logs">
+                <span class="reports-nav-icon">≡</span>
+                <span>Activity Logs</span>
+            </a>
+
+            <a href="/add-product">
+                <span class="reports-nav-icon">＋</span>
+                <span>Add Product</span>
+            </a>
+
+        </nav>
+
+
+        <div class="reports-sidebar-bottom">
+
+            <div class="reports-user">
+
+                <div class="reports-user-name">
+                    Mirza Arsalan
+                </div>
+
+                <div class="reports-user-role">
+                    Admin
+                </div>
+
+            </div>
+
+
+            <button
+                class="reports-logout"
+                onclick="location.href='/logout'"
+            >
+                Logout
+            </button>
+
+        </div>
+
+
+    </aside>
+
+
+    <!-- =========================================================
+         MAIN
+         ========================================================= -->
+
+    <main class="reports-main">
+
+
+        <div class="reports-container">
+
+
+            <!-- =================================================
+                 HEADER
+                 ================================================= -->
+
+            <header class="reports-page-header">
+
                 <div>
-                    <h2>Low Stock</h2>
-                    <p>Products with 1–10 units remaining.</p>
-                </div>
-            </div>
 
-            {% if low_stock_products %}
-            <div class="report-list">
-                {% for product in low_stock_products %}
-                <div class="report-list-row">
-                    <div>
-                        <strong>{{ product.product_name }}</strong>
-                        <span>{{ product.sku }}</span>
+                    <div class="reports-eyebrow">
+                        WAREHOUSE INTELLIGENCE
                     </div>
-                    <strong class="report-warning">{{ product.quantity }}</strong>
-                </div>
-                {% endfor %}
-            </div>
-            {% else %}
-            <div class="empty-state">
-                <p>No low-stock products.</p>
-            </div>
-            {% endif %}
-        </div>
 
-        <div class="report-panel">
-            <div class="panel-header">
-                <div>
-                    <h2>Out of Stock</h2>
-                    <p>Products currently unavailable.</p>
-                </div>
-            </div>
+                    <h1 class="reports-page-title">
+                        Reports
+                    </h1>
 
-            {% if out_of_stock_products %}
-            <div class="report-list">
-                {% for product in out_of_stock_products %}
-                <div class="report-list-row">
+                    <p class="reports-page-description">
+                        Review inventory health, stock movement
+                        and employee activity.
+                    </p>
+
+                </div>
+
+
+                <button
+                    class="reports-dashboard-btn"
+                    onclick="location.href='/dashboard'"
+                >
+                    Dashboard
+                </button>
+
+            </header>
+
+
+            <!-- =================================================
+                 KPI CARDS
+                 ================================================= -->
+
+            <section class="reports-kpis">
+
+
+                <div class="reports-kpi">
+
+                    <span class="reports-kpi-label">
+                        Inventory Health
+                    </span>
+
+                    <strong class="reports-kpi-value">
+                        {{ inventory_health }}%
+                    </strong>
+
+                </div>
+
+
+                <div class="reports-kpi">
+
+                    <span class="reports-kpi-label">
+                        Operations
+                    </span>
+
+                    <strong class="reports-kpi-value">
+                        {{ movement_total }}
+                    </strong>
+
+                </div>
+
+
+                <div class="reports-kpi">
+
+                    <span class="reports-kpi-label">
+                        Received Units
+                    </span>
+
+                    <strong class="reports-kpi-value">
+                        {{ receive_units }}
+                    </strong>
+
+                </div>
+
+
+                <div class="reports-kpi">
+
+                    <span class="reports-kpi-label">
+                        Issued Units
+                    </span>
+
+                    <strong class="reports-kpi-value">
+                        {{ issue_units }}
+                    </strong>
+
+                </div>
+
+
+                <div class="reports-kpi">
+
+                    <span class="reports-kpi-label">
+                        Moved Units
+                    </span>
+
+                    <strong class="reports-kpi-value">
+                        {{ move_units }}
+                    </strong>
+
+                </div>
+
+
+            </section>
+
+
+            <!-- =================================================
+                 FILTERS
+                 ================================================= -->
+
+            <section class="reports-panel">
+
+
+                <div class="reports-panel-header">
+
                     <div>
-                        <strong>{{ product.product_name }}</strong>
-                        <span>{{ product.sku }}</span>
+
+                        <h2 class="reports-panel-title">
+                            Report Filters
+                        </h2>
+
+                        <p class="reports-panel-description">
+                            Filter movement records before exporting.
+                        </p>
+
                     </div>
-                    <strong class="report-danger">0</strong>
+
                 </div>
-                {% endfor %}
+
+
+                <form
+                    method="GET"
+                    action="/reports"
+                    class="reports-filters"
+                >
+
+
+                    <div class="reports-field">
+
+                        <label for="date_from">
+                            From Date
+                        </label>
+
+                        <input
+                            id="date_from"
+                            type="date"
+                            name="date_from"
+                            value="{{ date_from }}"
+                        >
+
+                    </div>
+
+
+                    <div class="reports-field">
+
+                        <label for="date_to">
+                            To Date
+                        </label>
+
+                        <input
+                            id="date_to"
+                            type="date"
+                            name="date_to"
+                            value="{{ date_to }}"
+                        >
+
+                    </div>
+
+
+                    <div class="reports-field">
+
+                        <label for="movement_type">
+                            Movement Type
+                        </label>
+
+                        <select
+                            id="movement_type"
+                            name="movement_type"
+                        >
+
+                            <option value="">
+                                All Operations
+                            </option>
+
+                            <option
+                                value="RECEIVE"
+                                {% if selected_movement_type == "RECEIVE" %}
+                                    selected
+                                {% endif %}
+                            >
+                                Receive
+                            </option>
+
+                            <option
+                                value="ISSUE"
+                                {% if selected_movement_type == "ISSUE" %}
+                                    selected
+                                {% endif %}
+                            >
+                                Issue
+                            </option>
+
+                            <option
+                                value="MOVE"
+                                {% if selected_movement_type == "MOVE" %}
+                                    selected
+                                {% endif %}
+                            >
+                                Move
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <div class="reports-field">
+
+                        <label for="employee_id">
+                            Employee
+                        </label>
+
+                        <select
+                            id="employee_id"
+                            name="employee_id"
+                        >
+
+                            <option value="">
+                                All Employees
+                            </option>
+
+                            {% for employee in employees %}
+
+                            <option
+                                value="{{ employee.id }}"
+                                {% if selected_employee == employee.id|string %}
+                                    selected
+                                {% endif %}
+                            >
+                                {{ employee.name }}
+                                ({{ employee.employee_id }})
+                            </option>
+
+                            {% endfor %}
+
+                        </select>
+
+                    </div>
+
+
+                    <div class="reports-field">
+
+                        <label for="product_id">
+                            Product
+                        </label>
+
+                        <select
+                            id="product_id"
+                            name="product_id"
+                        >
+
+                            <option value="">
+                                All Products
+                            </option>
+
+                            {% for product in products %}
+
+                            <option
+                                value="{{ product.id }}"
+                                {% if selected_product == product.id|string %}
+                                    selected
+                                {% endif %}
+                            >
+                                {{ product.product_name }}
+                                ({{ product.sku }})
+                            </option>
+
+                            {% endfor %}
+
+                        </select>
+
+                    </div>
+
+
+                    <div class="reports-filter-actions">
+
+                        <button
+                            type="submit"
+                            class="reports-btn reports-btn-primary"
+                        >
+                            Apply Filters
+                        </button>
+
+                        <button
+                            type="button"
+                            class="reports-btn reports-btn-secondary"
+                            onclick="location.href='/reports'"
+                        >
+                            Clear
+                        </button>
+
+                    </div>
+
+
+                </form>
+
+
+                <div class="reports-export">
+
+                    <a
+                        class="reports-export-btn"
+                        href="{{ url_for(
+                            'export_report',
+                            date_from=date_from,
+                            date_to=date_to,
+                            movement_type=selected_movement_type,
+                            employee_id=selected_employee,
+                            product_id=selected_product
+                        ) }}"
+                    >
+                        Export CSV
+                    </a>
+
+                </div>
+
+
+            </section>
+
+
+            <!-- =================================================
+                 LOW STOCK + OUT OF STOCK
+                 ================================================= -->
+
+            <div class="reports-two-column">
+
+
+                <!-- LOW STOCK -->
+
+                <section class="reports-panel">
+
+                    <div class="reports-panel-header">
+
+                        <div>
+
+                            <h2 class="reports-panel-title">
+                                Low Stock
+                            </h2>
+
+                            <p class="reports-panel-description">
+                                Products with 1–10 units remaining.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+                    {% if low_stock_products %}
+
+                    <div class="reports-list">
+
+                        {% for product in low_stock_products %}
+
+                        <div class="reports-list-row">
+
+                            <div>
+
+                                <div class="reports-product-name">
+                                    {{ product.product_name }}
+                                </div>
+
+                                <div class="reports-product-sku">
+                                    {{ product.sku }}
+                                </div>
+
+                            </div>
+
+
+                            <strong class="reports-warning">
+                                {{ product.quantity }}
+                            </strong>
+
+                        </div>
+
+                        {% endfor %}
+
+                    </div>
+
+                    {% else %}
+
+                    <div class="reports-empty">
+                        No low-stock products.
+                    </div>
+
+                    {% endif %}
+
+
+                </section>
+
+
+                <!-- OUT OF STOCK -->
+
+                <section class="reports-panel">
+
+                    <div class="reports-panel-header">
+
+                        <div>
+
+                            <h2 class="reports-panel-title">
+                                Out of Stock
+                            </h2>
+
+                            <p class="reports-panel-description">
+                                Products currently unavailable.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+                    {% if out_of_stock_products %}
+
+                    <div class="reports-list">
+
+                        {% for product in out_of_stock_products %}
+
+                        <div class="reports-list-row">
+
+                            <div>
+
+                                <div class="reports-product-name">
+                                    {{ product.product_name }}
+                                </div>
+
+                                <div class="reports-product-sku">
+                                    {{ product.sku }}
+                                </div>
+
+                            </div>
+
+
+                            <strong class="reports-danger">
+                                0
+                            </strong>
+
+                        </div>
+
+                        {% endfor %}
+
+                    </div>
+
+                    {% else %}
+
+                    <div class="reports-empty">
+                        No out-of-stock products.
+                    </div>
+
+                    {% endif %}
+
+
+                </section>
+
+
             </div>
-            {% else %}
-            <div class="empty-state">
-                <p>No out-of-stock products.</p>
-            </div>
-            {% endif %}
+
+
+            <!-- =================================================
+                 EMPLOYEE ACTIVITY
+                 ================================================= -->
+
+            <section class="reports-panel">
+
+
+                <div class="reports-panel-header">
+
+                    <div>
+
+                        <h2 class="reports-panel-title">
+                            Employee Activity
+                        </h2>
+
+                        <p class="reports-panel-description">
+                            Operations included in the selected
+                            report period.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                {% if employee_activity %}
+
+                <div class="reports-table-wrapper">
+
+                    <table class="reports-table">
+
+                        <thead>
+
+                            <tr>
+
+                                <th>Employee</th>
+                                <th>Employee ID</th>
+                                <th>Role</th>
+                                <th>Operations</th>
+                                <th>Received</th>
+                                <th>Issued</th>
+                                <th>Moved</th>
+
+                            </tr>
+
+                        </thead>
+
+
+                        <tbody>
+
+                        {% for row in employee_activity %}
+
+                            <tr>
+
+                                <td>
+                                    <span class="reports-table-main">
+                                        {{ row.name }}
+                                    </span>
+                                </td>
+
+                                <td>
+                                    {{ row.employee_id }}
+                                </td>
+
+                                <td>
+                                    {{ row.role }}
+                                </td>
+
+                                <td>
+                                    {{ row.operations }}
+                                </td>
+
+                                <td>
+                                    {{ row.received }}
+                                </td>
+
+                                <td>
+                                    {{ row.issued }}
+                                </td>
+
+                                <td>
+                                    {{ row.moved }}
+                                </td>
+
+                            </tr>
+
+                        {% endfor %}
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+                {% else %}
+
+                <div class="reports-empty">
+                    No employee activity matches the selected filters.
+                </div>
+
+                {% endif %}
+
+
+            </section>
+
+
+            <!-- =================================================
+                 STOCK MOVEMENT
+                 ================================================= -->
+
+            <section class="reports-panel">
+
+
+                <div class="reports-panel-header">
+
+                    <div>
+
+                        <h2 class="reports-panel-title">
+                            Stock Movement Report
+                        </h2>
+
+                        <p class="reports-panel-description">
+                            Latest 200 records matching your filters.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                {% if movements %}
+
+                <div class="reports-table-wrapper">
+
+                    <table class="reports-table">
+
+                        <thead>
+
+                            <tr>
+
+                                <th>Date</th>
+                                <th>Product</th>
+                                <th>Type</th>
+                                <th>Quantity</th>
+                                <th>Employee</th>
+                                <th>From</th>
+                                <th>To</th>
+                                <th>Reason</th>
+
+                            </tr>
+
+                        </thead>
+
+
+                        <tbody>
+
+                        {% for movement in movements %}
+
+                            <tr>
+
+                                <td>
+                                    {{ format_ist(movement.created_at) }}
+                                </td>
+
+
+                                <td>
+
+                                    <span class="reports-table-main">
+                                        {{ movement.product.product_name }}
+                                    </span>
+
+                                    <div class="reports-table-subtext">
+                                        {{ movement.product.sku }}
+                                    </div>
+
+                                </td>
+
+
+                                <td>
+
+                                    <span
+                                        class="
+                                            movement-badge
+                                            movement-{{ movement.movement_type|lower }}
+                                        "
+                                    >
+                                        {{ movement.movement_type }}
+                                    </span>
+
+                                </td>
+
+
+                                <td>
+                                    {{ movement.quantity }}
+                                </td>
+
+
+                                <td>
+                                    {{ movement.employee.name }}
+                                </td>
+
+
+                                <td>
+                                    {{ movement.from_location or "-" }}
+                                </td>
+
+
+                                <td>
+                                    {{ movement.to_location or "-" }}
+                                </td>
+
+
+                                <td>
+                                    {{ movement.reason or "-" }}
+                                </td>
+
+                            </tr>
+
+                        {% endfor %}
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+                {% else %}
+
+                <div class="reports-empty">
+                    No stock movements match the selected filters.
+                </div>
+
+                {% endif %}
+
+
+            </section>
+
+
+            <!-- =================================================
+                 BACK TO DASHBOARD
+                 ================================================= -->
+
+            <button
+                class="reports-back"
+                onclick="location.href='/dashboard'"
+            >
+                Back to Dashboard
+            </button>
+
+
         </div>
 
-    </div>
+    </main>
 
-    <div class="report-panel">
-
-        <div class="panel-header">
-            <div>
-                <h2>Employee Activity</h2>
-                <p>Operations included in the selected report period.</p>
-            </div>
-        </div>
-
-        {% if employee_activity %}
-
-        <div class="inventory-table-wrapper">
-            <table class="inventory-table">
-                <thead>
-                    <tr>
-                        <th>Employee</th>
-                        <th>Employee ID</th>
-                        <th>Role</th>
-                        <th>Operations</th>
-                        <th>Received</th>
-                        <th>Issued</th>
-                        <th>Moved</th>
-                    </tr>
-                </thead>
-
-                <tbody>
-                {% for row in employee_activity %}
-                    <tr>
-                        <td>{{ row.name }}</td>
-                        <td>{{ row.employee_id }}</td>
-                        <td>{{ row.role }}</td>
-                        <td>{{ row.operations }}</td>
-                        <td>{{ row.received }}</td>
-                        <td>{{ row.issued }}</td>
-                        <td>{{ row.moved }}</td>
-                    </tr>
-                {% endfor %}
-                </tbody>
-            </table>
-        </div>
-
-        {% else %}
-        <div class="empty-state">
-            <p>No employee activity matches the selected filters.</p>
-        </div>
-        {% endif %}
-
-    </div>
-
-    <div class="report-panel">
-
-        <div class="panel-header">
-            <div>
-                <h2>Stock Movement Report</h2>
-                <p>Latest 200 records matching your filters.</p>
-            </div>
-        </div>
-
-        {% if movements %}
-
-        <div class="inventory-table-wrapper">
-            <table class="inventory-table">
-
-                <thead>
-                    <tr>
-                        <th>Date</th>
-                        <th>Product</th>
-                        <th>Type</th>
-                        <th>Quantity</th>
-                        <th>Employee</th>
-                        <th>From</th>
-                        <th>To</th>
-                        <th>Reason</th>
-                    </tr>
-                </thead>
-
-                <tbody>
-                {% for movement in movements %}
-                    <tr>
-                        <td>{{ format_ist(movement.created_at) }}</td>
-                        <td>
-                            {{ movement.product.product_name }}
-                            <div class="table-subtext">{{ movement.product.sku }}</div>
-                        </td>
-                        <td>
-                            <span class="movement-badge movement-{{ movement.movement_type|lower }}">
-                                {{ movement.movement_type }}
-                            </span>
-                        </td>
-                        <td>{{ movement.quantity }}</td>
-                        <td>{{ movement.employee.name }}</td>
-                        <td>{{ movement.from_location or "-" }}</td>
-                        <td>{{ movement.to_location or "-" }}</td>
-                        <td>{{ movement.reason or "-" }}</td>
-                    </tr>
-                {% endfor %}
-                </tbody>
-
-            </table>
-        </div>
-
-        {% else %}
-        <div class="empty-state">
-            <p>No stock movements match the selected filters.</p>
-        </div>
-        {% endif %}
-
-    </div>
-
-    <button onclick="location.href='/dashboard'">
-        Back to Dashboard
-    </button>
 
 </div>
 

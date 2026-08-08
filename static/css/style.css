@@ -3703,3 +3703,532 @@ margin-top:auto;
 background:#1b222d;
 
 }
+
+/* ===========================
+   GLOBAL LAYOUT
+=========================== */
+
+.wf2-page{
+    display:flex;
+    min-height:100vh;
+    background:#0d1117;
+}
+
+.wf2-sidebar{
+    width:260px;
+    background:#161b22;
+    border-right:1px solid #2d333b;
+
+    position:fixed;
+    left:0;
+    top:0;
+    bottom:0;
+
+    padding:28px 22px;
+
+    overflow-y:auto;
+}
+
+.wf2-main{
+
+    margin-left:260px;
+
+    width:calc(100% - 260px);
+
+    padding:35px;
+
+    overflow-x:hidden;
+
+}
+
+.wf2-brand{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:14px;
+
+    margin-bottom:40px;
+
+}
+
+.wf2-brand-mark{
+
+    width:52px;
+
+    height:52px;
+
+    border-radius:14px;
+
+    background:#00e5a8;
+
+    color:#000;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    font-size:24px;
+
+    font-weight:bold;
+
+}
+
+.wf2-nav{
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:12px;
+
+}
+
+.wf2-nav a{
+
+    text-decoration:none;
+
+    color:#d1d5db;
+
+    padding:14px;
+
+    border-radius:10px;
+
+    transition:.25s;
+
+}
+
+.wf2-nav a:hover{
+
+    background:#21262d;
+
+    color:#00e5a8;
+
+}
+
+.wf2-sidebar-footer{
+
+    margin-top:40px;
+
+    color:#9ca3af;
+
+}
+
+.wf2-sidebar-footer button{
+
+    width:100%;
+
+}
+
+@media(max-width:900px){
+
+    .wf2-sidebar{
+
+        position:relative;
+
+        width:100%;
+
+        border-right:none;
+
+        border-bottom:1px solid #2d333b;
+
+    }
+
+    .wf2-page{
+
+        flex-direction:column;
+
+    }
+
+    .wf2-main{
+
+        margin-left:0;
+
+        width:100%;
+
+    }
+
+}
+
+.analytics-card{
+
+    position:relative;
+
+    overflow:hidden;
+
+    transition:.3s;
+
+    cursor:pointer;
+
+}
+
+.analytics-card:hover{
+
+    transform:translateY(-8px);
+
+    box-shadow:0 15px 35px rgba(0,229,168,.25);
+
+}
+
+.kpi-icon{
+
+    width:55px;
+
+    height:55px;
+
+    border-radius:12px;
+
+    background:#00e5a820;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    font-size:28px;
+
+    margin-bottom:15px;
+
+}
+
+.health-bar{
+
+height:18px;
+
+background:#2d333b;
+
+border-radius:30px;
+
+overflow:hidden;
+
+}
+
+.health-fill{
+
+height:100%;
+
+width:92%;
+
+background:linear-gradient(90deg,#00e5a8,#00b894);
+
+animation:grow 2s ease;
+
+}
+
+@keyframes grow{
+
+from{
+
+width:0;
+
+}
+
+to{
+
+width:92%;
+
+}
+
+}
+
+
+/* =========================================================
+   WAREFLOW SHARED SIDEBAR — NEW UI
+   ========================================================= */
+
+.wf2-sidebar {
+    box-sizing: border-box;
+}
+
+.wf2-brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+
+    padding: 8px 10px 24px;
+
+    border-bottom: 1px solid #29323d;
+
+    margin-bottom: 24px;
+}
+
+.wf2-brand-mark {
+    width: 44px;
+    height: 44px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    flex-shrink: 0;
+
+    border-radius: 12px;
+
+    background: #00e5a8;
+
+    color: #07120f;
+
+    font-size: 24px;
+    font-weight: 900;
+}
+
+.wf2-brand-text h2 {
+    margin: 0;
+
+    color: #ffffff;
+
+    font-size: 20px;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+}
+
+.wf2-brand-text span {
+    display: block;
+
+    margin-top: 3px;
+
+    color: #7d8996;
+
+    font-size: 9px;
+    font-weight: 800;
+
+    letter-spacing: 1.5px;
+}
+
+
+/* NAV */
+
+.wf2-nav {
+    display: flex;
+    flex-direction: column;
+
+    gap: 5px;
+}
+
+.wf2-nav-section {
+    padding: 12px 12px 7px;
+
+    color: #66727f;
+
+    font-size: 9px;
+    font-weight: 800;
+
+    letter-spacing: 1.5px;
+}
+
+.wf2-nav-section-management {
+    margin-top: 15px;
+}
+
+
+.wf2-nav-link {
+    position: relative;
+
+    display: flex;
+    align-items: center;
+
+    gap: 12px;
+
+    min-height: 42px;
+
+    padding: 0 13px;
+
+    box-sizing: border-box;
+
+    border: 1px solid transparent;
+
+    border-radius: 10px;
+
+    color: #aab4bf;
+
+    text-decoration: none;
+
+    font-size: 13px;
+    font-weight: 650;
+
+    transition:
+        background .18s ease,
+        color .18s ease,
+        border-color .18s ease;
+}
+
+
+.wf2-nav-link:hover {
+    background: #18252a;
+
+    color: #ffffff;
+
+    border-color: #24443d;
+}
+
+
+.wf2-nav-link.active {
+    background: rgba(0, 229, 168, .10);
+
+    color: #00e5a8;
+
+    border-color: rgba(0, 229, 168, .25);
+}
+
+
+.wf2-nav-link.active::before {
+    content: "";
+
+    position: absolute;
+
+    left: -1px;
+    top: 8px;
+    bottom: 8px;
+
+    width: 3px;
+
+    border-radius: 0 4px 4px 0;
+
+    background: #00e5a8;
+}
+
+
+.wf2-nav-icon {
+    width: 20px;
+
+    display: inline-flex;
+
+    align-items: center;
+    justify-content: center;
+
+    color: #7d8996;
+
+    font-size: 15px;
+    font-weight: 700;
+}
+
+
+.wf2-nav-link.active .wf2-nav-icon {
+    color: #00e5a8;
+}
+
+
+/* FOOTER */
+
+.wf2-sidebar-footer {
+    margin-top: auto;
+
+    padding-top: 18px;
+
+    border-top: 1px solid #29323d;
+}
+
+
+.wf2-user-card {
+    display: flex;
+    align-items: center;
+
+    gap: 10px;
+
+    padding: 10px;
+
+    margin-bottom: 10px;
+
+    border: 1px solid #29323d;
+
+    border-radius: 10px;
+
+    background: #151c24;
+}
+
+
+.wf2-user-avatar {
+    width: 34px;
+    height: 34px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    flex-shrink: 0;
+
+    border-radius: 50%;
+
+    background: rgba(0, 229, 168, .08);
+
+    border: 1px solid rgba(0, 229, 168, .35);
+
+    color: #00e5a8;
+
+    font-size: 13px;
+    font-weight: 800;
+}
+
+
+.wf2-user-info {
+    min-width: 0;
+
+    display: flex;
+    flex-direction: column;
+
+    gap: 3px;
+}
+
+
+.wf2-user-info strong {
+    overflow: hidden;
+
+    color: #ffffff;
+
+    font-size: 12px;
+
+    white-space: nowrap;
+
+    text-overflow: ellipsis;
+}
+
+
+.wf2-user-info span {
+    color: #74808c;
+
+    font-size: 10px;
+}
+
+
+.wf2-logout {
+    width: 100%;
+
+    min-height: 40px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    gap: 8px;
+
+    border: 1px solid rgba(0, 229, 168, .25);
+
+    border-radius: 9px;
+
+    background: rgba(0, 229, 168, .08);
+
+    color: #00e5a8;
+
+    font-size: 12px;
+    font-weight: 750;
+
+    cursor: pointer;
+
+    transition:
+        background .18s ease,
+        border-color .18s ease;
+}
+
+
+.wf2-logout:hover {
+    background: #00e5a8;
+
+    border-color: #00e5a8;
+
+    color: #07120f;
+}
+

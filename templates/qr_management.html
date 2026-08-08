@@ -1,9 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-
     <meta charset="UTF-8">
+
     <meta
         name="viewport"
         content="width=device-width, initial-scale=1.0"
@@ -11,174 +10,1497 @@
 
     <title>QR Management | WareFlow WMS</title>
 
-    <link
-        rel="stylesheet"
-        href="{{ url_for('static', filename='css/style.css') }}"
-    >
+    <style>
 
+        /* =========================================================
+           WAREFLOW QR MANAGEMENT
+           Completely self-contained page styling
+           ========================================================= */
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        :root {
+            --bg: #080d12;
+            --sidebar: #10171f;
+            --card: #151d25;
+            --card-hover: #19232d;
+            --border: #26323d;
+
+            --green: #08dfad;
+            --green-dark: #0b8069;
+
+            --text: #f4f7f9;
+            --muted: #8995a1;
+            --muted-2: #66727d;
+
+            --yellow: #f2b84b;
+            --red: #ff5c69;
+            --blue: #5b9df9;
+        }
+
+        html,
+        body {
+            width: 100%;
+            min-height: 100%;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family:
+                -apple-system,
+                BlinkMacSystemFont,
+                "Segoe UI",
+                Roboto,
+                Helvetica,
+                Arial,
+                sans-serif;
+
+            overflow-x: hidden;
+        }
+
+        button,
+        a {
+            font-family: inherit;
+        }
+
+        a {
+            color: inherit;
+            text-decoration: none;
+        }
+
+
+        /* =========================================================
+           APP LAYOUT
+           ========================================================= */
+
+        .wf-app {
+            min-height: 100vh;
+            display: flex;
+            background: var(--bg);
+        }
+
+
+        /* =========================================================
+           SIDEBAR
+           ========================================================= */
+
+        .wf-sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            bottom: 0;
+
+            width: 282px;
+
+            background:
+                linear-gradient(
+                    180deg,
+                    #111921 0%,
+                    #0e151c 100%
+                );
+
+            border-right: 1px solid var(--border);
+
+            padding: 26px 18px;
+
+            display: flex;
+            flex-direction: column;
+
+            z-index: 1000;
+
+            overflow-y: auto;
+        }
+
+
+        /* Logo */
+
+        .wf-brand {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+
+            padding: 4px 10px 28px;
+
+            border-bottom: 1px solid var(--border);
+        }
+
+        .wf-logo {
+            width: 52px;
+            height: 52px;
+
+            border-radius: 13px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            background: var(--green);
+            color: #07100d;
+
+            font-size: 28px;
+            font-weight: 900;
+        }
+
+        .wf-brand-name {
+            font-size: 21px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+        }
+
+        .wf-brand-subtitle {
+            margin-top: 3px;
+
+            color: var(--muted);
+
+            font-size: 11px;
+            font-weight: 700;
+
+            letter-spacing: 1.4px;
+            text-transform: uppercase;
+        }
+
+
+        /* Navigation */
+
+        .wf-nav {
+            margin-top: 30px;
+        }
+
+        .wf-section-title {
+            margin: 0 12px 12px;
+
+            color: #65727e;
+
+            font-size: 10px;
+            font-weight: 800;
+
+            letter-spacing: 1.7px;
+            text-transform: uppercase;
+        }
+
+        .wf-nav-list {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .wf-nav-item {
+            min-height: 48px;
+
+            padding: 0 13px;
+
+            border: 1px solid transparent;
+            border-radius: 11px;
+
+            display: flex;
+            align-items: center;
+            gap: 13px;
+
+            color: #aeb7c0;
+
+            font-size: 14px;
+            font-weight: 650;
+
+            transition:
+                background 0.18s ease,
+                color 0.18s ease,
+                border-color 0.18s ease;
+        }
+
+        .wf-nav-item:hover {
+            background: rgba(255,255,255,0.035);
+            color: white;
+        }
+
+        .wf-nav-item.active {
+            background: rgba(8,223,173,0.10);
+            border-color: rgba(8,223,173,0.30);
+            color: var(--green);
+        }
+
+        .wf-nav-icon {
+            width: 20px;
+            height: 20px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            color: #7e8a95;
+
+            font-size: 13px;
+            font-weight: 800;
+        }
+
+        .wf-nav-item.active .wf-nav-icon {
+            color: var(--green);
+        }
+
+
+        /* User */
+
+        .wf-sidebar-bottom {
+            margin-top: auto;
+            padding-top: 20px;
+        }
+
+        .wf-user {
+            border-top: 1px solid var(--border);
+
+            padding: 20px 6px 16px;
+
+            display: flex;
+            align-items: center;
+            gap: 11px;
+        }
+
+        .wf-avatar {
+            width: 38px;
+            height: 38px;
+
+            border-radius: 50%;
+
+            border: 1px solid rgba(8,223,173,0.4);
+
+            background: rgba(8,223,173,0.08);
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            color: var(--green);
+
+            font-size: 14px;
+            font-weight: 800;
+        }
+
+        .wf-user-name {
+            color: white;
+
+            font-size: 13px;
+            font-weight: 750;
+        }
+
+        .wf-user-role {
+            margin-top: 2px;
+
+            color: var(--muted);
+
+            font-size: 11px;
+        }
+
+        .wf-logout {
+            width: 100%;
+            height: 44px;
+
+            border: 0;
+            border-radius: 10px;
+
+            background: var(--green);
+            color: #06110e;
+
+            font-size: 14px;
+            font-weight: 800;
+
+            cursor: pointer;
+
+            transition:
+                transform 0.15s ease,
+                filter 0.15s ease;
+        }
+
+        .wf-logout:hover {
+            filter: brightness(1.08);
+            transform: translateY(-1px);
+        }
+
+
+        /* =========================================================
+           MAIN CONTENT
+           ========================================================= */
+
+        .wf-main {
+            width: calc(100% - 282px);
+
+            margin-left: 282px;
+
+            min-height: 100vh;
+
+            padding: 48px 56px 70px;
+        }
+
+        .wf-content {
+            width: 100%;
+            max-width: 1320px;
+            margin: 0 auto;
+        }
+
+
+        /* =========================================================
+           PAGE HEADER
+           ========================================================= */
+
+        .wf-page-header {
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+
+            gap: 30px;
+
+            margin-bottom: 30px;
+        }
+
+        .wf-eyebrow {
+            margin-bottom: 8px;
+
+            color: var(--green);
+
+            font-size: 10px;
+            font-weight: 850;
+
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .wf-page-title {
+            font-size: clamp(32px, 4vw, 48px);
+
+            line-height: 1;
+
+            letter-spacing: -1.8px;
+
+            font-weight: 850;
+        }
+
+        .wf-page-description {
+            margin-top: 10px;
+
+            color: var(--muted);
+
+            font-size: 15px;
+        }
+
+
+        /* =========================================================
+           HEADER BUTTON
+           ========================================================= */
+
+        .wf-primary-button {
+            min-width: 170px;
+            height: 48px;
+
+            padding: 0 22px;
+
+            border: 0;
+            border-radius: 10px;
+
+            background: var(--green);
+            color: #06110e;
+
+            font-size: 14px;
+            font-weight: 800;
+
+            cursor: pointer;
+
+            transition:
+                transform 0.15s ease,
+                filter 0.15s ease;
+        }
+
+        .wf-primary-button:hover {
+            filter: brightness(1.08);
+            transform: translateY(-1px);
+        }
+
+
+        /* =========================================================
+           SUMMARY BAR
+           ========================================================= */
+
+        .wf-summary {
+            display: grid;
+
+            grid-template-columns:
+                repeat(3, minmax(0, 1fr));
+
+            gap: 14px;
+
+            margin-bottom: 22px;
+        }
+
+        .wf-summary-card {
+            min-height: 92px;
+
+            padding: 18px 20px;
+
+            border: 1px solid var(--border);
+            border-radius: 13px;
+
+            background: var(--card);
+        }
+
+        .wf-summary-label {
+            color: var(--muted);
+
+            font-size: 11px;
+            font-weight: 750;
+
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .wf-summary-value {
+            margin-top: 8px;
+
+            color: white;
+
+            font-size: 26px;
+            font-weight: 850;
+        }
+
+        .wf-summary-value.green {
+            color: var(--green);
+        }
+
+
+        /* =========================================================
+           TABLE CARD
+           ========================================================= */
+
+        .wf-table-card {
+            width: 100%;
+
+            border: 1px solid var(--border);
+            border-radius: 15px;
+
+            background: var(--card);
+
+            overflow: hidden;
+
+            box-shadow:
+                0 20px 50px rgba(0,0,0,0.18);
+        }
+
+        .wf-table-top {
+            padding: 20px 22px;
+
+            border-bottom: 1px solid var(--border);
+
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            gap: 20px;
+        }
+
+        .wf-table-title {
+            font-size: 17px;
+            font-weight: 800;
+        }
+
+        .wf-table-subtitle {
+            margin-top: 4px;
+
+            color: var(--muted);
+
+            font-size: 12px;
+        }
+
+        .wf-live {
+            padding: 6px 10px;
+
+            border-radius: 20px;
+
+            background: rgba(8,223,173,0.08);
+
+            color: var(--green);
+
+            font-size: 10px;
+            font-weight: 850;
+
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+
+        /* =========================================================
+           TABLE
+           ========================================================= */
+
+        .wf-table-wrapper {
+            width: 100%;
+            overflow-x: auto;
+        }
+
+        .wf-table {
+            width: 100%;
+
+            border-collapse: collapse;
+
+            min-width: 900px;
+        }
+
+        .wf-table thead {
+            background: #0d141b;
+        }
+
+        .wf-table th {
+            height: 54px;
+
+            padding: 0 22px;
+
+            color: #8996a1;
+
+            font-size: 10px;
+            font-weight: 850;
+
+            letter-spacing: 1.1px;
+            text-transform: uppercase;
+
+            text-align: left;
+
+            white-space: nowrap;
+        }
+
+        .wf-table td {
+            height: 78px;
+
+            padding: 0 22px;
+
+            border-top: 1px solid var(--border);
+
+            color: #e8edf1;
+
+            font-size: 13px;
+            font-weight: 600;
+
+            white-space: nowrap;
+        }
+
+        .wf-table tbody tr {
+            transition: background 0.15s ease;
+        }
+
+        .wf-table tbody tr:hover {
+            background: var(--card-hover);
+        }
+
+
+        /* Product */
+
+        .wf-product-name {
+            color: white;
+            font-weight: 750;
+        }
+
+        .wf-product-sku {
+            color: #7e8994;
+
+            font-size: 12px;
+
+            font-family:
+                "SFMono-Regular",
+                Consolas,
+                monospace;
+        }
+
+
+        /* Location */
+
+        .wf-location {
+            color: var(--green);
+
+            font-size: 12px;
+            font-weight: 800;
+
+            font-family:
+                "SFMono-Regular",
+                Consolas,
+                monospace;
+        }
+
+
+        /* Quantity */
+
+        .wf-quantity {
+            color: white;
+
+            font-size: 14px;
+            font-weight: 800;
+        }
+
+
+        /* =========================================================
+           STATUS BADGES
+           ========================================================= */
+
+        .wf-status {
+            display: inline-flex;
+            align-items: center;
+
+            min-width: 82px;
+            justify-content: center;
+
+            padding: 6px 11px;
+
+            border-radius: 20px;
+
+            font-size: 10px;
+            font-weight: 800;
+        }
+
+        .wf-status.good {
+            color: var(--green);
+
+            border: 1px solid rgba(8,223,173,0.28);
+
+            background: rgba(8,223,173,0.07);
+        }
+
+        .wf-status.low {
+            color: var(--yellow);
+
+            border: 1px solid rgba(242,184,75,0.30);
+
+            background: rgba(242,184,75,0.07);
+        }
+
+        .wf-status.out {
+            color: var(--red);
+
+            border: 1px solid rgba(255,92,105,0.30);
+
+            background: rgba(255,92,105,0.07);
+        }
+
+
+        /* =========================================================
+           QR BUTTON
+           ========================================================= */
+
+        .wf-qr-button {
+            height: 40px;
+
+            padding: 0 18px;
+
+            border: 0;
+            border-radius: 9px;
+
+            background: var(--green);
+            color: #06110e;
+
+            font-size: 12px;
+            font-weight: 850;
+
+            cursor: pointer;
+
+            transition:
+                transform 0.15s ease,
+                filter 0.15s ease;
+        }
+
+        .wf-qr-button:hover {
+            filter: brightness(1.08);
+            transform: translateY(-1px);
+        }
+
+
+        /* =========================================================
+           EMPTY STATE
+           ========================================================= */
+
+        .wf-empty {
+            padding: 70px 30px;
+
+            text-align: center;
+        }
+
+        .wf-empty-icon {
+            width: 58px;
+            height: 58px;
+
+            margin: 0 auto 18px;
+
+            border-radius: 14px;
+
+            border: 1px solid var(--border);
+
+            background: #101820;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            color: var(--green);
+
+            font-size: 22px;
+            font-weight: 850;
+        }
+
+        .wf-empty h2 {
+            font-size: 22px;
+        }
+
+        .wf-empty p {
+            max-width: 420px;
+
+            margin: 8px auto 22px;
+
+            color: var(--muted);
+
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+
+        /* =========================================================
+           BOTTOM ACTIONS
+           ========================================================= */
+
+        .wf-bottom-actions {
+            display: flex;
+            justify-content: flex-end;
+
+            margin-top: 20px;
+        }
+
+        .wf-secondary-button {
+            height: 44px;
+
+            padding: 0 20px;
+
+            border: 1px solid var(--border);
+            border-radius: 9px;
+
+            background: #111920;
+            color: #dce2e7;
+
+            font-size: 13px;
+            font-weight: 750;
+
+            cursor: pointer;
+
+            transition:
+                background 0.15s ease,
+                border-color 0.15s ease;
+        }
+
+        .wf-secondary-button:hover {
+            background: #17212a;
+            border-color: #35434f;
+        }
+
+
+        /* =========================================================
+           MOBILE
+           ========================================================= */
+
+        @media (max-width: 1100px) {
+
+            .wf-sidebar {
+                width: 230px;
+            }
+
+            .wf-main {
+                width: calc(100% - 230px);
+                margin-left: 230px;
+
+                padding: 40px 30px 60px;
+            }
+
+            .wf-summary {
+                grid-template-columns: 1fr;
+            }
+
+        }
+
+
+        @media (max-width: 800px) {
+
+            .wf-sidebar {
+                position: relative;
+
+                width: 100%;
+                height: auto;
+
+                border-right: 0;
+                border-bottom: 1px solid var(--border);
+
+                padding: 18px;
+
+                overflow: visible;
+            }
+
+            .wf-app {
+                display: block;
+            }
+
+            .wf-main {
+                width: 100%;
+                margin-left: 0;
+
+                padding: 30px 18px 50px;
+            }
+
+            .wf-page-header {
+                align-items: flex-start;
+
+                flex-direction: column;
+            }
+
+            .wf-primary-button {
+                width: 100%;
+            }
+
+            .wf-sidebar-bottom {
+                margin-top: 20px;
+            }
+
+            .wf-nav-list {
+                display: grid;
+
+                grid-template-columns:
+                    repeat(2, minmax(0, 1fr));
+            }
+
+            .wf-user {
+                display: none;
+            }
+
+            .wf-logout {
+                margin-top: 10px;
+            }
+
+        }
+
+
+        @media (max-width: 520px) {
+
+            .wf-nav-list {
+                grid-template-columns: 1fr;
+            }
+
+            .wf-page-title {
+                font-size: 34px;
+            }
+
+            .wf-table-top {
+                align-items: flex-start;
+                flex-direction: column;
+            }
+
+        }
+
+    </style>
 </head>
+
 
 <body>
 
-<div class="dashboard-container">
+<div class="wf-app">
 
-    <div class="inventory-header">
 
-        <div>
+    <!-- =========================================================
+         SIDEBAR
+         ========================================================= -->
 
-            <h1>QR Management</h1>
+    <aside class="wf-sidebar">
 
-            <p>
-                Generate and manage warehouse location labels.
-            </p>
+
+        <!-- BRAND -->
+
+        <div class="wf-brand">
+
+            <div class="wf-logo">
+                W
+            </div>
+
+            <div>
+
+                <div class="wf-brand-name">
+                    WareFlow
+                </div>
+
+                <div class="wf-brand-subtitle">
+                    Warehouse OS
+                </div>
+
+            </div>
 
         </div>
 
-        <button onclick="location.href='/search'">
-            Search Location
-        </button>
 
-    </div>
+        <!-- NAVIGATION -->
+
+        <nav class="wf-nav">
 
 
-    {% if products %}
+            <div class="wf-section-title">
+                Workspace
+            </div>
 
-    <div class="inventory-table-wrapper">
 
-        <table class="inventory-table">
+            <div class="wf-nav-list">
 
-            <thead>
 
-                <tr>
+                <a
+                    href="/dashboard"
+                    class="wf-nav-item"
+                >
 
-                    <th>Product</th>
-                    <th>SKU</th>
-                    <th>Location</th>
-                    <th>Quantity</th>
-                    <th>Status</th>
-                    <th>QR</th>
+                    <span class="wf-nav-icon">
+                        ▣
+                    </span>
 
-                </tr>
+                    <span>
+                        Dashboard
+                    </span>
 
-            </thead>
+                </a>
 
-            <tbody>
 
-            {% for product in products %}
+                <a
+                    href="/search"
+                    class="wf-nav-item"
+                >
 
-                <tr>
+                    <span class="wf-nav-icon">
+                        ⌕
+                    </span>
 
-                    <td>
+                    <span>
+                        Search Warehouse
+                    </span>
 
-                        <div class="product-name">
-                            {{ product.product_name }}
+                </a>
+
+
+                <a
+                    href="/inventory"
+                    class="wf-nav-item"
+                >
+
+                    <span class="wf-nav-icon">
+                        ▤
+                    </span>
+
+                    <span>
+                        Inventory
+                    </span>
+
+                </a>
+
+
+                <a
+                    href="/stock-operations"
+                    class="wf-nav-item"
+                >
+
+                    <span class="wf-nav-icon">
+                        ⇄
+                    </span>
+
+                    <span>
+                        Stock Operations
+                    </span>
+
+                </a>
+
+
+                <a
+                    href="/scanner"
+                    class="wf-nav-item"
+                >
+
+                    <span class="wf-nav-icon">
+                        #
+                    </span>
+
+                    <span>
+                        Scanner
+                    </span>
+
+                </a>
+
+
+                <a
+                    href="/alerts"
+                    class="wf-nav-item"
+                >
+
+                    <span class="wf-nav-icon">
+                        !
+                    </span>
+
+                    <span>
+                        Alerts
+                    </span>
+
+                </a>
+
+            </div>
+
+
+            <div
+                class="wf-section-title"
+                style="margin-top: 28px;"
+            >
+                Management
+            </div>
+
+
+            <div class="wf-nav-list">
+
+
+                <a
+                    href="/qr-management"
+                    class="wf-nav-item active"
+                >
+
+                    <span class="wf-nav-icon">
+                        ▦
+                    </span>
+
+                    <span>
+                        QR Management
+                    </span>
+
+                </a>
+
+
+                <a
+                    href="/reports"
+                    class="wf-nav-item"
+                >
+
+                    <span class="wf-nav-icon">
+                        ▤
+                    </span>
+
+                    <span>
+                        Reports
+                    </span>
+
+                </a>
+
+
+                <a
+                    href="/activity-logs"
+                    class="wf-nav-item"
+                >
+
+                    <span class="wf-nav-icon">
+                        ≡
+                    </span>
+
+                    <span>
+                        Activity Logs
+                    </span>
+
+                </a>
+
+
+                <a
+                    href="/add-product"
+                    class="wf-nav-item"
+                >
+
+                    <span class="wf-nav-icon">
+                        +
+                    </span>
+
+                    <span>
+                        Add Product
+                    </span>
+
+                </a>
+
+
+            </div>
+
+        </nav>
+
+
+        <!-- USER -->
+
+        <div class="wf-sidebar-bottom">
+
+            <div class="wf-user">
+
+                <div class="wf-avatar">
+                    M
+                </div>
+
+                <div>
+
+                    <div class="wf-user-name">
+                        Mirza Arsalan
+                    </div>
+
+                    <div class="wf-user-role">
+                        Admin
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <button
+                class="wf-logout"
+                onclick="location.href='/logout'"
+            >
+                Logout
+            </button>
+
+        </div>
+
+    </aside>
+
+
+
+    <!-- =========================================================
+         MAIN
+         ========================================================= -->
+
+    <main class="wf-main">
+
+        <div class="wf-content">
+
+
+            <!-- PAGE HEADER -->
+
+            <header class="wf-page-header">
+
+                <div>
+
+                    <div class="wf-eyebrow">
+                        Warehouse Management
+                    </div>
+
+                    <h1 class="wf-page-title">
+                        QR Management
+                    </h1>
+
+                    <p class="wf-page-description">
+                        Generate and manage warehouse location labels.
+                    </p>
+
+                </div>
+
+
+                <button
+                    class="wf-primary-button"
+                    onclick="location.href='/search'"
+                >
+                    Search Location
+                </button>
+
+            </header>
+
+
+
+            <!-- SUMMARY -->
+
+            <div class="wf-summary">
+
+
+                <div class="wf-summary-card">
+
+                    <div class="wf-summary-label">
+                        Locations
+                    </div>
+
+                    <div class="wf-summary-value">
+                        {{ products|length if products else 0 }}
+                    </div>
+
+                </div>
+
+
+                <div class="wf-summary-card">
+
+                    <div class="wf-summary-label">
+                        QR Available
+                    </div>
+
+                    <div class="wf-summary-value green">
+                        {{ products|length if products else 0 }}
+                    </div>
+
+                </div>
+
+
+                <div class="wf-summary-card">
+
+                    <div class="wf-summary-label">
+                        Management
+                    </div>
+
+                    <div class="wf-summary-value">
+                        Active
+                    </div>
+
+                </div>
+
+
+            </div>
+
+
+
+            <!-- TABLE -->
+
+            <section class="wf-table-card">
+
+
+                <div class="wf-table-top">
+
+                    <div>
+
+                        <div class="wf-table-title">
+                            Warehouse Location Labels
                         </div>
 
-                    </td>
-
-                    <td>
-
-                        <div class="product-sku">
-                            {{ product.sku }}
+                        <div class="wf-table-subtitle">
+                            Generate QR codes for registered warehouse locations.
                         </div>
 
-                    </td>
+                    </div>
 
-                    <td>
 
-                        <span class="product-location">
-                            {{ product.rack }}-{{ product.shelf }}-{{ product.bin }}
-                        </span>
+                    <div class="wf-live">
+                        Live Inventory
+                    </div>
 
-                    </td>
+                </div>
 
-                    <td>
 
-                        <span class="quantity-value">
-                            {{ product.quantity }}
-                        </span>
 
-                    </td>
+                {% if products %}
 
-                    <td>
 
-                        {% if product.stock_status == "In Stock" %}
+                <div class="wf-table-wrapper">
 
-                            <span class="stock-badge stock-good">
-                                In Stock
-                            </span>
+                    <table class="wf-table">
 
-                        {% elif product.stock_status == "Low Stock" %}
 
-                            <span class="stock-badge stock-low">
-                                Low Stock
-                            </span>
+                        <thead>
 
-                        {% else %}
+                            <tr>
 
-                            <span class="stock-badge stock-out">
-                                Out of Stock
-                            </span>
+                                <th>
+                                    Product
+                                </th>
 
-                        {% endif %}
+                                <th>
+                                    SKU
+                                </th>
 
-                    </td>
+                                <th>
+                                    Location
+                                </th>
 
-                    <td>
+                                <th>
+                                    Quantity
+                                </th>
 
-                        <form
-                            action="/result"
-                            method="POST"
-                            style="margin: 0;"
-                        >
+                                <th>
+                                    Status
+                                </th>
 
-                            <input
-                                type="hidden"
-                                name="location"
-                                value="{{ product.rack }}-{{ product.shelf }}-{{ product.bin }}"
-                            >
+                                <th>
+                                    QR Label
+                                </th>
 
-                            <button type="submit">
-                                Generate QR
-                            </button>
+                            </tr>
 
-                        </form>
+                        </thead>
 
-                    </td>
 
-                </tr>
+                        <tbody>
 
-            {% endfor %}
 
-            </tbody>
+                        {% for product in products %}
 
-        </table>
 
-    </div>
+                            <tr>
 
-    {% else %}
 
-    <div class="inventory-empty">
+                                <!-- PRODUCT -->
 
-        <h2>No Warehouse Locations</h2>
+                                <td>
 
-        <p>
-            Add products with warehouse locations to generate QR labels.
-        </p>
+                                    <div class="wf-product-name">
+                                        {{ product.product_name }}
+                                    </div>
 
-        <button onclick="location.href='/add-product'">
-            Add Product
-        </button>
+                                </td>
 
-    </div>
 
-    {% endif %}
+                                <!-- SKU -->
 
-    <br>
+                                <td>
 
-    <button onclick="location.href='/dashboard'">
-        Back to Dashboard
-    </button>
+                                    <div class="wf-product-sku">
+                                        {{ product.sku }}
+                                    </div>
+
+                                </td>
+
+
+                                <!-- LOCATION -->
+
+                                <td>
+
+                                    <span class="wf-location">
+                                        {{ product.rack }}-{{ product.shelf }}-{{ product.bin }}
+                                    </span>
+
+                                </td>
+
+
+                                <!-- QUANTITY -->
+
+                                <td>
+
+                                    <span class="wf-quantity">
+                                        {{ product.quantity }}
+                                    </span>
+
+                                </td>
+
+
+                                <!-- STATUS -->
+
+                                <td>
+
+
+                                    {% if product.stock_status == "In Stock" %}
+
+                                        <span class="wf-status good">
+                                            In Stock
+                                        </span>
+
+
+                                    {% elif product.stock_status == "Low Stock" %}
+
+                                        <span class="wf-status low">
+                                            Low Stock
+                                        </span>
+
+
+                                    {% else %}
+
+                                        <span class="wf-status out">
+                                            Out of Stock
+                                        </span>
+
+                                    {% endif %}
+
+
+                                </td>
+
+
+                                <!-- QR -->
+
+                                <td>
+
+                                    <form
+                                        action="/result"
+                                        method="POST"
+                                        style="margin: 0;"
+                                    >
+
+                                        <input
+                                            type="hidden"
+                                            name="location"
+                                            value="{{ product.rack }}-{{ product.shelf }}-{{ product.bin }}"
+                                        >
+
+                                        <button
+                                            type="submit"
+                                            class="wf-qr-button"
+                                        >
+                                            Generate QR
+                                        </button>
+
+                                    </form>
+
+                                </td>
+
+
+                            </tr>
+
+
+                        {% endfor %}
+
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+
+                {% else %}
+
+
+                <!-- EMPTY -->
+
+                <div class="wf-empty">
+
+                    <div class="wf-empty-icon">
+                        +
+                    </div>
+
+                    <h2>
+                        No Warehouse Locations
+                    </h2>
+
+                    <p>
+                        Add products with warehouse locations
+                        to generate QR labels.
+                    </p>
+
+                    <button
+                        class="wf-primary-button"
+                        onclick="location.href='/add-product'"
+                    >
+                        Add Product
+                    </button>
+
+                </div>
+
+
+                {% endif %}
+
+
+            </section>
+
+
+
+            <!-- BOTTOM -->
+
+            <div class="wf-bottom-actions">
+
+                <button
+                    class="wf-secondary-button"
+                    onclick="location.href='/dashboard'"
+                >
+                    Back to Dashboard
+                </button>
+
+            </div>
+
+
+        </div>
+
+    </main>
 
 </div>
 

@@ -8,75 +8,36 @@
     <meta name="viewport"
           content="width=device-width, initial-scale=1.0">
 
-    <title>{% block title %}WareFlow WMS{% endblock %}</title>
+    <title>
+        {% block title %}
+        WareFlow WMS
+        {% endblock %}
+    </title>
 
     <link rel="stylesheet"
           href="{{ url_for('static', filename='css/style.css') }}">
 
-    {% block styles %}{% endblock %}
+    {% block extra_css %}
+    {% endblock %}
 
 </head>
 
 <body>
 
-<div class="wf-layout">
+<div class="wf2-page">
 
     {% include "sidebar.html" %}
 
-    <div class="wf-main">
+    <main class="wf2-main">
 
-        <header class="wf-topbar">
+        {% block content %}
+        {% endblock %}
 
-            <div>
-
-                <h1>
-                    {% block page_title %}
-                    WareFlow
-                    {% endblock %}
-                </h1>
-
-                <p>
-                    {% block page_description %}
-                    Smart Warehouse Operations Platform
-                    {% endblock %}
-                </p>
-
-            </div>
-
-            <div class="wf-user">
-
-                <div>
-
-                    <strong>
-
-                        {{ session.get("employee_name","Employee") }}
-
-                    </strong>
-
-                    <span>
-
-                        {{ session.get("role","Employee") }}
-
-                    </span>
-
-                </div>
-
-            </div>
-
-        </header>
-
-        <section class="wf-content">
-
-            {% block content %}
-            {% endblock %}
-
-        </section>
-
-    </div>
+    </main>
 
 </div>
 
-{% block scripts %}
+{% block extra_js %}
 {% endblock %}
 
 </body>
