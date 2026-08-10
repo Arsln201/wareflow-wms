@@ -1047,6 +1047,219 @@
 
         }
 
+/* ==========================================
+   FINANCIAL & EXPIRY REPORT
+========================================== */
+
+.report-financial-section {
+    width: 100%;
+    margin-top: 24px;
+    margin-bottom: 28px;
+}
+
+
+.report-section-heading {
+    margin-bottom: 16px;
+}
+
+
+.report-eyebrow {
+    margin-bottom: 5px;
+
+    color: #00e5a8;
+
+    font-size: 9px;
+
+    font-weight: 850;
+
+    letter-spacing: 1.5px;
+
+    text-transform: uppercase;
+}
+
+
+.report-section-heading h2 {
+    margin: 0;
+
+    color: #f1f4f6;
+
+    font-size: 20px;
+
+    font-weight: 800;
+}
+
+
+.report-section-heading p {
+    margin: 5px 0 0;
+
+    color: #687580;
+
+    font-size: 10px;
+}
+
+
+/* ==========================================
+   CARD GRID
+========================================== */
+
+.report-financial-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(4, minmax(0, 1fr));
+
+    gap: 14px;
+}
+
+
+/* ==========================================
+   CARD
+========================================== */
+
+.report-financial-card {
+    min-height: 125px;
+
+    padding: 19px;
+
+    background: #141b22;
+
+    border: 1px solid #26333d;
+
+    border-radius: 12px;
+
+    transition:
+        transform .16s ease,
+        border-color .16s ease,
+        background .16s ease;
+}
+
+
+.report-financial-card:hover {
+    transform: translateY(-2px);
+
+    border-color: #34434e;
+
+    background: #161e26;
+}
+
+
+/* ==========================================
+   LABEL
+========================================== */
+
+.report-financial-label {
+    color: #687580;
+
+    font-size: 8px;
+
+    font-weight: 850;
+
+    letter-spacing: 1.1px;
+
+    text-transform: uppercase;
+}
+
+
+/* ==========================================
+   VALUE
+========================================== */
+
+.report-financial-value {
+    margin-top: 13px;
+
+    color: #00e5a8;
+
+    font-family:
+        "SFMono-Regular",
+        Consolas,
+        monospace;
+
+    font-size: 22px;
+
+    font-weight: 850;
+
+    letter-spacing: -.4px;
+}
+
+
+/* ==========================================
+   DESCRIPTION
+========================================== */
+
+.report-financial-description {
+    margin-top: 8px;
+
+    color: #687580;
+
+    font-size: 9px;
+
+    line-height: 1.4;
+}
+
+
+/* ==========================================
+   RISK COLORS
+========================================== */
+
+.report-card-danger {
+    border-color:
+        rgba(255, 107, 107, .18);
+}
+
+
+.report-card-danger
+.report-financial-value {
+    color: #ff6b6b;
+}
+
+
+.report-card-warning {
+    border-color:
+        rgba(244, 201, 93, .18);
+}
+
+
+.report-card-warning
+.report-financial-value {
+    color: #f4c95d;
+}
+
+
+.report-card-risk {
+    border-color:
+        rgba(255, 154, 91, .20);
+}
+
+
+.report-card-risk
+.report-financial-value {
+    color: #ff9a5b;
+}
+
+
+/* ==========================================
+   RESPONSIVE
+========================================== */
+
+@media (max-width: 1000px) {
+
+    .report-financial-grid {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+    }
+
+}
+
+
+@media (max-width: 600px) {
+
+    .report-financial-grid {
+        grid-template-columns: 1fr;
+    }
+
+}
+        
+
     </style>
 
 </head>
@@ -1303,6 +1516,112 @@
 
 
             </section>
+
+            <!-- ==========================================
+     FINANCIAL & EXPIRY OVERVIEW
+========================================== -->
+
+<section class="report-financial-section">
+
+    <div class="report-section-heading">
+
+        <div>
+            <div class="report-eyebrow">
+                INVENTORY FINANCIALS
+            </div>
+
+            <h2>
+                Inventory Value & Expiry Risk
+            </h2>
+
+            <p>
+                Financial value of current stock and products approaching expiry.
+            </p>
+        </div>
+
+    </div>
+
+
+    <div class="report-financial-grid">
+
+        <!-- TOTAL INVENTORY VALUE -->
+
+        <div class="report-financial-card">
+
+            <div class="report-financial-label">
+                TOTAL INVENTORY VALUE
+            </div>
+
+            <div class="report-financial-value">
+                ₹{{ "%.2f"|format(total_inventory_value or 0) }}
+            </div>
+
+            <div class="report-financial-description">
+                Current value of all available inventory
+            </div>
+
+        </div>
+
+
+        <!-- EXPIRED VALUE -->
+
+        <div class="report-financial-card report-card-danger">
+
+            <div class="report-financial-label">
+                EXPIRED STOCK VALUE
+            </div>
+
+            <div class="report-financial-value">
+                ₹{{ "%.2f"|format(expired_value or 0) }}
+            </div>
+
+            <div class="report-financial-description">
+                Value of inventory already expired
+            </div>
+
+        </div>
+
+
+        <!-- EXPIRING SOON -->
+
+        <div class="report-financial-card report-card-warning">
+
+            <div class="report-financial-label">
+                EXPIRING SOON VALUE
+            </div>
+
+            <div class="report-financial-value">
+                ₹{{ "%.2f"|format(expiring_soon_value or 0) }}
+            </div>
+
+            <div class="report-financial-description">
+                Products expiring within 30 days
+            </div>
+
+        </div>
+
+
+        <!-- VALUE AT RISK -->
+
+        <div class="report-financial-card report-card-risk">
+
+            <div class="report-financial-label">
+                TOTAL VALUE AT RISK
+            </div>
+
+            <div class="report-financial-value">
+                ₹{{ "%.2f"|format(value_at_risk or 0) }}
+            </div>
+
+            <div class="report-financial-description">
+                Expired + expiring inventory value
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
 
 
             <!-- =================================================
@@ -1902,8 +2221,8 @@
 
 
             </section>
-
-
+   
+            
             <!-- =================================================
                  BACK TO DASHBOARD
                  ================================================= -->

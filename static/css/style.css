@@ -4232,3 +4232,24 @@ width:92%;
     color: #07120f;
 }
 
+.success-message {
+    margin: 0 0 20px;
+    padding: 14px 18px;
+    border: 1px solid rgba(0, 229, 168, 0.35);
+    border-radius: 10px;
+    background: rgba(0, 229, 168, 0.08);
+    color: #00e5a8;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.error-message {
+    margin: 0 0 20px;
+    padding: 14px 18px;
+    border: 1px solid rgba(255, 80, 80, 0.35);
+    border-radius: 10px;
+    background: rgba(255, 80, 80, 0.08);
+    color: #ff6b6b;
+    font-size: 14px;
+    font-weight: 600;
+}

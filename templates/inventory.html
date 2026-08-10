@@ -740,143 +740,297 @@
            TABLE
            ===================================================== */
 
-        .inventory-table-wrapper {
-            width: 100%;
-
-            overflow-x: auto;
-        }
-
-
-        .inventory-table {
-            width: 100%;
-
-            min-width: 920px;
-
-            border-collapse: collapse;
-        }
+.inventory-table-wrapper {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
 
 
-        .inventory-table th {
-            padding: 13px 18px;
+/* =========================================
+   INVENTORY TABLE
+========================================= */
 
-            text-align: left;
+.inventory-table {
+    width: 100%;
+    min-width: 1200px;
 
-            background: #141b22;
-
-            border-bottom: 1px solid var(--border);
-
-            color: #687580;
-
-            font-size: 9px;
-            font-weight: 850;
-
-            letter-spacing: 1.1px;
-
-            text-transform: uppercase;
-
-            white-space: nowrap;
-        }
+    border-collapse: collapse;
+    table-layout: auto;
+}
 
 
-        .inventory-table td {
-            padding: 16px 18px;
+/* =========================================
+   TABLE HEADER
+========================================= */
 
-            border-bottom: 1px solid #242f38;
+.inventory-table th {
+    padding: 13px 18px;
 
-            color: #b7c0c8;
+    text-align: left;
 
-            font-size: 12px;
+    background: #141b22;
 
-            vertical-align: middle;
-        }
+    border-bottom: 1px solid var(--border);
 
+    color: #687580;
 
-        .inventory-table tbody tr {
-            transition: .16s ease;
-        }
+    font-size: 9px;
+    font-weight: 850;
 
+    letter-spacing: 1.1px;
 
-        .inventory-table tbody tr:hover {
-            background: rgba(255,255,255,.018);
-        }
+    text-transform: uppercase;
 
-
-        .inventory-table tbody tr:last-child td {
-            border-bottom: 0;
-        }
+    white-space: nowrap;
+}
 
 
-        .product-name {
-            color: #f1f4f6;
+/* =========================================
+   TABLE CELLS
+========================================= */
 
-            font-size: 13px;
-            font-weight: 750;
+.inventory-table td {
+    padding: 16px 18px;
 
-            max-width: 230px;
-        }
+    border-bottom: 1px solid #242f38;
 
+    color: #b7c0c8;
 
-        .product-sku {
-            color: #82909b;
+    font-size: 12px;
 
-            font-family:
-                "SFMono-Regular",
-                Consolas,
-                monospace;
+    vertical-align: middle;
 
-            font-size: 10px;
-        }
+    white-space: nowrap;
+}
 
 
-        .product-category {
-            color: #a4afb8;
+/* =========================================
+   ROW HOVER
+========================================= */
 
-            padding: 5px 9px;
+.inventory-table tbody tr {
+    transition: .16s ease;
+}
 
-            border-radius: 6px;
+.inventory-table tbody tr:hover {
+    background: rgba(255,255,255,.018);
+}
 
-            background: #1b242d;
-
-            border: 1px solid #2b3741;
-
-            font-size: 10px;
-        }
-
-
-        .quantity-value {
-            color: #fff;
-
-            font-family:
-                "SFMono-Regular",
-                Consolas,
-                monospace;
-
-            font-size: 13px;
-            font-weight: 800;
-        }
+.inventory-table tbody tr:last-child td {
+    border-bottom: 0;
+}
 
 
-        .product-location {
-            display: inline-block;
+/* =========================================
+   PRODUCT COLUMN
+========================================= */
 
-            padding: 7px 9px;
+/* Header + cell */
 
-            border-radius: 7px;
+.inventory-table th:first-child,
+.inventory-table td:first-child {
+    min-width: 190px;
 
-            background: rgba(0, 229, 168, .055);
+    width: 190px;
 
-            border: 1px solid rgba(0, 229, 168, .15);
+    white-space: nowrap;
+}
 
-            color: var(--green);
 
-            font-family:
-                "SFMono-Regular",
-                Consolas,
-                monospace;
+/* Product name */
 
-            font-size: 10px;
-            font-weight: 750;
-        }
+.product-name {
+    color: #f1f4f6;
+
+    font-size: 13px;
+    font-weight: 750;
+
+    max-width: none;
+
+    min-width: 190px;
+
+    white-space: nowrap;
+}
+
+
+/* =========================================
+   SKU
+========================================= */
+
+.product-sku {
+    color: #82909b;
+
+    font-family:
+        "SFMono-Regular",
+        Consolas,
+        monospace;
+
+    font-size: 10px;
+
+    white-space: nowrap;
+}
+
+
+/* =========================================
+   CATEGORY
+========================================= */
+
+.product-category {
+    display: inline-block;
+
+    color: #a4afb8;
+
+    padding: 5px 9px;
+
+    border-radius: 6px;
+
+    background: #1b242d;
+
+    border: 1px solid #2b3741;
+
+    font-size: 10px;
+
+    white-space: nowrap;
+}
+
+
+/* =========================================
+   QUANTITY
+========================================= */
+
+.quantity-value {
+    color: #fff;
+
+    font-family:
+        "SFMono-Regular",
+        Consolas,
+        monospace;
+
+    font-size: 13px;
+
+    font-weight: 800;
+
+    white-space: nowrap;
+}
+
+
+/* =========================================
+   UNIT COST
+========================================= */
+
+.inventory-table td:nth-child(5) {
+    color: #b7c0c8;
+
+    font-family:
+        "SFMono-Regular",
+        Consolas,
+        monospace;
+
+    font-size: 11px;
+
+    white-space: nowrap;
+}
+
+
+/* =========================================
+   INVENTORY VALUE
+========================================= */
+
+.inventory-table td:nth-child(6) {
+    color: #00e5a8;
+
+    font-family:
+        "SFMono-Regular",
+        Consolas,
+        monospace;
+
+    font-size: 11px;
+
+    font-weight: 750;
+
+    white-space: nowrap;
+}
+
+
+/* =========================================
+   EXPIRY
+========================================= */
+
+.inventory-table td:nth-child(7) {
+    white-space: nowrap;
+
+    color: #aeb8c0;
+
+    font-size: 11px;
+}
+
+
+/* =========================================
+   LOCATION
+========================================= */
+
+.product-location {
+    display: inline-block;
+
+    padding: 7px 9px;
+
+    border-radius: 7px;
+
+    background: rgba(0, 229, 168, .055);
+
+    border: 1px solid rgba(0, 229, 168, .15);
+
+    color: var(--green);
+
+    font-family:
+        "SFMono-Regular",
+        Consolas,
+        monospace;
+
+    font-size: 10px;
+
+    font-weight: 750;
+
+    white-space: nowrap;
+}
+
+
+/* =========================================
+   ACTIONS
+========================================= */
+
+.inventory-table td:last-child {
+    white-space: nowrap;
+}
+
+
+/* =========================================
+   MOBILE
+========================================= */
+
+@media (max-width: 700px) {
+
+    .inventory-table {
+        min-width: 1200px;
+    }
+
+    .inventory-table th {
+        padding: 12px 14px;
+    }
+
+    .inventory-table td {
+        padding: 14px;
+    }
+
+    .inventory-table th:first-child,
+    .inventory-table td:first-child,
+    .product-name {
+        min-width: 180px;
+        width: 180px;
+    }
+
+}
 
 
         /* =====================================================
@@ -1683,6 +1837,10 @@
                                     Quantity
                                 </th>
 
+                                <th>Unit Cost</th>
+                                <th>Inventory Value</th>
+                                <th>Expiry</th>
+
                                 <th>
                                     Location
                                 </th>
@@ -1700,131 +1858,155 @@
                         </thead>
 
 
-                        <tbody>
+           <tbody>
+
+{% for product in products %}
+
+    <tr>
+
+        <!-- PRODUCT -->
+
+        <td>
+            <div class="product-name">
+                {{ product.product_name }}
+            </div>
+        </td>
 
 
-                        {% for product in products %}
+        <!-- SKU -->
+
+        <td>
+            <span class="product-sku">
+                {{ product.sku }}
+            </span>
+        </td>
 
 
-                            <tr>
+        <!-- CATEGORY -->
+
+        <td>
+            <span class="product-category">
+                {{ product.category }}
+            </span>
+        </td>
 
 
-                                <td>
+        <!-- QUANTITY -->
 
-                                    <div class="product-name">
-                                        {{ product.product_name }}
-                                    </div>
-
-                                </td>
-
-
-                                <td>
-
-                                    <span class="product-sku">
-                                        {{ product.sku }}
-                                    </span>
-
-                                </td>
+        <td>
+            <span class="quantity-value">
+                {{ product.quantity }}
+            </span>
+        </td>
 
 
-                                <td>
+        <!-- UNIT COST -->
 
-                                    <span class="product-category">
-                                        {{ product.category }}
-                                    </span>
-
-                                </td>
+        <td>
+            ₹{{ "%.2f"|format(product.unit_cost or 0) }}
+        </td>
 
 
-                                <td>
+        <!-- INVENTORY VALUE -->
 
-                                    <span class="quantity-value">
-                                        {{ product.quantity }}
-                                    </span>
-
-                                </td>
-
-
-                                <td>
-
-                                    <span class="product-location">
-                                        {{ product.rack }}-{{ product.shelf }}-{{ product.bin }}
-                                    </span>
-
-                                </td>
+        <td>
+            ₹{{ "%.2f"|format(
+                (product.quantity or 0)
+                * (product.unit_cost or 0)
+            ) }}
+        </td>
 
 
-                                <td>
+        <!-- EXPIRY -->
+
+        <td>
+
+            {% if product.expiry_date %}
+
+                {{ product.expiry_date.strftime("%d %b %Y") }}
+
+            {% else %}
+
+                -
+
+            {% endif %}
+
+        </td>
 
 
-                                    {% if product.stock_status == "In Stock" %}
+        <!-- LOCATION -->
 
-                                        <span class="stock-badge stock-good">
-                                            ● In Stock
-                                        </span>
-
-                                    {% elif product.stock_status == "Low Stock" %}
-
-                                        <span class="stock-badge stock-low">
-                                            ● Low Stock
-                                        </span>
-
-                                    {% else %}
-
-                                        <span class="stock-badge stock-out">
-                                            ● Out of Stock
-                                        </span>
-
-                                    {% endif %}
+        <td>
+            <span class="product-location">
+                {{ product.rack }}-{{ product.shelf }}-{{ product.bin }}
+            </span>
+        </td>
 
 
-                                </td>
+        <!-- STATUS -->
+
+        <td>
+
+            {% if product.stock_status == "In Stock" %}
+
+                <span class="stock-badge stock-good">
+                    ● In Stock
+                </span>
+
+            {% elif product.stock_status == "Low Stock" %}
+
+                <span class="stock-badge stock-low">
+                    ● Low Stock
+                </span>
+
+            {% else %}
+
+                <span class="stock-badge stock-out">
+                    ● Out of Stock
+                </span>
+
+            {% endif %}
+
+        </td>
 
 
-                                <td>
+        <!-- ACTIONS -->
+
+        <td>
+
+            <div class="inventory-actions">
+
+                <a
+                    href="/edit-product/{{ product.id }}"
+                >
+                    <button type="button">
+                        Edit
+                    </button>
+                </a>
 
 
-                                    <div class="inventory-actions">
+                <form
+                    action="/delete-product/{{ product.id }}"
+                    method="POST"
+                    style="display:inline;"
+                    onsubmit="return confirm('Delete this product?')"
+                >
 
+                    <button type="submit">
+                        Delete
+                    </button>
 
-                                        <a
-                                            href="/edit-product/{{ product.id }}"
-                                        >
+                </form>
 
-                                            <button type="button">
-                                                Edit
-                                            </button>
+            </div>
 
-                                        </a>
+        </td>
 
+    </tr>
 
-                                        <form
-                                            action="/delete-product/{{ product.id }}"
-                                            method="POST"
-                                            style="display:inline;"
-                                            onsubmit="return confirm('Delete this product?')"
-                                        >
+{% endfor %}
 
-                                            <button type="submit">
-                                                Delete
-                                            </button>
-
-                                        </form>
-
-
-                                    </div>
-
-
-                                </td>
-
-
-                            </tr>
-
-
-                        {% endfor %}
-
-
-                        </tbody>
+</tbody>
 
 
                     </table>

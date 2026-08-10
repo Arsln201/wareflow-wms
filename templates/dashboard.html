@@ -1436,6 +1436,338 @@
 
         }
 
+/* ==========================================
+   EXPIRY RISK PANEL
+========================================== */
+
+.wf2-expiry-panel {
+    margin-bottom: 31px;
+
+    padding: 24px;
+
+    background: #141b22;
+
+    border: 1px solid #26333d;
+
+    border-radius: 14px;
+
+    box-shadow:
+        0 12px 30px rgba(0, 0, 0, .12);
+}
+
+
+/* ==========================================
+   HEADING
+========================================== */
+
+.wf2-section-heading {
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    gap: 20px;
+
+    margin-bottom: 20px;
+}
+
+
+.wf2-eyebrow {
+    margin-bottom: 5px;
+
+    color: #00e5a8;
+
+    font-size: 9px;
+
+    font-weight: 850;
+
+    letter-spacing: 1.5px;
+
+    text-transform: uppercase;
+}
+
+
+.wf2-section-heading h2 {
+    margin: 0;
+
+    color: #ffffff;
+
+    font-size: 20px;
+
+    font-weight: 800;
+}
+
+
+.wf2-section-heading p {
+    margin: 5px 0 0;
+
+    color: #687580;
+
+    font-size: 10px;
+}
+
+
+.wf2-expiry-count {
+    padding: 8px 12px;
+
+    border: 1px solid #2b3741;
+
+    border-radius: 8px;
+
+    color: #8d9aa4;
+
+    background: #11181f;
+
+    font-size: 10px;
+
+    font-weight: 750;
+
+    white-space: nowrap;
+}
+
+
+/* ==========================================
+   EXPIRY LIST
+========================================== */
+
+.wf2-expiry-list {
+    display: flex;
+
+    flex-direction: column;
+}
+
+
+.wf2-expiry-item {
+    display: grid;
+
+    grid-template-columns:
+        minmax(190px, 1.7fr)
+        minmax(120px, 1fr)
+        minmax(80px, .7fr)
+        minmax(110px, .9fr)
+        auto;
+
+    align-items: center;
+
+    gap: 20px;
+
+    padding: 17px 0;
+
+    border-top: 1px solid #242f38;
+}
+
+
+.wf2-expiry-item:first-child {
+    border-top: 0;
+}
+
+
+/* ==========================================
+   PRODUCT
+========================================== */
+
+.wf2-expiry-product-name {
+    color: #f1f4f6;
+
+    font-size: 12px;
+
+    font-weight: 750;
+
+    white-space: nowrap;
+}
+
+
+.wf2-expiry-sku {
+    margin-top: 5px;
+
+    color: #687580;
+
+    font-family:
+        "SFMono-Regular",
+        Consolas,
+        monospace;
+
+    font-size: 9px;
+}
+
+
+/* ==========================================
+   LABELS
+========================================== */
+
+.wf2-expiry-label {
+    display: block;
+
+    margin-bottom: 5px;
+
+    color: #687580;
+
+    font-size: 8px;
+
+    font-weight: 750;
+
+    letter-spacing: .8px;
+
+    text-transform: uppercase;
+}
+
+
+.wf2-expiry-date strong,
+.wf2-expiry-quantity strong,
+.wf2-expiry-value strong {
+    color: #dce2e6;
+
+    font-size: 11px;
+
+    font-weight: 700;
+}
+
+
+.wf2-expiry-value strong {
+    color: #00e5a8;
+
+    font-family:
+        "SFMono-Regular",
+        Consolas,
+        monospace;
+}
+
+
+/* ==========================================
+   STATUS BADGES
+========================================== */
+
+.wf2-expiry-badge {
+    display: inline-flex;
+
+    align-items: center;
+
+    padding: 7px 10px;
+
+    border-radius: 7px;
+
+    font-size: 9px;
+
+    font-weight: 750;
+
+    white-space: nowrap;
+}
+
+
+.wf2-expiring {
+    color: #f4c95d;
+
+    background: rgba(244, 201, 93, .08);
+
+    border: 1px solid rgba(244, 201, 93, .18);
+}
+
+
+.wf2-expired {
+    color: #ff6b6b;
+
+    background: rgba(255, 107, 107, .08);
+
+    border: 1px solid rgba(255, 107, 107, .18);
+}
+
+
+/* ==========================================
+   EMPTY STATE
+========================================== */
+
+.wf2-expiry-empty {
+    display: flex;
+
+    align-items: center;
+
+    gap: 14px;
+
+    padding: 18px;
+
+    border: 1px solid rgba(0, 229, 168, .12);
+
+    border-radius: 9px;
+
+    background: rgba(0, 229, 168, .035);
+}
+
+
+.wf2-expiry-empty-icon {
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    width: 32px;
+    height: 32px;
+
+    border-radius: 50%;
+
+    color: #00e5a8;
+
+    background: rgba(0, 229, 168, .08);
+
+    font-weight: 850;
+}
+
+
+.wf2-expiry-empty strong {
+    display: block;
+
+    color: #dce2e6;
+
+    font-size: 11px;
+}
+
+
+.wf2-expiry-empty span {
+    display: block;
+
+    margin-top: 3px;
+
+    color: #687580;
+
+    font-size: 9px;
+}
+
+
+/* ==========================================
+   RESPONSIVE
+========================================== */
+
+@media (max-width: 900px) {
+
+    .wf2-expiry-item {
+        grid-template-columns:
+            1fr 1fr;
+
+        gap: 14px;
+    }
+
+}
+
+
+@media (max-width: 600px) {
+
+    .wf2-expiry-panel {
+        padding: 18px;
+    }
+
+    .wf2-section-heading {
+        align-items: flex-start;
+
+        flex-direction: column;
+    }
+
+    .wf2-expiry-item {
+        grid-template-columns: 1fr;
+    }
+
+}
+
     </style>
 
 </head>
@@ -1925,7 +2257,244 @@
                 </div>
 
 
+<!-- ==========================================
+     TOTAL INVENTORY VALUE
+========================================== -->
+
+<div class="wf2-kpi">
+
+    <div class="wf2-kpi-label">
+        Inventory Value
+    </div>
+
+    <div class="wf2-kpi-value">
+        ₹{{ "%.2f"|format(total_inventory_value) }}
+    </div>
+
+    <div class="wf2-kpi-note">
+        Current stock value
+    </div>
+
+</div>
+
+
+<!-- ==========================================
+     EXPIRING SOON
+========================================== -->
+
+<div class="wf2-kpi">
+
+    <div class="wf2-kpi-label">
+        Expiring Soon
+    </div>
+
+    <div class="wf2-kpi-value">
+        {{ expiring_soon }}
+    </div>
+
+    <div class="wf2-kpi-note">
+        Within next 30 days
+    </div>
+
+</div>
+
+
+<!-- ==========================================
+     EXPIRED PRODUCTS
+========================================== -->
+
+<div class="wf2-kpi">
+
+    <div class="wf2-kpi-label">
+        Expired Products
+    </div>
+
+    <div class="wf2-kpi-value">
+        {{ expired_products }}
+    </div>
+
+    <div class="wf2-kpi-note">
+        Past expiry date
+    </div>
+
+</div>
+
+
+<!-- ==========================================
+     VALUE AT RISK
+========================================== -->
+
+<div class="wf2-kpi">
+
+    <div class="wf2-kpi-label">
+        Value At Risk
+    </div>
+
+    <div class="wf2-kpi-value">
+        ₹{{ "%.2f"|format(inventory_value_at_risk) }}
+    </div>
+
+    <div class="wf2-kpi-note">
+        Expired + expiring stock
+    </div>
+
+</div>
+
             </section>
+
+
+            <!-- ==========================================
+     EXPIRY RISK PANEL
+========================================== -->
+
+<section class="wf2-expiry-panel">
+
+    <div class="wf2-section-heading">
+
+        <div>
+            <div class="wf2-eyebrow">
+                INVENTORY RISK
+            </div>
+
+            <h2>
+                Expiry Risk
+            </h2>
+
+            <p>
+                Products that are expired or approaching expiry.
+            </p>
+        </div>
+
+        <div class="wf2-expiry-count">
+            {{ expiry_risk_products|length }}
+            Items
+        </div>
+
+    </div>
+
+
+    {% if expiry_risk_products %}
+
+        <div class="wf2-expiry-list">
+
+            {% for product in expiry_risk_products %}
+
+                {% set is_expired = product.expiry_date < today %}
+
+                <div class="wf2-expiry-item">
+
+                    <!-- PRODUCT -->
+
+                    <div class="wf2-expiry-product">
+
+                        <div class="wf2-expiry-product-name">
+                            {{ product.product_name }}
+                        </div>
+
+                        <div class="wf2-expiry-sku">
+                            {{ product.sku }}
+                        </div>
+
+                    </div>
+
+
+                    <!-- EXPIRY -->
+
+                    <div class="wf2-expiry-date">
+
+                        <span class="wf2-expiry-label">
+                            Expiry
+                        </span>
+
+                        <strong>
+                            {{ product.expiry_date.strftime("%d %b %Y") }}
+                        </strong>
+
+                    </div>
+
+
+                    <!-- QUANTITY -->
+
+                    <div class="wf2-expiry-quantity">
+
+                        <span class="wf2-expiry-label">
+                            Stock
+                        </span>
+
+                        <strong>
+                            {{ product.quantity }}
+                        </strong>
+
+                    </div>
+
+
+                    <!-- VALUE -->
+
+                    <div class="wf2-expiry-value">
+
+                        <span class="wf2-expiry-label">
+                            Value
+                        </span>
+
+                        <strong>
+                            ₹{{ "%.2f"|format(
+                                (product.quantity or 0)
+                                * (product.unit_cost or 0)
+                            ) }}
+                        </strong>
+
+                    </div>
+
+
+                    <!-- STATUS -->
+
+                    <div>
+
+                        {% if is_expired %}
+
+                            <span class="wf2-expiry-badge wf2-expired">
+                                🚨 Expired
+                            </span>
+
+                        {% else %}
+
+                            <span class="wf2-expiry-badge wf2-expiring">
+                                ⚠ Expiring Soon
+                            </span>
+
+                        {% endif %}
+
+                    </div>
+
+                </div>
+
+            {% endfor %}
+
+        </div>
+
+    {% else %}
+
+        <div class="wf2-expiry-empty">
+
+            <div class="wf2-expiry-empty-icon">
+                ✓
+            </div>
+
+            <div>
+                <strong>
+                    No expiry risks
+                </strong>
+
+                <span>
+                    No products are expired or expiring within 30 days.
+                </span>
+            </div>
+
+        </div>
+
+    {% endif %}
+
+</section>
 
 
 

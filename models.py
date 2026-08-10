@@ -75,6 +75,17 @@ class Product(db.Model):
         nullable=False,
         default=0
     )
+    
+    unit_cost = db.Column(
+    db.Float,
+    nullable=False,
+    default=0.0
+    )
+
+    expiry_date = db.Column(
+    db.Date,
+    nullable=True
+    )
 
     supplier = db.Column(
         db.String(100),

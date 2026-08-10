@@ -27,6 +27,29 @@
 
     <p>Remove outgoing stock from the warehouse.</p>
 
+{% with messages = get_flashed_messages(with_categories=true) %}
+
+    {% if messages %}
+
+        {% for category, message in messages %}
+
+            <div class="{{ category }}-message">
+                {{ message }}
+            </div>
+
+        {% endfor %}
+
+    {% endif %}
+
+{% endwith %}
+
+
+{% if error %}
+    <div class="error-message">
+        {{ error }}
+    </div>
+{% endif %}
+
     {% if error %}
 
         <div class="form-error">

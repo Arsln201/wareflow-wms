@@ -3,7 +3,7 @@ from werkzeug.security import check_password_hash, generate_password_hash
 import qrcode
 import os
 
-from flask import Flask, render_template, request, redirect, session
+from flask import Flask, render_template, request, redirect, session, flash
 
 from models import (
     db,
@@ -14,7 +14,7 @@ from models import (
 )
 
 from config import Config
-from datetime import datetime
+from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
 from models import ActivityLog
 import csv
@@ -192,6 +192,100 @@ def log_activity(action, details):
 
     db.session.commit()
 
+def create_stock_alert(product, previous_quantity, current_quantity):
+    """
+    Create the appropriate warehouse alert when a stock
+    operation changes the product's stock status.
+    """
+
+    # ------------------------------------------
+    # Determine previous status
+    # ------------------------------------------
+
+    if previous_quantity <= 0:
+        previous_status = "Out of Stock"
+
+    elif previous_quantity <= 10:
+        previous_status = "Low Stock"
+
+    else:
+        previous_status = "In Stock"
+
+
+    # ------------------------------------------
+    # Determine current status
+    # ------------------------------------------
+
+    if current_quantity <= 0:
+        current_status = "Out of Stock"
+
+    elif current_quantity <= 10:
+        current_status = "Low Stock"
+
+    else:
+        current_status = "In Stock"
+
+
+    # ------------------------------------------
+    # OUT OF STOCK
+    # ------------------------------------------
+
+    if current_status == "Out of Stock":
+
+        alert = WarehouseAlert(
+            alert_type="OUT_OF_STOCK",
+            product_id=product.id,
+            title="Out of Stock",
+            message=(
+                f"{product.product_name} is now out of stock."
+            )
+        )
+
+        db.session.add(alert)
+
+
+    # ------------------------------------------
+    # LOW STOCK
+    # ------------------------------------------
+
+    elif current_status == "Low Stock":
+
+        alert = WarehouseAlert(
+            alert_type="LOW_STOCK",
+            product_id=product.id,
+            title="Low Stock",
+            message=(
+                f"{product.product_name} has only "
+                f"{current_quantity} units remaining."
+            )
+        )
+
+        db.session.add(alert)
+
+
+    # ------------------------------------------
+    # STOCK RECOVERED
+    # ------------------------------------------
+
+    elif (
+        previous_status != "In Stock"
+        and current_status == "In Stock"
+    ):
+
+        alert = WarehouseAlert(
+            alert_type="STOCK_RECOVERED",
+            product_id=product.id,
+            title="Stock Recovered",
+            message=(
+                f"{product.product_name} stock has recovered "
+                f"to {current_quantity} units."
+            )
+        )
+
+        db.session.add(alert)
+
+
+
 # ==========================
 # LOGIN
 # ==========================
@@ -359,6 +453,103 @@ def dashboard():
 
 
     # ==========================================
+    # INVENTORY VALUE
+    # ==========================================
+
+    total_inventory_value = db.session.query(
+        db.func.coalesce(
+            db.func.sum(
+                Product.quantity * Product.unit_cost
+            ),
+            0
+        )
+    ).scalar() or 0
+
+
+    # ==========================================
+    # EXPIRY ANALYTICS
+    # ==========================================
+
+    today = datetime.utcnow().date()
+
+    expiry_limit = today + timedelta(days=30)
+
+
+    # EXPIRED PRODUCTS
+
+    expired_products = Product.query.filter(
+        Product.expiry_date.isnot(None),
+        Product.expiry_date < today
+    ).count()
+
+
+    # EXPIRING WITHIN 30 DAYS
+
+    expiring_soon = Product.query.filter(
+        Product.expiry_date.isnot(None),
+        Product.expiry_date >= today,
+        Product.expiry_date <= expiry_limit
+    ).count()
+
+
+    # ==========================================
+    # EXPIRY RISK PRODUCTS
+    # ==========================================
+
+    expiry_risk_products = Product.query.filter(
+    Product.expiry_date.isnot(None),
+    Product.expiry_date <= expiry_limit
+    ).order_by(
+    Product.expiry_date.asc()
+    ).limit(8).all()
+
+
+    # ==========================================
+    # VALUE OF EXPIRED STOCK
+    # ==========================================
+
+    expired_inventory_value = db.session.query(
+        db.func.coalesce(
+            db.func.sum(
+                Product.quantity * Product.unit_cost
+            ),
+            0
+        )
+    ).filter(
+        Product.expiry_date.isnot(None),
+        Product.expiry_date < today
+    ).scalar() or 0
+
+
+    # ==========================================
+    # VALUE OF STOCK EXPIRING SOON
+    # ==========================================
+
+    expiring_soon_value = db.session.query(
+        db.func.coalesce(
+            db.func.sum(
+                Product.quantity * Product.unit_cost
+            ),
+            0
+        )
+    ).filter(
+        Product.expiry_date.isnot(None),
+        Product.expiry_date >= today,
+        Product.expiry_date <= expiry_limit
+    ).scalar() or 0
+
+
+    # ==========================================
+    # TOTAL STOCK VALUE AT RISK
+    # ==========================================
+
+    inventory_value_at_risk = (
+        expired_inventory_value
+        + expiring_soon_value
+    )
+
+
+    # ==========================================
     # RECENT PRODUCTS
     # ==========================================
 
@@ -498,8 +689,24 @@ def dashboard():
 
         total_employees=total_employees,
 
-        recent_products=recent_products,
+        # INVENTORY VALUE
+        total_inventory_value=total_inventory_value,
 
+        # EXPIRY
+        expired_products=expired_products,
+
+        expiring_soon=expiring_soon,
+
+        expired_inventory_value=expired_inventory_value,
+        expiring_soon_value=expiring_soon_value,
+        inventory_value_at_risk=inventory_value_at_risk,
+
+        expiry_risk_products=expiry_risk_products,
+
+        today=today,
+
+        recent_products=recent_products,
+        
         recent_movements=recent_movements,
 
         receive_units=receive_units,
@@ -637,60 +844,199 @@ def add_product():
 
     if request.method == "POST":
 
-        product_name = request.form.get("product_name", "").strip()
-        sku = request.form.get("sku", "").strip().upper()
-        category = request.form.get("category", "").strip()
-        supplier = request.form.get("supplier", "").strip()
-        rack = request.form.get("rack", "").strip().upper()
-        shelf = request.form.get("shelf", "").strip()
-        bin_value = request.form.get("bin", "").strip().upper()
+        product_name = request.form.get(
+            "product_name",
+            ""
+        ).strip()
+
+        sku = request.form.get(
+            "sku",
+            ""
+        ).strip().upper()
+
+        category = request.form.get(
+            "category",
+            ""
+        ).strip()
+
+        supplier = request.form.get(
+            "supplier",
+            ""
+        ).strip()
+
+        rack = request.form.get(
+            "rack",
+            ""
+        ).strip().upper()
+
+        shelf = request.form.get(
+            "shelf",
+            ""
+        ).strip()
+
+        bin_value = request.form.get(
+            "bin",
+            ""
+        ).strip().upper()
+
+        # ==========================================
+        # QUANTITY
+        # ==========================================
 
         try:
-            quantity = int(request.form.get("quantity", 0))
-        except ValueError:
+
+            quantity = int(
+                request.form.get(
+                    "quantity",
+                    0
+                )
+            )
+
+        except (TypeError, ValueError):
+
             return render_template(
                 "add_product.html",
                 error="Quantity must be a valid number."
             )
 
         if quantity < 0:
+
             return render_template(
                 "add_product.html",
                 error="Quantity cannot be negative."
             )
+
+        # ==========================================
+        # UNIT COST
+        # ==========================================
+
+        try:
+
+            unit_cost = float(
+                request.form.get(
+                    "unit_cost",
+                    0
+                )
+            )
+
+        except (TypeError, ValueError):
+
+            return render_template(
+                "add_product.html",
+                error="Unit cost must be a valid number."
+            )
+
+        if unit_cost < 0:
+
+            return render_template(
+                "add_product.html",
+                error="Unit cost cannot be negative."
+            )
+
+        # ==========================================
+        # EXPIRY DATE
+        # ==========================================
+
+        expiry_date_raw = request.form.get(
+            "expiry_date",
+            ""
+        ).strip()
+
+        expiry_date = None
+
+        if expiry_date_raw:
+
+            try:
+
+                expiry_date = datetime.strptime(
+                    expiry_date_raw,
+                    "%Y-%m-%d"
+                ).date()
+
+            except ValueError:
+
+                return render_template(
+                    "add_product.html",
+                    error="Please enter a valid expiry date."
+                )
+
+        # ==========================================
+        # SKU CHECK
+        # ==========================================
 
         existing_product = Product.query.filter_by(
             sku=sku
         ).first()
 
         if existing_product:
+
             return render_template(
                 "add_product.html",
                 error="SKU already exists."
             )
 
+        # ==========================================
+        # CREATE PRODUCT
+        # ==========================================
+
         product = Product(
+
             product_name=product_name,
+
             sku=sku,
+
             category=category or "General",
+
             quantity=quantity,
+
+            unit_cost=unit_cost,
+
+            expiry_date=expiry_date,
+
             supplier=supplier or "Unknown",
+
             rack=rack,
+
             shelf=shelf,
+
             bin=bin_value
         )
 
+        # ==========================================
+        # SAVE
+        # ==========================================
+
         db.session.add(product)
+
         db.session.commit()
+
+        # ==========================================
+        # ACTIVITY LOG
+        # ==========================================
 
         log_activity(
             "ADD PRODUCT",
-            f"Added product: {product.product_name} (SKU: {product.sku})"
+            (
+                f"Added product: "
+                f"{product.product_name} "
+                f"(SKU: {product.sku}) "
+                f"(Cost: ₹{product.unit_cost:.2f})"
+            )
         )
+
+        # ==========================================
+        # SUCCESS
+        # ==========================================
 
         return redirect("/inventory")
 
-    return render_template("add_product.html")
+    # ==========================================
+    # GET
+    # ==========================================
+
+    return render_template(
+        "add_product.html"
+    )
 
 
 # ==========================
@@ -1046,35 +1392,78 @@ def receive_stock():
     if request.method == "POST":
 
         product_id = request.form.get("product_id")
-        quantity = request.form.get("quantity")
+        quantity_raw = request.form.get("quantity")
         reason = request.form.get("reason", "").strip()
 
+        # ==========================================
+        # VALIDATE PRODUCT ID
+        # ==========================================
+
         try:
-            quantity = int(quantity)
+            product_id = int(product_id)
+
         except (TypeError, ValueError):
+
             return render_template(
                 "receive_stock.html",
                 products=products,
-                error="Quantity must be a valid number."
+                error="Please select a valid product."
+            )
+
+        # ==========================================
+        # VALIDATE QUANTITY
+        # ==========================================
+
+        try:
+            quantity = int(quantity_raw)
+
+        except (TypeError, ValueError):
+
+            return render_template(
+                "receive_stock.html",
+                products=products,
+                error="Quantity must be a valid whole number."
             )
 
         if quantity <= 0:
+
             return render_template(
                 "receive_stock.html",
                 products=products,
                 error="Quantity must be greater than zero."
             )
 
+        # ==========================================
+        # FIND PRODUCT
+        # ==========================================
+
         product = Product.query.get(product_id)
 
         if not product:
+
             return render_template(
                 "receive_stock.html",
                 products=products,
                 error="Product not found."
             )
 
-        product.quantity += quantity
+        # ==========================================
+        # REMEMBER PREVIOUS STOCK
+        # ==========================================
+
+        previous_quantity = product.quantity or 0
+
+        # ==========================================
+        # UPDATE STOCK
+        # ==========================================
+
+        product.quantity = (
+            previous_quantity + quantity
+        )
+
+        # ==========================================
+        # CREATE MOVEMENT RECORD
+        # ==========================================
 
         movement = StockMovement(
             product_id=product.id,
@@ -1091,9 +1480,58 @@ def receive_stock():
         )
 
         db.session.add(movement)
-        db.session.commit()
 
-        return redirect("/stock-operations")
+        # ==========================================
+        # AUTOMATIC STOCK ALERT
+        # ==========================================
+
+        create_stock_alert(
+            product,
+            previous_quantity,
+            product.quantity
+        )
+
+        # ==========================================
+        # SAVE EVERYTHING
+        # ==========================================
+
+        try:
+
+            db.session.commit()
+
+        except Exception:
+
+            db.session.rollback()
+
+            return render_template(
+                "receive_stock.html",
+                products=products,
+                error=(
+                    "Unable to receive stock right now. "
+                    "No inventory changes were saved."
+                )
+            )
+
+        # ==========================================
+        # SUCCESS MESSAGE
+        # ==========================================
+
+        flash(
+            f"Successfully received {quantity} units of "
+            f"{product.product_name}. "
+            f"New stock: {product.quantity} units.",
+            "success"
+        )
+
+        # ==========================================
+        # POST → REDIRECT → GET
+        # ==========================================
+
+        return redirect("/receive-stock")
+
+    # ==========================================
+    # GET REQUEST
+    # ==========================================
 
     return render_template(
         "receive_stock.html",
@@ -1123,12 +1561,18 @@ def issue_stock():
     if request.method == "POST":
 
         product_id = request.form.get("product_id")
-        quantity = request.form.get("quantity")
+        quantity_raw = request.form.get("quantity")
         reason = request.form.get("reason", "").strip()
 
+        # ==========================================
+        # VALIDATE QUANTITY
+        # ==========================================
+
         try:
-            quantity = int(quantity)
+            quantity = int(quantity_raw)
+
         except (TypeError, ValueError):
+
             return render_template(
                 "issue_stock.html",
                 products=products,
@@ -1136,29 +1580,62 @@ def issue_stock():
             )
 
         if quantity <= 0:
+
             return render_template(
                 "issue_stock.html",
                 products=products,
                 error="Quantity must be greater than zero."
             )
 
+        # ==========================================
+        # FIND PRODUCT
+        # ==========================================
+
         product = Product.query.get(product_id)
 
         if not product:
+
             return render_template(
                 "issue_stock.html",
                 products=products,
                 error="Product not found."
             )
 
-        if quantity > product.quantity:
+        # ==========================================
+        # CHECK CURRENT STOCK
+        # ==========================================
+
+        previous_quantity = product.quantity or 0
+
+        if quantity > previous_quantity:
+
             return render_template(
                 "issue_stock.html",
                 products=products,
                 error="Insufficient stock available."
             )
 
-        product.quantity -= quantity
+        # ==========================================
+        # UPDATE STOCK
+        # ==========================================
+
+        product.quantity = (
+            previous_quantity - quantity
+        )
+
+        # ==========================================
+        # AUTOMATIC STOCK ALERT
+        # ==========================================
+
+        create_stock_alert(
+            product,
+            previous_quantity,
+            product.quantity
+        )
+
+        # ==========================================
+        # CREATE MOVEMENT RECORD
+        # ==========================================
 
         movement = StockMovement(
             product_id=product.id,
@@ -1175,9 +1652,48 @@ def issue_stock():
         )
 
         db.session.add(movement)
-        db.session.commit()
 
-        return redirect("/stock-operations")
+        # ==========================================
+        # SAVE EVERYTHING
+        # ==========================================
+
+        try:
+
+            db.session.commit()
+
+        except Exception:
+
+            db.session.rollback()
+
+            return render_template(
+                "issue_stock.html",
+                products=products,
+                error=(
+                    "Unable to issue stock right now. "
+                    "No inventory changes were saved."
+                )
+            )
+
+        # ==========================================
+        # SUCCESS MESSAGE
+        # ==========================================
+
+        flash(
+            f"Successfully issued {quantity} units of "
+            f"{product.product_name}. "
+            f"Remaining stock: {product.quantity} units.",
+            "success"
+        )
+
+        # ==========================================
+        # POST → REDIRECT → GET
+        # ==========================================
+
+        return redirect("/issue-stock")
+
+    # ==========================================
+    # GET REQUEST
+    # ==========================================
 
     return render_template(
         "issue_stock.html",
@@ -1207,7 +1723,7 @@ def move_stock():
     if request.method == "POST":
 
         product_id = request.form.get("product_id")
-        quantity = request.form.get("quantity")
+        quantity_raw = request.form.get("quantity")
 
         to_rack = request.form.get(
             "to_rack",
@@ -1229,9 +1745,15 @@ def move_stock():
             ""
         ).strip()
 
+        # ==========================================
+        # VALIDATE QUANTITY
+        # ==========================================
+
         try:
-            quantity = int(quantity)
+            quantity = int(quantity_raw)
+
         except (TypeError, ValueError):
+
             return render_template(
                 "move_stock.html",
                 products=products,
@@ -1239,34 +1761,56 @@ def move_stock():
             )
 
         if quantity <= 0:
+
             return render_template(
                 "move_stock.html",
                 products=products,
                 error="Quantity must be greater than zero."
             )
 
+        # ==========================================
+        # VALIDATE DESTINATION
+        # ==========================================
+
         if not to_rack or not to_shelf or not to_bin:
+
             return render_template(
                 "move_stock.html",
                 products=products,
                 error="Destination location is required."
             )
 
+        # ==========================================
+        # FIND PRODUCT
+        # ==========================================
+
         product = Product.query.get(product_id)
 
         if not product:
+
             return render_template(
                 "move_stock.html",
                 products=products,
                 error="Product not found."
             )
 
-        if quantity > product.quantity:
+        # ==========================================
+        # CHECK STOCK
+        # ==========================================
+
+        current_quantity = product.quantity or 0
+
+        if quantity > current_quantity:
+
             return render_template(
                 "move_stock.html",
                 products=products,
                 error="Insufficient stock available."
             )
+
+        # ==========================================
+        # PREVIOUS LOCATION
+        # ==========================================
 
         from_location = (
             f"{product.rack}-"
@@ -1274,11 +1818,34 @@ def move_stock():
             f"{product.bin}"
         )
 
+        # ==========================================
+        # DESTINATION LOCATION
+        # ==========================================
+
         to_location = (
             f"{to_rack}-"
             f"{to_shelf}-"
             f"{to_bin}"
         )
+
+        # ==========================================
+        # PREVENT SAME LOCATION
+        # ==========================================
+
+        if from_location == to_location:
+
+            return render_template(
+                "move_stock.html",
+                products=products,
+                error=(
+                    "Destination location must be "
+                    "different from the current location."
+                )
+            )
+
+        # ==========================================
+        # CREATE MOVEMENT RECORD
+        # ==========================================
 
         movement = StockMovement(
             product_id=product.id,
@@ -1292,85 +1859,147 @@ def move_stock():
 
         db.session.add(movement)
 
+        # ==========================================
+        # UPDATE PRODUCT LOCATION
+        # ==========================================
+
         product.rack = to_rack
         product.shelf = to_shelf
         product.bin = to_bin
 
-        db.session.commit()
+        # ==========================================
+        # SAVE EVERYTHING
+        # ==========================================
 
-        return redirect("/stock-operations")
+        try:
+
+            db.session.commit()
+
+        except Exception:
+
+            db.session.rollback()
+
+            return render_template(
+                "move_stock.html",
+                products=products,
+                error=(
+                    "Unable to move stock right now. "
+                    "No inventory changes were saved."
+                )
+            )
+
+        # ==========================================
+        # SUCCESS MESSAGE
+        # ==========================================
+
+        flash(
+            f"Successfully moved {quantity} units of "
+            f"{product.product_name} from "
+            f"{from_location} to {to_location}.",
+            "success"
+        )
+
+        # ==========================================
+        # POST → REDIRECT → GET
+        # ==========================================
+
+        return redirect("/move-stock")
+
+    # ==========================================
+    # GET REQUEST
+    # ==========================================
 
     return render_template(
         "move_stock.html",
         products=products
     )
-    
-# ==========================
-# REPORTS
-# ==========================
-
-def parse_report_date(value, end_of_day=False):
-    if not value:
-        return None
-
-    try:
-        parsed = datetime.strptime(value, "%Y-%m-%d")
-    except ValueError:
-        return None
-
-    if end_of_day:
-        parsed = parsed.replace(
-            hour=23,
-            minute=59,
-            second=59,
-            microsecond=999999
-        )
-
-    ist_time = parsed.replace(
-        tzinfo=ZoneInfo("Asia/Kolkata")
-    )
-
-    utc_time = ist_time.astimezone(
-        ZoneInfo("UTC")
-    )
-
-    return utc_time.replace(tzinfo=None)
-
 
 def get_report_query():
 
-    date_from = request.args.get("date_from", "").strip()
-    date_to = request.args.get("date_to", "").strip()
-    movement_type = request.args.get("movement_type", "").strip().upper()
-    employee_id = request.args.get("employee_id", "").strip()
-    product_id = request.args.get("product_id", "").strip()
+    date_from = request.args.get(
+        "date_from",
+        ""
+    ).strip()
+
+    date_to = request.args.get(
+        "date_to",
+        ""
+    ).strip()
+
+    movement_type = request.args.get(
+        "movement_type",
+        ""
+    ).strip().upper()
+
+    employee_id = request.args.get(
+        "employee_id",
+        ""
+    ).strip()
+
+    product_id = request.args.get(
+        "product_id",
+        ""
+    ).strip()
 
     query = StockMovement.query
 
-    start_date = parse_report_date(date_from)
-    end_date = parse_report_date(date_to, end_of_day=True)
+    # DATE FILTERS
+    if date_from:
+        try:
+            start_date = datetime.strptime(
+                date_from,
+                "%Y-%m-%d"
+            )
 
-    if start_date:
-        query = query.filter(
-            StockMovement.created_at >= start_date
-        )
+            query = query.filter(
+                StockMovement.created_at >= start_date
+            )
 
-    if end_date:
-        query = query.filter(
-            StockMovement.created_at <= end_date
-        )
+        except ValueError:
+            pass
 
-    if movement_type in {"RECEIVE", "ISSUE", "MOVE"}:
+    if date_to:
+        try:
+            end_date = datetime.strptime(
+                date_to,
+                "%Y-%m-%d"
+            )
+
+            end_date = end_date.replace(
+                hour=23,
+                minute=59,
+                second=59,
+                microsecond=999999
+            )
+
+            query = query.filter(
+                StockMovement.created_at <= end_date
+            )
+
+        except ValueError:
+            pass
+
+    # MOVEMENT TYPE
+    if movement_type in {
+        "RECEIVE",
+        "ISSUE",
+        "MOVE"
+    }:
+
         query = query.filter(
             StockMovement.movement_type == movement_type
         )
 
+    # EMPLOYEE
     if employee_id:
+
         query = query.filter(
             StockMovement.employee_id == employee_id
         )
 
+    # PRODUCT
     if product_id:
+
         query = query.filter(
             StockMovement.product_id == product_id
         )
@@ -1398,8 +2027,16 @@ def reports():
     # Filters
     # -----------------------------------------
 
-    date_from = request.args.get("date_from", "").strip()
-    date_to = request.args.get("date_to", "").strip()
+    date_from = request.args.get(
+        "date_from",
+        ""
+    ).strip()
+
+    date_to = request.args.get(
+        "date_to",
+        ""
+    ).strip()
+
     movement_type = request.args.get(
         "movement_type",
         ""
@@ -1415,29 +2052,33 @@ def reports():
         ""
     ).strip()
 
+
     # -----------------------------------------
     # Base movement query
     # -----------------------------------------
 
     query = StockMovement.query
 
+
     # -----------------------------------------
     # Movement type filter
     # -----------------------------------------
 
-    if movement_type in [
+    if movement_type in {
         "RECEIVE",
         "ISSUE",
         "MOVE"
-    ]:
+    }:
 
         query = query.filter(
-            StockMovement.movement_type == movement_type
+            StockMovement.movement_type
+            == movement_type
         )
 
     else:
 
         movement_type = ""
+
 
     # -----------------------------------------
     # Employee filter
@@ -1458,6 +2099,7 @@ def reports():
 
             employee_id = ""
 
+
     # -----------------------------------------
     # Product filter
     # -----------------------------------------
@@ -1477,6 +2119,7 @@ def reports():
 
             product_id = ""
 
+
     # -----------------------------------------
     # Date filters
     # -----------------------------------------
@@ -1491,12 +2134,14 @@ def reports():
             )
 
             query = query.filter(
-                StockMovement.created_at >= start_date
+                StockMovement.created_at
+                >= start_date
             )
 
         except ValueError:
 
             date_from = ""
+
 
     if date_to:
 
@@ -1507,20 +2152,24 @@ def reports():
                 "%Y-%m-%d"
             )
 
-            # Include the entire selected end date
+            # Include entire selected day
+
             end_date = end_date.replace(
                 hour=23,
                 minute=59,
-                second=59
+                second=59,
+                microsecond=999999
             )
 
             query = query.filter(
-                StockMovement.created_at <= end_date
+                StockMovement.created_at
+                <= end_date
             )
 
         except ValueError:
 
             date_to = ""
+
 
     # -----------------------------------------
     # Get movements
@@ -1529,6 +2178,7 @@ def reports():
     movements = query.order_by(
         StockMovement.created_at.desc()
     ).limit(200).all()
+
 
     # -----------------------------------------
     # Employees and products
@@ -1541,6 +2191,7 @@ def reports():
     products = Product.query.order_by(
         Product.product_name.asc()
     ).all()
+
 
     # -----------------------------------------
     # Movement statistics
@@ -1564,27 +2215,127 @@ def reports():
         if m.movement_type == "MOVE"
     )
 
+
     # -----------------------------------------
     # Inventory statistics
     # -----------------------------------------
 
     inventory_total = Product.query.count()
 
+
     total_units = db.session.query(
         db.func.coalesce(
             db.func.sum(Product.quantity),
             0
         )
-    ).scalar()
+    ).scalar() or 0
+
 
     low_stock_total = Product.query.filter(
         Product.quantity > 0,
         Product.quantity <= 10
     ).count()
 
+
     out_of_stock_total = Product.query.filter(
         Product.quantity <= 0
     ).count()
+
+
+    # -----------------------------------------
+    # TOTAL INVENTORY VALUE
+    # -----------------------------------------
+
+    total_inventory_value = db.session.query(
+        db.func.coalesce(
+            db.func.sum(
+                Product.quantity
+                * Product.unit_cost
+            ),
+            0
+        )
+    ).scalar() or 0
+
+
+    # -----------------------------------------
+    # EXPIRY DATE
+    # -----------------------------------------
+
+    today = datetime.now(
+        ZoneInfo("Asia/Kolkata")
+    ).date()
+
+    expiry_limit = today + timedelta(
+        days=30
+    )
+
+
+    # -----------------------------------------
+    # EXPIRED PRODUCTS
+    # -----------------------------------------
+
+    expired_products = Product.query.filter(
+        Product.expiry_date.isnot(None),
+        Product.expiry_date < today
+    ).order_by(
+        Product.expiry_date.asc()
+    ).all()
+
+
+    # -----------------------------------------
+    # EXPIRING WITHIN 30 DAYS
+    # -----------------------------------------
+
+    expiring_soon_products = Product.query.filter(
+        Product.expiry_date.isnot(None),
+        Product.expiry_date >= today,
+        Product.expiry_date <= expiry_limit
+    ).order_by(
+        Product.expiry_date.asc()
+    ).all()
+
+
+    # -----------------------------------------
+    # EXPIRED STOCK VALUE
+    # -----------------------------------------
+
+    expired_value = sum(
+        (product.quantity or 0)
+        * (product.unit_cost or 0)
+        for product in expired_products
+    )
+
+
+    # -----------------------------------------
+    # EXPIRING SOON STOCK VALUE
+    # -----------------------------------------
+
+    expiring_soon_value = sum(
+        (product.quantity or 0)
+        * (product.unit_cost or 0)
+        for product in expiring_soon_products
+    )
+
+
+    # -----------------------------------------
+    # TOTAL VALUE AT RISK
+    # -----------------------------------------
+
+    value_at_risk = (
+        expired_value
+        + expiring_soon_value
+    )
+
+
+    # -----------------------------------------
+    # COMBINED EXPIRY RISK PRODUCTS
+    # -----------------------------------------
+
+    expiry_risk_products = (
+        expired_products
+        + expiring_soon_products
+    )
+
 
     # -----------------------------------------
     # Employee activity
@@ -1592,73 +2343,131 @@ def reports():
 
     employee_activity = {}
 
+
     for movement in movements:
 
         employee = movement.employee
 
-        # Handle missing/orphan employee records
+
+        # -------------------------------------
+        # Missing employee protection
+        # -------------------------------------
+
         if employee is None:
 
             employee_key = (
                 f"unknown-{movement.employee_id}"
             )
 
+
             if employee_key not in employee_activity:
 
-                employee_activity[employee_key] = {
+                employee_activity[
+                    employee_key
+                ] = {
+
                     "employee_id": str(
                         movement.employee_id
                     ),
-                    "name": "Unknown Employee",
-                    "role": "Unknown",
-                    "received": 0,
-                    "issued": 0,
-                    "moved": 0,
-                    "total": 0
+
+                    "name":
+                        "Unknown Employee",
+
+                    "role":
+                        "Unknown",
+
+                    "received":
+                        0,
+
+                    "issued":
+                        0,
+
+                    "moved":
+                        0,
+
+                    "total":
+                        0
                 }
+
 
             row = employee_activity[
                 employee_key
             ]
 
+
         else:
 
             if employee.id not in employee_activity:
 
-                employee_activity[employee.id] = {
-                    "employee_id": employee.employee_id,
-                    "name": employee.name,
-                    "role": employee.role,
-                    "received": 0,
-                    "issued": 0,
-                    "moved": 0,
-                    "total": 0
+                employee_activity[
+                    employee.id
+                ] = {
+
+                    "employee_id":
+                        employee.employee_id,
+
+                    "name":
+                        employee.name,
+
+                    "role":
+                        employee.role,
+
+                    "received":
+                        0,
+
+                    "issued":
+                        0,
+
+                    "moved":
+                        0,
+
+                    "total":
+                        0
                 }
+
 
             row = employee_activity[
                 employee.id
             ]
 
+
+        # -------------------------------------
+        # Movement totals
+        # -------------------------------------
+
         if movement.movement_type == "RECEIVE":
 
-            row["received"] += movement.quantity
+            row["received"] += (
+                movement.quantity
+            )
+
 
         elif movement.movement_type == "ISSUE":
 
-            row["issued"] += movement.quantity
+            row["issued"] += (
+                movement.quantity
+            )
+
 
         elif movement.movement_type == "MOVE":
 
-            row["moved"] += movement.quantity
+            row["moved"] += (
+                movement.quantity
+            )
+
 
         row["total"] += movement.quantity
 
+
     # -----------------------------------------
-    # Render reports
+    # RENDER REPORT
     # -----------------------------------------
 
     return render_template(
+
         "report.html",
+
+        # Movement data
 
         movements=movements,
 
@@ -1666,35 +2475,100 @@ def reports():
 
         products=products,
 
+
+        # Employee activity
+
         employee_activity=list(
             employee_activity.values()
         ),
 
-        inventory_total=inventory_total,
 
-        total_units=total_units,
+        # Inventory statistics
 
-        low_stock_total=low_stock_total,
+        inventory_total=
+            inventory_total,
 
-        out_of_stock_total=out_of_stock_total,
+        total_units=
+            total_units,
 
-        total_received=total_received,
+        low_stock_total=
+            low_stock_total,
 
-        total_issued=total_issued,
+        out_of_stock_total=
+            out_of_stock_total,
 
-        total_moved=total_moved,
 
-        movement_total=len(movements),
+        # Movement statistics
 
-        selected_date_from=date_from,
+        total_received=
+            total_received,
 
-        selected_date_to=date_to,
+        total_issued=
+            total_issued,
 
-        selected_movement_type=movement_type,
+        total_moved=
+            total_moved,
 
-        selected_employee=employee_id,
+        movement_total=
+            len(movements),
 
-        selected_product=product_id
+
+        # -------------------------------------
+        # NEW FINANCIAL DATA
+        # -------------------------------------
+
+        total_inventory_value=
+            total_inventory_value,
+
+
+        # -------------------------------------
+        # NEW EXPIRY DATA
+        # -------------------------------------
+
+        expired_products=
+            expired_products,
+
+        expiring_soon_products=
+            expiring_soon_products,
+
+        expired_value=
+            expired_value,
+
+        expiring_soon_value=
+            expiring_soon_value,
+
+        value_at_risk=
+            value_at_risk,
+
+        expiry_risk_products=
+            expiry_risk_products,
+
+        today=
+            today,
+
+        expiry_limit=
+            expiry_limit,
+
+
+        # -------------------------------------
+        # Selected filters
+        # -------------------------------------
+
+        selected_date_from=
+            date_from,
+
+        selected_date_to=
+            date_to,
+
+        selected_movement_type=
+            movement_type,
+
+        selected_employee=
+            employee_id,
+
+        selected_product=
+            product_id
+
     )
 
 
@@ -1707,7 +2581,7 @@ def export_report():
 
     # Get the same filters used by the Reports page
     query, date_from, date_to, movement_type, employee_id, product_id = (
-        get_report_query()
+      get_report_query()
     )
 
     movements = query.order_by(
@@ -2056,6 +2930,7 @@ def delete_employee(employee_id):
     db.session.commit()
 
     return redirect("/employee-management")
+
 
 
 
