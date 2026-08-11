@@ -6,7 +6,17 @@
 from wareflow_capabilities import get_wareflow_capabilities
 
 
-def answer_warehouse_question(question, inventory_risk, value_at_risk=None):
+def answer_warehouse_question(
+    question,
+    inventory_risk,
+    value_at_risk=None,
+    context=None
+):
+    
+    question = question.strip().lower()
+    
+    context = context or {}
+    
     """
     Answer common warehouse questions using
     current WareFlow data.
@@ -25,6 +35,180 @@ def answer_warehouse_question(question, inventory_risk, value_at_risk=None):
     if not question:
         return "Please enter a warehouse question."
 
+
+    # ======================================
+    # FOLLOW-UP: "WHICH ONE?"
+    # ======================================
+
+    if (
+        "which one" in question
+        or "which is the worst" in question
+        or "which one is worst" in question
+        or "who is the worst" in question
+        or "what is the worst one" in question
+    ):
+
+        previous_items = context.get(
+            "last_items",
+            []
+        )
+
+        if previous_items:
+
+            worst = previous_items[0]
+
+            return (
+                f"🔴 {worst['product']} is the "
+                f"highest-risk item from the previous "
+                f"results.\n\n"
+                f"Risk score: {worst['score']}/100 "
+                f"({worst['priority']})\n"
+                f"Recommended action: "
+                f"{worst['action']}"
+            )
+
+        if inventory_risk:
+
+            worst = inventory_risk[0]
+
+            return (
+                f"🔴 {worst['product']} is currently "
+                f"the highest-risk item.\n\n"
+                f"Risk score: {worst['score']}/100 "
+                f"({worst['priority']})"
+            )
+
+        return (
+            "I don't currently have a previous "
+            "risk result to compare."
+        )
+
+    # ======================================
+    # FOLLOW-UP: "WHAT SHOULD I DO?"
+    # ======================================
+
+    if (
+        "what should i do about it" in question
+        or "what should i do" in question
+        or "what do i do about it" in question
+        or "what action should i take" in question
+        or "what should i handle" in question
+    ):
+
+        previous_product = context.get(
+            "last_product"
+        )
+
+        if previous_product:
+
+            return (
+                f"🎯 Recommended Action — "
+                f"{previous_product['product']}\n\n"
+                f"Risk score: "
+                f"{previous_product['score']}/100 "
+                f"({previous_product['priority']})\n\n"
+                f"Action:\n"
+                f"{previous_product['action']}"
+            )
+
+        return (
+            "Tell me which product you want me "
+            "to recommend an action for."
+        )
+
+
+    # ======================================
+    # PRODUCT SWITCH
+    # ======================================
+
+    for item in inventory_risk:
+
+        product_name = (
+            item["product"] or ""
+        ).lower()
+
+        sku = (
+            item["sku"] or ""
+        ).lower()
+
+        if (
+            product_name
+            and product_name in question
+        ) or (
+            sku
+            and sku in question
+        ):
+
+            if (
+                "what about" in question
+                or "how about" in question
+                or "tell me about" in question
+                or "what is the risk" in question
+                or "risk of" in question
+            ):
+
+                return (
+                    f"🔎 {item['product']} Risk\n\n"
+                    f"Risk score: "
+                    f"{item['score']}/100 "
+                    f"({item['priority']})\n"
+                    f"Quantity: "
+                    f"{item['quantity']} units\n\n"
+                    f"Recommended action:\n"
+                    f"{item['action']}"
+                )
+
+    # ======================================
+    # RISKY PRODUCTS
+    # ======================================
+
+    if (
+        "which products are risky" in question
+        or "show risky products" in question
+        or "show risky inventory" in question
+        or "what products are risky" in question
+        or "what inventory is risky" in question
+        or "which inventory is risky" in question
+        or "risky products" in question
+        or "risky inventory" in question
+        or "high risk products" in question
+        or "high risk inventory" in question
+    ):
+
+        risky_items = [
+            item
+            for item in inventory_risk
+            if item["score"] >= 40
+        ]
+
+        if not risky_items:
+
+            return (
+                "🟢 No significant inventory risks "
+                "were detected.\n\n"
+                "Your current warehouse inventory "
+                "looks healthy."
+            )
+
+        answer = (
+            "⚠️ Risky Inventory\n\n"
+            f"{len(risky_items)} product(s) "
+            "currently require attention:\n\n"
+        )
+
+        for item in risky_items[:5]:
+
+            answer += (
+                f"• {item['product']} — "
+                f"{item['score']}/100 "
+                f"({item['priority']})\n"
+            )
+
+            answer += (
+                f"  Action: {item['action']}\n\n"
+            )
+
+        return answer
 
     # ======================================
     # HIGHEST RISK
@@ -506,6 +690,9 @@ def answer_warehouse_question(question, inventory_risk, value_at_risk=None):
 
                 matched_item = item
                 break
+
+        if matched_item:
+            context["last_product"] = matched_item
 
         if not matched_item:
 

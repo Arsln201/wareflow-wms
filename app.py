@@ -1,18 +1,35 @@
 from functools import wraps
-from werkzeug.security import check_password_hash, generate_password_hash
+import csv
+import io
+import os
+
+from datetime import datetime, timedelta
+from zoneinfo import ZoneInfo
+
 import qrcode
-import os
 
-from flask import request, jsonify
-import os
+from flask import (
+    Flask,
+    render_template,
+    request,
+    redirect,
+    session,
+    flash,
+    jsonify,
+)
 
-from flask import Flask, render_template, request, redirect, session, flash
+from werkzeug.security import (
+    check_password_hash,
+    generate_password_hash,
+)
+
 from ai_engine import (
     analyze_warehouse,
     generate_recommendations,
     calculate_value_at_risk,
-    calculate_inventory_risk
+    calculate_inventory_risk,
 )
+
 from wareflow_copilot import answer_warehouse_question
 
 from models import (
@@ -20,15 +37,12 @@ from models import (
     Product,
     Employee,
     StockMovement,
-    WarehouseAlert
+    WarehouseAlert,
+    ActivityLog,
 )
 
 from config import Config
-from datetime import datetime, timedelta
-from zoneinfo import ZoneInfo
-from models import ActivityLog
-import csv
-import io
+
 
 def role_required(*allowed_roles):
     def decorator(function):
@@ -3010,12 +3024,34 @@ def ask_wareflow_ai():
             all_products
         )
 
-        # Ask the local WareFlow Copilot
+        # ------------------------------------------
+        # LOAD PREVIOUS WAREFLOW AI CONTEXT
+        # ------------------------------------------
+
+        context = session.get(
+            "wareflow_ai_context",
+            {}
+        )
+
+        # ------------------------------------------
+        # ASK LOCAL WAREFLOW COPILOT
+        # ------------------------------------------
+
         answer = answer_warehouse_question(
             question,
             inventory_risk,
-            value_at_risk
+            value_at_risk,
+            context
         )
+
+        # ------------------------------------------
+        # SAVE CURRENT CONTEXT
+        # ------------------------------------------
+
+        session["wareflow_ai_context"] = {
+       "last_items": inventory_risk[:5],
+       "last_product": context.get("last_product")
+}
 
         return jsonify({
             "success": True,
