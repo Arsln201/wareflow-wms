@@ -4099,6 +4099,100 @@
 
 </section>
 
+<!-- ==========================================
+     ASK WAREFLOW AI
+========================================== -->
+
+<section class="wf-copilot-panel">
+
+    <div class="wf-copilot-header">
+
+        <div>
+
+            <span class="wf-ai-label">
+                WAREFLOW COPILOT
+            </span>
+
+            <h2>
+                Ask WareFlow AI
+            </h2>
+
+            <p>
+                Ask questions about your current warehouse inventory.
+            </p>
+
+        </div>
+
+        <div class="wf-copilot-status">
+            <span></span>
+            LOCAL AI
+        </div>
+
+    </div>
+
+
+    <div class="wf-copilot-questions">
+
+        <button type="button"
+                onclick="askWareFlow('What should I handle first?')">
+            What should I handle first?
+        </button>
+
+        <button type="button"
+                onclick="askWareFlow('Which product has the highest risk?')">
+            Highest risk product
+        </button>
+
+        <button type="button"
+                onclick="askWareFlow('What products are expiring?')">
+            Expiring products
+        </button>
+
+        <button type="button"
+                onclick="askWareFlow('How much inventory value is at risk?')">
+            Value at risk
+        </button>
+
+    </div>
+
+
+    <div class="wf-copilot-input">
+
+        <input
+            type="text"
+            id="wfCopilotQuestion"
+            placeholder="Ask about your warehouse..."
+            autocomplete="off"
+        >
+
+        <button
+            type="button"
+            onclick="askWareFlow()">
+            Ask AI
+        </button>
+
+    </div>
+
+
+    <div
+        id="wfCopilotAnswer"
+        class="wf-copilot-answer"
+        hidden
+    >
+
+        <div class="wf-copilot-answer-label">
+            WAREFLOW AI
+        </div>
+
+        <div
+            id="wfCopilotAnswerText"
+            class="wf-copilot-answer-text"
+        ></div>
+
+    </div>
+
+</section>
+
             <section class="wf2-kpis">
 
 
@@ -5225,6 +5319,95 @@
         updateClock,
         1000
     );
+
+</script>
+
+<script>
+
+async function askWareFlow(question = null) {
+
+    const input =
+        document.getElementById("wfCopilotQuestion");
+
+    const answerBox =
+        document.getElementById("wfCopilotAnswer");
+
+    const answerText =
+        document.getElementById("wfCopilotAnswerText");
+
+
+    if (!question) {
+
+        question = input.value.trim();
+
+    } else {
+
+        input.value = question;
+
+    }
+
+
+    if (!question) {
+
+        return;
+
+    }
+
+
+    answerBox.hidden = false;
+
+    answerText.innerHTML =
+        '<span class="wf-copilot-loading">Analyzing warehouse data...</span>';
+
+
+    try {
+
+        const response = await fetch(
+            "/api/ask-ai",
+            {
+                method: "POST",
+
+                headers: {
+                    "Content-Type": "application/json"
+                },
+
+                body: JSON.stringify({
+                    question: question
+                })
+            }
+        );
+
+
+        const data = await response.json();
+
+
+        if (data.success) {
+
+            answerText.textContent =
+                data.answer;
+
+        } else {
+
+            answerText.textContent =
+                data.answer ||
+                "WareFlow AI could not process that question.";
+
+        }
+
+
+    } catch (error) {
+
+        console.error(
+            "WareFlow AI error:",
+            error
+        );
+
+        answerText.textContent =
+            "Unable to connect to WareFlow AI.";
+
+    }
+
+}
 
 </script>
 

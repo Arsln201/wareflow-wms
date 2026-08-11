@@ -11,9 +11,9 @@ from ai_engine import (
     analyze_warehouse,
     generate_recommendations,
     calculate_value_at_risk,
-    calculate_inventory_risk,
-    build_wareflow_ai_prompt
+    calculate_inventory_risk
 )
+from wareflow_copilot import answer_warehouse_question
 
 from models import (
     db,
@@ -2982,7 +2982,54 @@ def delete_employee(employee_id):
 
     return redirect("/employee-management")
 
+@app.route("/api/ask-ai", methods=["POST"])
+def ask_wareflow_ai():
 
+    data = request.get_json(silent=True) or {}
+
+    question = (data.get("question") or "").strip()
+
+    if not question:
+        return jsonify({
+            "success": False,
+            "answer": "Please enter a question."
+        }), 400
+
+    try:
+
+        # Get current products
+        all_products = Product.query.all()
+
+        # Calculate current inventory risks
+        inventory_risk = calculate_inventory_risk(
+            all_products
+        )
+
+        # Calculate current value at risk
+        value_at_risk = calculate_value_at_risk(
+            all_products
+        )
+
+        # Ask the local WareFlow Copilot
+        answer = answer_warehouse_question(
+            question,
+            inventory_risk,
+            value_at_risk
+        )
+
+        return jsonify({
+            "success": True,
+            "answer": answer
+        })
+
+    except Exception as e:
+
+        print("WareFlow Copilot error:", e)
+
+        return jsonify({
+            "success": False,
+            "answer": "WareFlow AI encountered an error."
+        }), 500
 
 
 # ==========================

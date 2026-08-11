@@ -4253,3 +4253,288 @@ width:92%;
     font-size: 14px;
     font-weight: 600;
 }
+
+/* ==========================================
+   ASK WAREFLOW AI
+========================================== */
+
+.wf-copilot-panel {
+    margin-top: 24px;
+    padding: 22px;
+
+    background: #10181f;
+
+    border: 1px solid #26333d;
+    border-radius: 12px;
+}
+
+
+/* HEADER */
+
+.wf-copilot-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+
+    gap: 20px;
+}
+
+
+.wf-copilot-header h2 {
+    margin: 5px 0 6px;
+
+    color: #e9eef1;
+
+    font-size: 20px;
+    font-weight: 800;
+}
+
+
+.wf-copilot-header p {
+    margin: 0;
+
+    color: #71808a;
+
+    font-size: 10px;
+}
+
+
+/* STATUS */
+
+.wf-copilot-status {
+    display: flex;
+    align-items: center;
+
+    gap: 6px;
+
+    padding: 6px 9px;
+
+    color: #00e5a8;
+
+    background: rgba(0, 229, 168, .06);
+
+    border: 1px solid rgba(0, 229, 168, .14);
+
+    border-radius: 6px;
+
+    font-size: 7px;
+    font-weight: 900;
+    letter-spacing: .5px;
+}
+
+
+.wf-copilot-status span {
+    width: 6px;
+    height: 6px;
+
+    border-radius: 50%;
+
+    background: #00e5a8;
+
+    box-shadow:
+        0 0 8px rgba(0, 229, 168, .7);
+}
+
+
+/* QUICK QUESTIONS */
+
+.wf-copilot-questions {
+    display: flex;
+    flex-wrap: wrap;
+
+    gap: 7px;
+
+    margin-top: 18px;
+}
+
+
+.wf-copilot-questions button {
+    padding: 7px 10px;
+
+    color: #91a0a9;
+
+    background: #151e26;
+
+    border: 1px solid #26333d;
+    border-radius: 6px;
+
+    font-size: 8px;
+
+    cursor: pointer;
+
+    transition:
+        color .15s ease,
+        border-color .15s ease,
+        background .15s ease;
+}
+
+
+.wf-copilot-questions button:hover {
+    color: #00e5a8;
+
+    background: rgba(0, 229, 168, .04);
+
+    border-color: rgba(0, 229, 168, .25);
+}
+
+
+/* INPUT */
+
+.wf-copilot-input {
+    display: flex;
+
+    gap: 8px;
+
+    margin-top: 14px;
+}
+
+
+.wf-copilot-input input {
+    flex: 1;
+
+    min-width: 0;
+
+    height: 40px;
+
+    padding: 0 12px;
+
+    color: #dce6ea;
+
+    background: #0d141a;
+
+    border: 1px solid #26333d;
+    border-radius: 7px;
+
+    outline: none;
+
+    font-size: 10px;
+}
+
+
+.wf-copilot-input input::placeholder {
+    color: #53616a;
+}
+
+
+.wf-copilot-input input:focus {
+    border-color: rgba(0, 229, 168, .45);
+
+    box-shadow:
+        0 0 0 2px rgba(0, 229, 168, .04);
+}
+
+
+.wf-copilot-input button {
+    flex-shrink: 0;
+
+    height: 40px;
+
+    padding: 0 15px;
+
+    color: #06110d;
+
+    background: #00e5a8;
+
+    border: none;
+    border-radius: 7px;
+
+    font-size: 9px;
+    font-weight: 900;
+
+    cursor: pointer;
+
+    transition:
+        background .15s ease,
+        transform .15s ease;
+}
+
+
+.wf-copilot-input button:hover {
+    background: #19f0b7;
+}
+
+
+.wf-copilot-input button:active {
+    transform: scale(.97);
+}
+
+
+/* ANSWER */
+
+.wf-copilot-answer {
+    margin-top: 14px;
+
+    padding: 14px;
+
+    background: #0d151b;
+
+    border: 1px solid rgba(0, 229, 168, .14);
+
+    border-left: 2px solid #00e5a8;
+
+    border-radius: 8px;
+}
+
+
+.wf-copilot-answer-label {
+    margin-bottom: 8px;
+
+    color: #00e5a8;
+
+    font-size: 7px;
+    font-weight: 900;
+
+    letter-spacing: .8px;
+}
+
+
+.wf-copilot-answer-text {
+    color: #b9c5cb;
+
+    font-size: 10px;
+
+    line-height: 1.7;
+
+    white-space: pre-line;
+}
+
+
+/* LOADING */
+
+.wf-copilot-loading {
+    color: #71808a;
+
+    font-size: 9px;
+}
+
+
+/* MOBILE */
+
+@media (max-width: 600px) {
+
+    .wf-copilot-panel {
+        padding: 16px;
+    }
+
+
+    .wf-copilot-header {
+        flex-direction: column;
+        gap: 12px;
+    }
+
+
+    .wf-copilot-input {
+        flex-direction: column;
+    }
+
+
+    .wf-copilot-input button {
+        width: 100%;
+    }
+
+
+    .wf-copilot-questions button {
+        flex: 1;
+    }
+
+}
