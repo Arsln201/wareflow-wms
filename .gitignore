@@ -15,4 +15,5 @@ instance/
 .DS_Store
 
 # Generated QR Images
-static/qr/*.pngcookies.txt
+static/qr/*.png
+cookies.txt
