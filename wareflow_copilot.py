@@ -568,6 +568,175 @@ def answer_warehouse_question(question, inventory_risk, value_at_risk=None):
         return answer
 
     # ======================================
+    # OVERALL WAREHOUSE SUMMARY
+    # ======================================
+
+    if (
+        "biggest problems" in question
+        or "main problems" in question
+        or "problems today" in question
+        or "quick summary" in question
+        or "warehouse summary" in question
+        or "summarize warehouse" in question
+        or "summary of warehouse" in question
+    ):
+
+        if not inventory_risk:
+
+            return (
+                "🟢 Warehouse Summary\n\n"
+                "Your current inventory looks healthy. "
+                "No significant risks were detected."
+            )
+
+        critical = [
+            item for item in inventory_risk
+            if item["priority"] == "CRITICAL"
+        ]
+
+        high = [
+            item for item in inventory_risk
+            if item["priority"] == "HIGH"
+        ]
+
+        expiring = [
+            item for item in inventory_risk
+            if (
+                item["days_remaining"] is not None
+                and item["days_remaining"] <= 30
+            )
+        ]
+
+        total_risk_value = sum(
+            item["stock_value"]
+            for item in inventory_risk
+            if item["score"] >= 40
+        )
+
+        if critical:
+
+            status = "🔴 Critical attention required"
+
+        elif high:
+
+            status = "🟠 Warehouse needs attention"
+
+        else:
+
+            status = "🟢 Warehouse is relatively healthy"
+
+        answer = (
+            f"🏭 {status}\n\n"
+            f"Products analyzed: {len(inventory_risk)}\n"
+            f"Critical risks: {len(critical)}\n"
+            f"High risks: {len(high)}\n"
+            f"Expiry risks within 30 days: {len(expiring)}\n"
+            f"Potentially exposed inventory value: "
+            f"₹{total_risk_value:,.2f}\n"
+        )
+
+        answer += "\nTop issues:\n"
+
+        for item in inventory_risk[:3]:
+
+            answer += (
+                f"• {item['product']} — "
+                f"{item['score']}/100 "
+                f"({item['priority']})\n"
+            )
+
+        answer += (
+            "\nRecommended focus:\n"
+            f"{inventory_risk[0]['action']}"
+        )
+
+        return answer
+
+
+    # ======================================
+    # COMBINED RISK + VALUE QUESTION
+    # ======================================
+
+    if (
+        (
+            "risk" in question
+            and "value" in question
+        )
+        or (
+            "attention" in question
+            and "money" in question
+        )
+        or "financial impact" in question
+    ):
+
+        if not inventory_risk:
+
+            return (
+                "There are currently no significant "
+                "inventory risks."
+            )
+
+        high_value_items = sorted(
+            inventory_risk,
+            key=lambda item: item["stock_value"],
+            reverse=True
+        )[:3]
+
+        answer = (
+            "💰 Risk & Financial Impact\n\n"
+            "These products combine significant "
+            "inventory risk with inventory value:\n\n"
+        )
+
+        for item in high_value_items:
+
+            answer += (
+                f"• {item['product']}\n"
+                f"  Risk: {item['score']}/100 "
+                f"({item['priority']})\n"
+                f"  Value: ₹{item['stock_value']:,.2f}\n"
+                f"  Action: {item['action']}\n\n"
+            )
+
+        return answer
+
+
+    # ======================================
+    # GENERAL ATTENTION QUESTION
+    # ======================================
+
+    if (
+        "needs attention" in question
+        or "need attention" in question
+        or "need to worry" in question
+        or "should i worry" in question
+        or "what should i focus" in question
+        or "what should i focus on" in question
+    ):
+
+        if not inventory_risk:
+
+            return (
+                "🟢 Nothing currently requires "
+                "immediate attention."
+            )
+
+        answer = (
+            "⚠️ Items requiring your attention:\n\n"
+        )
+
+        for item in inventory_risk[:5]:
+
+            answer += (
+                f"• {item['product']} — "
+                f"{item['score']}/100 "
+                f"({item['priority']})\n"
+                f"  {item['action']}\n\n"
+            )
+
+        return answer
+
+    # ======================================
     # DEFAULT RESPONSE
     # ======================================
 
