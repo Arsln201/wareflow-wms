@@ -404,23 +404,23 @@
            MAIN
         ========================================================= */
 
-        .wf2-main {
-            width: calc(100% - 265px);
+       .wf2-main {
+    width: calc(100% - 265px);
 
-            min-width: 0;
+    min-width: 0;
 
-            margin-left: 265px;
+    margin-left: 265px;
 
-            padding: 34px 38px 45px;
-        }
+    padding: 28px 20px 40px;
+}
 
 
         .wf2-content {
-            width: 100%;
-            max-width: 1380px;
+    width: 100%;
+    max-width: none;
 
-            margin: 0 auto;
-        }
+    margin: 0;
+}
 
 
         /* =========================================================
@@ -1768,6 +1768,1469 @@
 
 }
 
+.wf2-section-header {
+    display: block !important;
+}
+
+.wf2-section-header > div {
+    display: block !important;
+}
+
+.wf2-section-header span {
+    display: block;
+}
+
+.wf2-section-header h2 {
+    margin: 6px 0 24px 0;
+    text-align: left;
+}
+
+/* ==========================================
+   WAREFLOW INTELLIGENCE
+========================================== */
+
+.wf-ai-panel {
+    width: 100%;
+    margin: 28px 0 32px;
+    padding: 24px;
+    box-sizing: border-box;
+
+    background: #111920;
+    border: 1px solid #26333d;
+    border-radius: 16px;
+
+    box-shadow:
+        0 10px 30px rgba(0, 0, 0, .18);
+}
+
+
+/* HEADER */
+
+.wf-ai-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 20px;
+}
+
+
+.wf-ai-label {
+    display: block;
+
+    margin-bottom: 6px;
+
+    color: #00e5a8;
+
+    font-size: 9px;
+    font-weight: 850;
+
+    letter-spacing: 1.8px;
+}
+
+
+.wf-ai-header h2 {
+    margin: 0;
+
+    color: #f1f4f6;
+
+    font-size: 22px;
+    font-weight: 800;
+}
+
+
+.wf-ai-header p {
+    margin: 6px 0 0;
+
+    color: #74818b;
+
+    font-size: 12px;
+}
+
+
+/* LIVE STATUS */
+
+.wf-ai-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+
+    padding: 6px 10px;
+
+    border-radius: 20px;
+
+    background: rgba(0, 229, 168, .07);
+    border: 1px solid rgba(0, 229, 168, .16);
+
+    color: #00e5a8;
+
+    font-size: 9px;
+    font-weight: 800;
+
+    letter-spacing: 1px;
+}
+
+
+.wf-ai-dot {
+    width: 6px;
+    height: 6px;
+
+    border-radius: 50%;
+
+    background: #00e5a8;
+
+    box-shadow:
+        0 0 8px rgba(0, 229, 168, .8);
+}
+
+
+/* SUMMARY */
+
+.wf-ai-summary {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+
+    margin-top: 22px;
+    padding: 14px 16px;
+
+    border-radius: 10px;
+
+    background: #151e26;
+    border: 1px solid #26333d;
+}
+
+
+.wf-ai-summary-number {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 38px;
+    height: 38px;
+
+    flex-shrink: 0;
+
+    border-radius: 10px;
+
+    background: rgba(255, 193, 7, .09);
+    border: 1px solid rgba(255, 193, 7, .2);
+
+    color: #ffc107;
+
+    font-size: 16px;
+    font-weight: 850;
+}
+
+
+.wf-ai-summary strong {
+    display: block;
+
+    color: #e8edf0;
+
+    font-size: 12px;
+}
+
+
+.wf-ai-summary span {
+    display: block;
+
+    margin-top: 3px;
+
+    color: #71808b;
+
+    font-size: 10px;
+}
+
+
+/* INSIGHTS */
+
+.wf-ai-insights {
+    display: grid;
+
+    grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+
+    gap: 10px;
+
+    margin-top: 12px;
+}
+
+
+.wf-ai-insight {
+    display: flex;
+    align-items: center;
+
+    min-width: 0;
+
+    padding: 13px 14px;
+
+    border-radius: 10px;
+
+    background: #151e26;
+
+    border: 1px solid #26333d;
+}
+
+
+.wf-ai-critical {
+    border-left: 3px solid #ff4d4d;
+}
+
+
+.wf-ai-warning {
+    border-left: 3px solid #ffc107;
+}
+
+
+/* ICON */
+
+.wf-ai-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 28px;
+    height: 28px;
+
+    flex-shrink: 0;
+
+    margin-right: 11px;
+
+    border-radius: 8px;
+
+    background: rgba(255, 77, 77, .08);
+
+    color: #ff6262;
+
+    font-size: 12px;
+    font-weight: 900;
+}
+
+
+.wf-ai-warning .wf-ai-icon {
+    background: rgba(255, 193, 7, .08);
+    color: #ffc107;
+}
+
+
+/* CONTENT */
+
+.wf-ai-insight-content {
+    min-width: 0;
+
+    flex: 1;
+}
+
+
+.wf-ai-insight-content strong {
+    display: block;
+
+    overflow: hidden;
+
+    color: #e9eef1;
+
+    font-size: 11px;
+    font-weight: 750;
+
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+
+.wf-ai-insight-content span {
+    display: block;
+
+    margin-top: 3px;
+
+    overflow: hidden;
+
+    color: #7c8993;
+
+    font-size: 10px;
+
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+
+/* BADGE */
+
+.wf-ai-badge {
+    flex-shrink: 0;
+
+    margin-left: 10px;
+
+    padding: 4px 7px;
+
+    border-radius: 6px;
+
+    font-size: 8px;
+    font-weight: 800;
+
+    letter-spacing: .5px;
+
+    text-transform: uppercase;
+}
+
+
+.wf-ai-critical .wf-ai-badge {
+    background: rgba(255, 77, 77, .08);
+    border: 1px solid rgba(255, 77, 77, .18);
+
+    color: #ff6262;
+}
+
+
+.wf-ai-warning .wf-ai-badge {
+    background: rgba(255, 193, 7, .08);
+    border: 1px solid rgba(255, 193, 7, .18);
+
+    color: #ffc107;
+}
+
+
+/* EMPTY STATE */
+
+.wf-ai-empty {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+
+    margin-top: 22px;
+    padding: 16px;
+
+    border-radius: 10px;
+
+    background: rgba(0, 229, 168, .035);
+    border: 1px solid rgba(0, 229, 168, .12);
+}
+
+
+.wf-ai-empty-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 30px;
+    height: 30px;
+
+    border-radius: 8px;
+
+    background: rgba(0, 229, 168, .08);
+
+    color: #00e5a8;
+
+    font-weight: 900;
+}
+
+
+.wf-ai-empty strong {
+    display: block;
+
+    color: #dfe7ea;
+
+    font-size: 11px;
+}
+
+
+.wf-ai-empty span {
+    display: block;
+
+    margin-top: 3px;
+
+    color: #71808b;
+
+    font-size: 10px;
+}
+
+
+/* RESPONSIVE */
+
+@media (max-width: 800px) {
+
+    .wf-ai-insights {
+        grid-template-columns: 1fr;
+    }
+
+    .wf-ai-header {
+        flex-direction: column;
+    }
+
+}
+
+/* ==========================================
+   AI RECOMMENDED ACTIONS
+========================================== */
+
+.wf-ai-actions {
+    margin-top: 22px;
+    padding-top: 20px;
+
+    border-top: 1px solid #26333d;
+}
+
+
+.wf-ai-actions-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    margin-bottom: 12px;
+}
+
+
+.wf-ai-actions-header h3 {
+    margin: 4px 0 0;
+
+    color: #e9eef1;
+
+    font-size: 15px;
+    font-weight: 800;
+}
+
+
+.wf-ai-actions-count {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    min-width: 25px;
+    height: 25px;
+
+    padding: 0 7px;
+
+    border-radius: 7px;
+
+    background: #19242c;
+    border: 1px solid #2a3842;
+
+    color: #aebac2;
+
+    font-size: 10px;
+    font-weight: 800;
+}
+
+
+/* ACTION LIST */
+
+.wf-ai-action-list {
+    display: grid;
+
+    grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+
+    gap: 9px;
+}
+
+
+.wf-ai-action {
+    display: flex;
+    align-items: center;
+
+    min-width: 0;
+
+    padding: 12px;
+
+    border-radius: 9px;
+
+    background: #151e26;
+    border: 1px solid #26333d;
+}
+
+
+/* HIGH */
+
+.wf-ai-action-high {
+    border-left: 3px solid #ff4d4d;
+}
+
+
+.wf-ai-action-high
+.wf-ai-action-icon {
+    background: rgba(255, 77, 77, .09);
+    color: #ff6262;
+}
+
+
+/* MEDIUM */
+
+.wf-ai-action-medium {
+    border-left: 3px solid #ffc107;
+}
+
+
+.wf-ai-action-medium
+.wf-ai-action-icon {
+    background: rgba(255, 193, 7, .09);
+    color: #ffc107;
+}
+
+
+/* LOW */
+
+.wf-ai-action-low {
+    border-left: 3px solid #00e5a8;
+}
+
+
+.wf-ai-action-low
+.wf-ai-action-icon {
+    background: rgba(0, 229, 168, .08);
+    color: #00e5a8;
+}
+
+
+/* ICON */
+
+.wf-ai-action-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 27px;
+    height: 27px;
+
+    flex-shrink: 0;
+
+    margin-right: 10px;
+
+    border-radius: 7px;
+
+    font-size: 12px;
+    font-weight: 900;
+}
+
+
+/* CONTENT */
+
+.wf-ai-action-content {
+    min-width: 0;
+
+    flex: 1;
+}
+
+
+.wf-ai-action-content strong {
+    display: block;
+
+    overflow: hidden;
+
+    color: #e9eef1;
+
+    font-size: 10px;
+    font-weight: 750;
+
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+
+.wf-ai-action-content span {
+    display: block;
+
+    margin-top: 3px;
+
+    overflow: hidden;
+
+    color: #77858f;
+
+    font-size: 9px;
+    line-height: 1.4;
+
+    text-overflow: ellipsis;
+}
+
+
+/* PRIORITY */
+
+.wf-ai-action-priority {
+    flex-shrink: 0;
+
+    margin-left: 8px;
+
+    padding: 4px 6px;
+
+    border-radius: 5px;
+
+    font-size: 7px;
+    font-weight: 850;
+
+    letter-spacing: .5px;
+}
+
+
+.wf-ai-action-high
+.wf-ai-action-priority {
+    color: #ff6262;
+    background: rgba(255, 77, 77, .08);
+}
+
+
+.wf-ai-action-medium
+.wf-ai-action-priority {
+    color: #ffc107;
+    background: rgba(255, 193, 7, .08);
+}
+
+
+.wf-ai-action-low
+.wf-ai-action-priority {
+    color: #00e5a8;
+    background: rgba(0, 229, 168, .08);
+}
+
+
+/* MOBILE */
+
+@media (max-width: 800px) {
+
+    .wf-ai-action-list {
+        grid-template-columns: 1fr;
+    }
+
+}
+
+/* ==========================================
+   WAREFLOW AI - LAYOUT FIX
+========================================== */
+
+.wf-ai-panel {
+    display: block !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+}
+
+
+/* Keep AI sections stacked vertically */
+
+.wf-ai-panel > .wf-ai-summary,
+.wf-ai-panel > .wf-ai-insights,
+.wf-ai-panel > .wf-ai-actions {
+    width: 100% !important;
+    box-sizing: border-box !important;
+}
+
+
+/* Summary */
+
+.wf-ai-summary {
+    display: flex !important;
+    width: 100% !important;
+    margin-top: 22px !important;
+}
+
+
+/* Detected issues */
+
+.wf-ai-insights {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    width: 100% !important;
+    margin-top: 12px !important;
+}
+
+
+/* Recommendations */
+
+.wf-ai-actions {
+    display: block !important;
+    width: 100% !important;
+    margin-top: 22px !important;
+    padding-top: 20px !important;
+}
+
+
+/* Recommendation list */
+
+.wf-ai-action-list {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    width: 100% !important;
+}
+
+
+/* Make sure the action header stays normal */
+
+.wf-ai-actions-header {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+}
+
+/* ==========================================
+   INVENTORY VALUE AT RISK
+========================================== */
+
+.wf-ai-risk {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 24px;
+
+    margin-top: 12px;
+    padding: 18px;
+
+    background: #151e26;
+
+    border: 1px solid #26333d;
+    border-left: 3px solid #ff4d4d;
+
+    border-radius: 10px;
+}
+
+
+.wf-ai-risk-main {
+    min-width: 0;
+}
+
+
+.wf-ai-risk-main > strong {
+    display: block;
+
+    margin-top: 5px;
+
+    color: #ff6262;
+
+    font-size: 24px;
+    font-weight: 850;
+}
+
+
+.wf-ai-risk-main > span:last-child {
+    display: block;
+
+    margin-top: 4px;
+
+    color: #71808b;
+
+    font-size: 10px;
+}
+
+
+.wf-ai-risk-breakdown {
+    display: flex;
+
+    gap: 10px;
+}
+
+
+.wf-ai-risk-breakdown > div {
+    min-width: 110px;
+
+    padding: 10px 12px;
+
+    background: #111920;
+
+    border: 1px solid #26333d;
+    border-radius: 8px;
+}
+
+
+.wf-ai-risk-breakdown span {
+    display: block;
+
+    color: #71808b;
+
+    font-size: 9px;
+}
+
+
+.wf-ai-risk-breakdown strong {
+    display: block;
+
+    margin-top: 4px;
+
+    color: #dfe7ea;
+
+    font-size: 12px;
+    font-weight: 800;
+}
+
+
+@media (max-width: 700px) {
+
+    .wf-ai-risk {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .wf-ai-risk-breakdown {
+        width: 100%;
+    }
+
+    .wf-ai-risk-breakdown > div {
+        flex: 1;
+    }
+
+}
+
+/* ==========================================
+   WAREFLOW DASHBOARD SPACING FIX
+========================================== */
+
+/* Main content breathing room */
+.wf2-content {
+    padding-left: 34px !important;
+    padding-right: 34px !important;
+}
+
+
+/* Warehouse Overview heading */
+.wf2-content > h2,
+.wf2-content .wf-section-title {
+    margin-bottom: 28px !important;
+}
+
+
+/* Intelligence panel */
+.wf-ai-panel {
+    margin-top: 26px !important;
+}
+
+
+/* Intelligence header */
+.wf-ai-header {
+    margin-bottom: 24px !important;
+}
+
+
+/* Attention summary */
+.wf-ai-summary {
+    margin-bottom: 14px !important;
+}
+
+
+/* Value at risk */
+.wf-ai-risk {
+    margin-top: 0 !important;
+    margin-bottom: 28px !important;
+}
+
+
+/* Detected risks section */
+.wf-ai-risk-section {
+    margin-top: 0 !important;
+    margin-bottom: 28px !important;
+}
+
+
+/* Detected risks heading */
+.wf-ai-subheader {
+    margin-bottom: 16px !important;
+}
+
+
+/* "DETECTED RISKS" label */
+.wf-ai-subheader .wf-ai-label {
+    display: block !important;
+    margin-bottom: 6px !important;
+}
+
+
+/* Inventory Alerts heading */
+.wf-ai-subheader h3 {
+    margin: 0 !important;
+}
+
+
+/* Alert cards */
+.wf-ai-insights {
+    margin-top: 0 !important;
+    gap: 12px !important;
+}
+
+
+/* Recommendations */
+.wf-ai-actions {
+    margin-top: 4px !important;
+}
+
+
+/* Recommendations heading */
+.wf-ai-actions-header {
+    margin-bottom: 16px !important;
+}
+
+
+/* Desktop */
+@media (min-width: 1200px) {
+
+    .wf2-content {
+        padding-left: 40px !important;
+        padding-right: 40px !important;
+    }
+
+}
+
+
+/* Laptop / smaller browser */
+@media (max-width: 1100px) {
+
+    .wf2-content {
+        padding-left: 24px !important;
+        padding-right: 24px !important;
+    }
+
+    .wf-ai-panel {
+        margin-top: 22px !important;
+    }
+
+}
+
+
+/* Small screen */
+@media (max-width: 700px) {
+
+    .wf2-content {
+        padding-left: 16px !important;
+        padding-right: 16px !important;
+    }
+
+    .wf-ai-header {
+        margin-bottom: 18px !important;
+    }
+
+    .wf-ai-risk {
+        margin-bottom: 22px !important;
+    }
+
+    .wf-ai-risk-section {
+        margin-bottom: 22px !important;
+    }
+
+}
+
+/* ==========================================
+   AI RISK SCORE
+========================================== */
+
+.wf-ai-risk-score-section {
+    margin-top: 26px;
+    margin-bottom: 28px;
+    padding-top: 24px;
+    border-top: 1px solid #26333d;
+}
+
+
+/* HEADER */
+
+.wf-ai-risk-score-section .wf-ai-subheader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+
+.wf-ai-risk-score-section .wf-ai-label {
+    display: block;
+    margin-bottom: 5px;
+}
+
+
+.wf-ai-risk-score-section h3 {
+    margin: 0;
+}
+
+
+/* COUNT */
+
+.wf-ai-count {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    min-width: 30px;
+    height: 28px;
+
+    padding: 0 8px;
+
+    color: #83919a;
+
+    background: #151e26;
+
+    border: 1px solid #26333d;
+
+    border-radius: 7px;
+
+    font-size: 10px;
+    font-weight: 800;
+}
+
+
+/* LIST */
+
+.wf-ai-risk-score-list {
+    display: flex;
+    flex-direction: column;
+
+    gap: 9px;
+
+    margin-top: 16px;
+}
+
+
+/* ==========================================
+   RISK ROW
+========================================== */
+
+.wf-ai-risk-item {
+    display: grid;
+
+    grid-template-columns:
+        62px
+        minmax(120px, 1.1fr)
+        minmax(180px, 1.5fr)
+        85px
+        70px;
+
+    align-items: center;
+
+    column-gap: 14px;
+
+    min-height: 62px;
+
+    padding: 10px 12px;
+
+    background: #151e26;
+
+    border: 1px solid #26333d;
+
+    border-radius: 9px;
+
+    transition:
+        background .15s ease,
+        border-color .15s ease;
+}
+
+
+.wf-ai-risk-item:hover {
+    background: #18232c;
+    border-color: #354651;
+}
+
+
+/* ==========================================
+   SCORE
+========================================== */
+
+.wf-ai-risk-score {
+    display: grid;
+
+    grid-template-columns: 30px 22px;
+
+    align-items: baseline;
+
+    justify-content: center;
+
+    width: 62px;
+    height: 40px;
+
+    box-sizing: border-box;
+
+    padding: 0 5px;
+
+    background: #111920;
+
+    border: 1px solid #26333d;
+
+    border-radius: 8px;
+
+    font-variant-numeric: tabular-nums;
+}
+
+
+.wf-ai-risk-score strong {
+    display: block;
+
+    width: 30px;
+
+    font-size: 17px;
+
+    line-height: 1;
+
+    font-weight: 900;
+
+    text-align: right;
+
+    font-variant-numeric: tabular-nums;
+}
+
+
+.wf-ai-risk-score span {
+    display: block;
+
+    width: 22px;
+
+    color: #64737d;
+
+    font-size: 8px;
+
+    line-height: 1;
+
+    text-align: left;
+
+    white-space: nowrap;
+}
+
+
+/* SCORE COLORS */
+
+.wf-risk-critical strong {
+    color: #ff4d4d;
+}
+
+
+.wf-risk-high strong {
+    color: #ff8a3d;
+}
+
+
+.wf-risk-medium strong {
+    color: #ffc107;
+}
+
+
+.wf-risk-low strong {
+    color: #00e5a8;
+}
+
+
+/* ==========================================
+   PRODUCT
+========================================== */
+
+.wf-ai-risk-product {
+    min-width: 0;
+}
+
+
+.wf-ai-risk-product strong {
+    display: block;
+
+    overflow: hidden;
+
+    color: #e9eef1;
+
+    font-size: 11px;
+
+    font-weight: 800;
+
+    text-overflow: ellipsis;
+
+    white-space: nowrap;
+}
+
+
+.wf-ai-risk-product span {
+    display: block;
+
+    margin-top: 4px;
+
+    overflow: hidden;
+
+    color: #687781;
+
+    font-size: 8px;
+
+    text-overflow: ellipsis;
+
+    white-space: nowrap;
+}
+
+
+/* ==========================================
+   REASONS
+========================================== */
+
+.wf-ai-risk-reasons {
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 4px;
+
+    min-width: 0;
+}
+
+
+.wf-ai-risk-reasons span {
+    display: block;
+
+    overflow: hidden;
+
+    color: #84929b;
+
+    font-size: 8px;
+
+    line-height: 1.3;
+
+    text-overflow: ellipsis;
+
+    white-space: nowrap;
+}
+
+
+.wf-ai-risk-reasons span::before {
+    content: "•";
+
+    margin-right: 5px;
+
+    color: #00e5a8;
+}
+
+
+/* ==========================================
+   STOCK DETAILS
+========================================== */
+
+.wf-ai-risk-details {
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: flex-end;
+
+    gap: 4px;
+
+    min-width: 0;
+}
+
+
+.wf-ai-risk-details span {
+    color: #87949c;
+
+    font-size: 8px;
+
+    white-space: nowrap;
+}
+
+
+.wf-ai-risk-details span:last-child {
+    color: #c5d0d5;
+
+    font-weight: 800;
+}
+
+
+/* ==========================================
+   PRIORITY
+========================================== */
+
+.wf-ai-risk-priority {
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    width: 70px;
+    min-height: 24px;
+
+    box-sizing: border-box;
+
+    border-radius: 6px;
+
+    font-size: 7px;
+
+    font-weight: 900;
+
+    letter-spacing: .5px;
+
+    text-align: center;
+}
+
+
+/* PRIORITY COLORS */
+
+.wf-risk-badge-critical {
+    color: #ff6262;
+
+    background: rgba(255, 77, 77, .09);
+
+    border: 1px solid rgba(255, 77, 77, .18);
+}
+
+
+.wf-risk-badge-high {
+    color: #ff9a52;
+
+    background: rgba(255, 138, 61, .09);
+
+    border: 1px solid rgba(255, 138, 61, .18);
+}
+
+
+.wf-risk-badge-medium {
+    color: #ffc107;
+
+    background: rgba(255, 193, 7, .09);
+
+    border: 1px solid rgba(255, 193, 7, .18);
+}
+
+
+.wf-risk-badge-low {
+    color: #00e5a8;
+
+    background: rgba(0, 229, 168, .08);
+
+    border: 1px solid rgba(0, 229, 168, .16);
+}
+
+
+/* ==========================================
+   NO DATA
+========================================== */
+
+.wf-ai-risk-no-data {
+    display: flex;
+
+    align-items: center;
+
+    gap: 10px;
+
+    padding: 14px;
+
+    color: #00e5a8;
+
+    background: rgba(0, 229, 168, .04);
+
+    border: 1px solid rgba(0, 229, 168, .12);
+
+    border-radius: 8px;
+}
+
+
+.wf-ai-risk-no-data > span {
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    width: 27px;
+    height: 27px;
+
+    border-radius: 7px;
+
+    background: rgba(0, 229, 168, .08);
+
+    font-weight: 900;
+}
+
+
+.wf-ai-risk-no-data strong {
+    display: block;
+
+    color: #dce6ea;
+
+    font-size: 10px;
+}
+
+
+.wf-ai-risk-no-data small {
+    display: block;
+
+    margin-top: 3px;
+
+    color: #65747e;
+
+    font-size: 8px;
+}
+
+
+/* ==========================================
+   RESPONSIVE
+========================================== */
+
+@media (max-width: 1050px) {
+
+    .wf-ai-risk-item {
+        grid-template-columns:
+            62px
+            minmax(110px, 1fr)
+            minmax(130px, 1.2fr)
+            70px;
+    }
+
+    .wf-ai-risk-priority {
+        grid-column: 4;
+    }
+
+}
+
+
+@media (max-width: 800px) {
+
+    .wf-ai-risk-item {
+        grid-template-columns:
+            62px
+            minmax(120px, 1fr)
+            70px;
+    }
+
+    .wf-ai-risk-reasons {
+        grid-column: 2 / -1;
+        grid-row: 2;
+    }
+
+    .wf-ai-risk-details {
+        grid-column: 3;
+        grid-row: 1;
+    }
+
+    .wf-ai-risk-priority {
+        grid-column: 2 / -1;
+        grid-row: 3;
+
+        width: 100%;
+    }
+
+}
+
+
+@media (max-width: 500px) {
+
+    .wf-ai-risk-item {
+        grid-template-columns:
+            62px
+            1fr;
+
+        row-gap: 10px;
+    }
+
+    .wf-ai-risk-score {
+        grid-column: 1;
+        grid-row: 1;
+    }
+
+    .wf-ai-risk-product {
+        grid-column: 2;
+        grid-row: 1;
+    }
+
+    .wf-ai-risk-reasons {
+        grid-column: 1 / -1;
+        grid-row: 2;
+    }
+
+    .wf-ai-risk-details {
+        grid-column: 1;
+        grid-row: 3;
+
+        align-items: flex-start;
+    }
+
+    .wf-ai-risk-priority {
+        grid-column: 2;
+        grid-row: 3;
+
+        justify-self: end;
+
+        width: 70px;
+    }
+
+}
+
     </style>
 
 </head>
@@ -2173,18 +3636,468 @@
                  INVENTORY SNAPSHOT
             ================================================== -->
 
-            <div class="wf2-section-heading">
+            <div class="wf2-section-header">
+
+    <div>
+        <span>
+            Inventory Snapshot
+        </span>
+
+        <h2>
+            Warehouse Overview
+        </h2>
+    </div>
+
+</div>
+
+<!-- ==========================================
+     WAREFLOW INTELLIGENCE
+========================================== -->
+
+<section class="wf-ai-panel">
+
+    <!-- ==========================================
+         HEADER
+    =========================================== -->
+
+    <div class="wf-ai-header">
+
+        <div class="wf-ai-header-info">
+
+            <span class="wf-ai-label">
+                INTELLIGENCE ENGINE
+            </span>
+
+            <h2>
+                WareFlow Intelligence
+            </h2>
+
+            <p>
+                Automated analysis of your current warehouse activity.
+            </p>
+
+        </div>
+
+        <div class="wf-ai-status">
+            <span class="wf-ai-dot"></span>
+            LIVE
+        </div>
+
+    </div>
+
+
+    {% if critical_insights or warning_insights %}
+
+        <!-- ======================================
+             ATTENTION SUMMARY
+        ======================================= -->
+
+        <div class="wf-ai-summary">
+
+            <div class="wf-ai-summary-number">
+                {{ critical_insights|length + warning_insights|length }}
+            </div>
+
+            <div class="wf-ai-summary-text">
+
+                <strong>
+                    Things need your attention
+                </strong>
 
                 <span>
-                    Inventory Snapshot
+                    WareFlow detected inventory risks.
                 </span>
-
-                <h2>
-                    Warehouse Overview
-                </h2>
 
             </div>
 
+        </div>
+
+
+        <!-- ======================================
+             VALUE AT RISK
+        ======================================= -->
+
+        <div class="wf-ai-risk">
+
+            <div class="wf-ai-risk-main">
+
+                <span class="wf-ai-label">
+                    INVENTORY VALUE AT RISK
+                </span>
+
+                <strong>
+                    ₹{{ "{:,.2f}".format(value_at_risk.total_value) }}
+                </strong>
+
+                <span>
+                    Stock affected by expiry within 30 days
+                </span>
+
+            </div>
+
+
+            <div class="wf-ai-risk-breakdown">
+
+                <div>
+
+                    <span>
+                        Expired
+                    </span>
+
+                    <strong>
+                        ₹{{ "{:,.2f}".format(value_at_risk.expired_value) }}
+                    </strong>
+
+                </div>
+
+
+                <div>
+
+                    <span>
+                        Expiring Soon
+                    </span>
+
+                    <strong>
+                        ₹{{ "{:,.2f}".format(value_at_risk.expiring_value) }}
+                    </strong>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- ======================================
+             DETECTED RISKS
+        ======================================= -->
+
+        <div class="wf-ai-risk-section">
+
+            <div class="wf-ai-subheader">
+
+                <div>
+
+                    <span class="wf-ai-label">
+                        DETECTED RISKS
+                    </span>
+
+                    <h3>
+                        Inventory Alerts
+                    </h3>
+
+                </div>
+
+                <span class="wf-ai-count">
+                    {{ critical_insights|length + warning_insights|length }}
+                </span>
+
+            </div>
+
+
+            <div class="wf-ai-insights">
+
+                {% for insight in critical_insights[:4] %}
+
+                    <div class="wf-ai-insight wf-ai-critical">
+
+                        <div class="wf-ai-icon">
+                            !
+                        </div>
+
+                        <div class="wf-ai-insight-content">
+
+                            <strong>
+                                {{ insight.product }}
+                            </strong>
+
+                            <span>
+                                {{ insight.message }}
+                            </span>
+
+                        </div>
+
+                        <span class="wf-ai-badge">
+                            Critical
+                        </span>
+
+                    </div>
+
+                {% endfor %}
+
+
+                {% for insight in warning_insights[:4] %}
+
+                    <div class="wf-ai-insight wf-ai-warning">
+
+                        <div class="wf-ai-icon">
+                            !
+                        </div>
+
+                        <div class="wf-ai-insight-content">
+
+                            <strong>
+                                {{ insight.product }}
+                            </strong>
+
+                            <span>
+                                {{ insight.message }}
+                            </span>
+
+                        </div>
+
+                        <span class="wf-ai-badge">
+                            Warning
+                        </span>
+
+                    </div>
+
+                {% endfor %}
+
+            </div>
+
+        </div>
+
+<!-- ======================================
+     INVENTORY RISK SCORE
+====================================== -->
+
+<div class="wf-ai-risk-score-section">
+
+    <div class="wf-ai-subheader">
+
+        <div>
+            <span class="wf-ai-label">
+                RISK ANALYSIS
+            </span>
+
+            <h3>
+                Top Inventory Risks
+            </h3>
+        </div>
+
+        <span class="wf-ai-count">
+            {{ inventory_risk|length }}
+        </span>
+
+    </div>
+
+
+    <div class="wf-ai-risk-score-list">
+
+        {% for item in inventory_risk[:5] %}
+
+            <div class="wf-ai-risk-item">
+
+                <!-- SCORE -->
+
+                <div class="wf-ai-risk-score
+                    wf-risk-{{ item.priority|lower }}">
+
+                    <strong>
+                        {{ item.score }}
+                    </strong>
+
+                    <span>
+                        /100
+                    </span>
+
+                </div>
+
+
+                <!-- PRODUCT -->
+
+                <div class="wf-ai-risk-product">
+
+                    <strong>
+                        {{ item.product }}
+                    </strong>
+
+                    <span>
+                        SKU: {{ item.sku }}
+                    </span>
+
+                </div>
+
+
+                <!-- REASONS -->
+
+                <div class="wf-ai-risk-reasons">
+
+                    {% for reason in item.reasons[:2] %}
+
+                        <span>
+                            {{ reason }}
+                        </span>
+
+                    {% endfor %}
+
+                </div>
+
+
+                <!-- STOCK DETAILS -->
+
+                <div class="wf-ai-risk-details">
+
+                    <span>
+                        {{ item.quantity }} units
+                    </span>
+
+                    <span>
+                        ₹{{ "{:,.2f}".format(item.stock_value) }}
+                    </span>
+
+                </div>
+
+
+                <!-- PRIORITY -->
+
+                <span class="
+                    wf-ai-risk-priority
+                    wf-risk-badge-{{ item.priority|lower }}">
+                    {{ item.priority }}
+                </span>
+
+            </div>
+
+        {% else %}
+
+            <div class="wf-ai-risk-no-data">
+
+                <span>
+                    ✓
+                </span>
+
+                <div>
+
+                    <strong>
+                        No inventory risks detected
+                    </strong>
+
+                    <small>
+                        Current inventory appears healthy.
+                    </small>
+
+                </div>
+
+            </div>
+
+        {% endfor %}
+
+    </div>
+
+</div>
+
+        <!-- ======================================
+             AI RECOMMENDATIONS
+        ======================================= -->
+
+        <div class="wf-ai-actions">
+
+            <div class="wf-ai-actions-header">
+
+                <div>
+
+                    <span class="wf-ai-label">
+                        AI RECOMMENDATIONS
+                    </span>
+
+                    <h3>
+                        Recommended Actions
+                    </h3>
+
+                </div>
+
+                <span class="wf-ai-actions-count">
+                    {{ warehouse_recommendations|length }}
+                </span>
+
+            </div>
+
+
+            <div class="wf-ai-action-list">
+
+                {% for recommendation in warehouse_recommendations %}
+
+                    <div class="
+                        wf-ai-action
+                        wf-ai-action-{{ recommendation.priority|lower }}
+                    ">
+
+                        <div class="wf-ai-action-icon">
+
+                            {% if recommendation.priority == "HIGH" %}
+
+                                !
+
+                            {% elif recommendation.priority == "MEDIUM" %}
+
+                                •
+
+                            {% else %}
+
+                                ✓
+
+                            {% endif %}
+
+                        </div>
+
+
+                        <div class="wf-ai-action-content">
+
+                            <strong>
+                                {{ recommendation.title }}
+                            </strong>
+
+                            <span>
+                                {{ recommendation.message }}
+                            </span>
+
+                        </div>
+
+
+                        <span class="wf-ai-action-priority">
+                            {{ recommendation.priority }}
+                        </span>
+
+                    </div>
+
+                {% endfor %}
+
+            </div>
+
+        </div>
+
+
+    {% else %}
+
+        <!-- ======================================
+             HEALTHY STATE
+        ======================================= -->
+
+        <div class="wf-ai-empty">
+
+            <div class="wf-ai-empty-icon">
+                ✓
+            </div>
+
+            <div>
+
+                <strong>
+                    Warehouse looks healthy
+                </strong>
+
+                <span>
+                    No critical inventory issues detected.
+                </span>
+
+            </div>
+
+        </div>
+
+    {% endif %}
+
+</section>
 
             <section class="wf2-kpis">
 

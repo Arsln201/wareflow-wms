@@ -3,7 +3,17 @@ from werkzeug.security import check_password_hash, generate_password_hash
 import qrcode
 import os
 
+from flask import request, jsonify
+import os
+
 from flask import Flask, render_template, request, redirect, session, flash
+from ai_engine import (
+    analyze_warehouse,
+    generate_recommendations,
+    calculate_value_at_risk,
+    calculate_inventory_risk,
+    build_wareflow_ai_prompt
+)
 
 from models import (
     db,
@@ -428,6 +438,40 @@ def dashboard():
 
     total_products = Product.query.count()
 
+# ==========================================
+# WAREFLOW INTELLIGENCE
+# ==========================================
+
+    all_products = Product.query.all()
+
+    warehouse_insights = analyze_warehouse(
+                         all_products
+           )
+    
+    value_at_risk = calculate_value_at_risk(
+    all_products
+           )
+    
+    warehouse_recommendations = generate_recommendations(
+    warehouse_insights
+)
+
+    inventory_risk = calculate_inventory_risk(
+    all_products
+)
+
+    critical_insights = [
+        insight
+        for insight in warehouse_insights
+        if insight["severity"] == "critical"
+          ]
+
+    warning_insights = [
+    insight
+    for insight in warehouse_insights
+    if insight["severity"] == "warning"
+]
+
     total_locations = db.session.query(
         Product.rack,
         Product.shelf,
@@ -678,7 +722,14 @@ def dashboard():
         role=session["role"],
 
         total_products=total_products,
-
+        
+        warehouse_insights=warehouse_insights,
+        critical_insights=critical_insights,
+        warning_insights=warning_insights,
+        warehouse_recommendations=warehouse_recommendations,
+        inventory_risk=inventory_risk,
+        value_at_risk=value_at_risk,
+        
         total_locations=total_locations,
 
         total_units=total_units,
